@@ -29,10 +29,15 @@ LIBDIR := lib
 
 #SRC := $(wildcard $(SRCDIR)/*.f90)
 #OBJECTS := $(SRC:.f90=.o)
-DISTFILES := $(wildcard $(SRCDIR)/*.f90) $(SCRIPTDIR) $(DOCDIR) \
-	$(LIBDIR) AUTHORS ChangeLog COPYING depend.mk Makefile \
+SCRIPTS := $(SCRIPTDIR)/interpolate4 $(SCRIPTDIR)/layers
+MLIBS := $(LIBDIR)/m/*.m
+DOCS := $(DOCDIR)/vasputil*
+DISTFILES := $(wildcard $(SRCDIR)/*.f90) $(SCRIPTS) $(DOCS) \
+	$(MLIBS) AUTHORS ChangeLog COPYING depend.mk Makefile \
 	comp-lf95.mk comp-pgf90.mk comp-xlf95.mk comp-pathf90.mk \
 	comp-ifort9.mk NEWS README
+
+
 
 VERSION := 3.2
 
@@ -50,10 +55,10 @@ clean:
 
 install: $(PROG)
 	cp $(PROG) $(PREFIX)/bin
-	cp $(SCRIPTDIR)/* $(PREFIX)/bin
+	cp $(SCRIPTS) $(PREFIX)/bin
 	if [ ! -d "$(PREFIX)/$(LIBDIR)" ]; then mkdir $(PREFIX)/$(LIBDIR); fi
 	if [ ! -d "$(PREFIX)/$(LIBDIR)/m" ]; then mkdir $(PREFIX)/$(LIBDIR)/m; fi
-	cp $(LIBDIR)/m/*.m $(PREFIX)/lib/m/ 
+	cp $(LIBS) $(PREFIX)/lib/m/ 
 
 dist: doc depend
 	if [ -d $(PROG)-$(VERSION) -o -f $(PROG)-$(VERSION) ]; then \

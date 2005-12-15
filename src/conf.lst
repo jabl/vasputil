@@ -1,10 +1,10 @@
 
- Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Wed Dec 14 13:09:48 2005
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Thu Dec 15 15:56:24 2005
  Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
  Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
 
  Compilation information
-   Current directory : /home/job/src/vasputil_f90
+   Current directory : /home/job/src/vasputil
    Source file       : src/conf.f90
    Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
                      : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 

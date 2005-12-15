@@ -7,90 +7,89 @@
 <!-- Generated with ROBODoc Version 4.99.8 (Dec 14 2005) -->
 </head>
 <body bgcolor="#FFFFFF">
-<a name="robo_top_of_doc">Generated from ./src/</a> with <a href="http://sourceforge.net/projects/robodoc/">ROBODoc</a> v4.99.8 on Wed Dec 14 16:11:28 2005
+<a name="robo_top_of_doc">Generated from ./src/</a> with <a href="http://sourceforge.net/projects/robodoc/">ROBODoc</a> v4.99.8 on Thu Dec 15 15:46:51 2005
 <br />
 <h3 align="center">TABLE OF CONTENTS</h3>
 <ul>
 <li>1.   <a href="#robo0">/kind_params</a></li>
-<li>2.   <a href="#robo1">/kind_params</a></li>
-<li>3.   <a href="#robo2">/mathconst</a></li>
-<li>4.   <a href="#robo3">/vasputil</a></li>
-<li>4.1.   <a href="#robo4">vasputil/conf</a></li>
-<li>4.1.1.   <a href="#robo9">conf/error_msg</a></li>
-<li>4.1.2.   <a href="#robo10">conf/error_stop</a></li>
-<li>4.2.   <a href="#robo5">vasputil/geometry</a></li>
-<li>4.2.1.   <a href="#robo18">geometry/.cross.</a></li>
-<li>4.2.2.   <a href="#robo19">geometry/cross</a></li>
-<li>4.2.3.   <a href="#robo20">geometry/distanceFrom</a></li>
-<li>4.2.4.   <a href="#robo21">geometry/is_lin_dependent</a></li>
-<li>4.2.5.   <a href="#robo22">geometry/new</a></li>
-<li>4.2.6.   <a href="#robo23">geometry/new_p3</a></li>
-<li>4.2.7.   <a href="#robo24">geometry/new_pn</a></li>
-<li>4.2.8.   <a href="#robo25">geometry/norm</a></li>
-<li>4.2.9.   <a href="#robo26">geometry/pl_intersect</a></li>
-<li>4.2.10.   <a href="#robo27">geometry/plane3</a></li>
-<li>4.3.   <a href="#robo6">vasputil/lattice</a></li>
-<li>4.3.1.   <a href="#robo28">lattice/cart2Direct</a></li>
-<li>4.3.2.   <a href="#robo29">lattice/direct2recip</a></li>
-<li>4.3.3.   <a href="#robo30">lattice/latt</a></li>
-<li>4.3.4.   <a href="#robo31">lattice/latt_init</a></li>
-<li>4.3.5.   <a href="#robo32">lattice/read_lattice</a></li>
-<li>4.4.   <a href="#robo7">vasputil/supercell_core</a></li>
-<li>4.4.1.   <a href="#robo38">supercell_core/act2Rel</a></li>
-<li>4.4.2.   <a href="#robo39">supercell_core/atom</a></li>
-<li>4.4.3.   <a href="#robo40">supercell_core/atomdist</a></li>
-<li>4.4.4.   <a href="#robo41">supercell_core/cartesian2Direct</a></li>
-<li>4.4.5.   <a href="#robo42">supercell_core/check_nndist</a></li>
-<li>4.4.6.   <a href="#robo43">supercell_core/checkCells</a></li>
-<li>4.4.7.   <a href="#robo44">supercell_core/destroy_cell</a></li>
-<li>4.4.8.   <a href="#robo45">supercell_core/direct2Cartesian</a></li>
-<li>4.4.9.   <a href="#robo46">supercell_core/generate_supercell</a></li>
-<li>4.4.9.1.   <a href="#robo11">generate_supercell/create_atom</a></li>
-<li>4.4.9.2.   <a href="#robo12">generate_supercell/destroy_scgenerator</a></li>
-<li>4.4.9.3.   <a href="#robo13">generate_supercell/hash</a></li>
-<li>4.4.9.4.   <a href="#robo14">generate_supercell/init_queue</a></li>
-<li>4.4.9.5.   <a href="#robo15">generate_supercell/insert</a></li>
-<li>4.4.9.6.   <a href="#robo16">generate_supercell/is_inside_cell</a></li>
-<li>4.4.9.7.   <a href="#robo17">generate_supercell/remove</a></li>
-<li>4.4.10.   <a href="#robo47">supercell_core/init_cell</a></li>
-<li>4.4.11.   <a href="#robo48">supercell_core/interpolate</a></li>
-<li>4.4.12.   <a href="#robo49">supercell_core/normalize</a></li>
-<li>4.4.13.   <a href="#robo50">supercell_core/planetopoint</a></li>
-<li>4.4.14.   <a href="#robo51">supercell_core/rel2Act</a></li>
-<li>4.4.15.   <a href="#robo52">supercell_core/removeAtoms</a></li>
-<li>4.4.16.   <a href="#robo53">supercell_core/sort_cell</a></li>
-<li>4.4.16.1.   <a href="#robo36">sort_cell/qsort</a></li>
-<li>4.4.16.2.   <a href="#robo37">sort_cell/swap</a></li>
-<li>4.4.17.   <a href="#robo54">supercell_core/supercell</a></li>
-<li>4.4.18.   <a href="#robo55">supercell_core/unnormalize</a></li>
-<li>4.5.   <a href="#robo8">vasputil/supercell_io</a></li>
-<li>4.5.1.   <a href="#robo56">supercell_io/atomsDistance</a></li>
-<li>4.5.2.   <a href="#robo57">supercell_io/atomsMoved</a></li>
-<li>4.5.3.   <a href="#robo58">supercell_io/check_nn_POSCAR</a></li>
-<li>4.5.4.   <a href="#robo59">supercell_io/direct2cartesian_poscar</a></li>
-<li>4.5.5.   <a href="#robo60">supercell_io/dumpcoords</a></li>
-<li>4.5.6.   <a href="#robo61">supercell_io/importcoords</a></li>
-<li>4.5.7.   <a href="#robo62">supercell_io/interpolate_POSCAR</a></li>
-<li>4.5.8.   <a href="#robo63">supercell_io/kspace2xyz</a></li>
-<li>4.5.9.   <a href="#robo64">supercell_io/lock_atoms</a></li>
-<li>4.5.10.   <a href="#robo65">supercell_io/normalize_POSCAR</a></li>
-<li>4.5.11.   <a href="#robo66">supercell_io/planetoatom</a></li>
-<li>4.5.12.   <a href="#robo67">supercell_io/planetolayer</a></li>
-<li>4.5.13.   <a href="#robo68">supercell_io/POSCAR2xyz</a></li>
-<li>4.5.14.   <a href="#robo69">supercell_io/read_POSCAR</a></li>
-<li>4.5.14.1.   <a href="#robo33">read_POSCAR/eat_whitespace</a></li>
-<li>4.5.14.2.   <a href="#robo34">read_POSCAR/read_species</a></li>
-<li>4.5.14.3.   <a href="#robo35">read_POSCAR/set_species</a></li>
-<li>4.5.15.   <a href="#robo70">supercell_io/read_xyz</a></li>
-<li>4.5.16.   <a href="#robo71">supercell_io/removeAtoms_POSCAR</a></li>
-<li>4.5.17.   <a href="#robo72">supercell_io/sc_generator_io</a></li>
-<li>4.5.18.   <a href="#robo73">supercell_io/unnormalize_POSCAR</a></li>
-<li>4.5.19.   <a href="#robo74">supercell_io/write_POSCAR</a></li>
-<li>4.5.20.   <a href="#robo75">supercell_io/write_xyz</a></li>
-<li>4.5.21.   <a href="#robo76">supercell_io/xyz2poscar</a></li>
-<li>4.6.   <a href="#robo77">vasputil/print_usage</a></li>
-<li>4.7.   <a href="#robo78">vasputil/print_version</a></li>
-<li>4.8.   <a href="#robo79">vasputil/runtest</a></li>
+<li>2.   <a href="#robo1">/mathconst</a></li>
+<li>3.   <a href="#robo2">/vasputil</a></li>
+<li>3.1.   <a href="#robo3">vasputil/conf</a></li>
+<li>3.1.1.   <a href="#robo8">conf/error_msg</a></li>
+<li>3.1.2.   <a href="#robo9">conf/error_stop</a></li>
+<li>3.2.   <a href="#robo4">vasputil/geometry</a></li>
+<li>3.2.1.   <a href="#robo17">geometry/.cross.</a></li>
+<li>3.2.2.   <a href="#robo18">geometry/cross</a></li>
+<li>3.2.3.   <a href="#robo19">geometry/distanceFrom</a></li>
+<li>3.2.4.   <a href="#robo20">geometry/is_lin_dependent</a></li>
+<li>3.2.5.   <a href="#robo21">geometry/new</a></li>
+<li>3.2.6.   <a href="#robo22">geometry/new_p3</a></li>
+<li>3.2.7.   <a href="#robo23">geometry/new_pn</a></li>
+<li>3.2.8.   <a href="#robo24">geometry/norm</a></li>
+<li>3.2.9.   <a href="#robo25">geometry/pl_intersect</a></li>
+<li>3.2.10.   <a href="#robo26">geometry/plane3</a></li>
+<li>3.3.   <a href="#robo5">vasputil/lattice</a></li>
+<li>3.3.1.   <a href="#robo27">lattice/cart2Direct</a></li>
+<li>3.3.2.   <a href="#robo28">lattice/direct2recip</a></li>
+<li>3.3.3.   <a href="#robo29">lattice/latt</a></li>
+<li>3.3.4.   <a href="#robo30">lattice/latt_init</a></li>
+<li>3.3.5.   <a href="#robo31">lattice/read_lattice</a></li>
+<li>3.4.   <a href="#robo6">vasputil/supercell_core</a></li>
+<li>3.4.1.   <a href="#robo37">supercell_core/act2Rel</a></li>
+<li>3.4.2.   <a href="#robo38">supercell_core/atom</a></li>
+<li>3.4.3.   <a href="#robo39">supercell_core/atomdist</a></li>
+<li>3.4.4.   <a href="#robo40">supercell_core/cartesian2Direct</a></li>
+<li>3.4.5.   <a href="#robo41">supercell_core/check_nndist</a></li>
+<li>3.4.6.   <a href="#robo42">supercell_core/checkCells</a></li>
+<li>3.4.7.   <a href="#robo43">supercell_core/destroy_cell</a></li>
+<li>3.4.8.   <a href="#robo44">supercell_core/direct2Cartesian</a></li>
+<li>3.4.9.   <a href="#robo45">supercell_core/generate_supercell</a></li>
+<li>3.4.9.1.   <a href="#robo10">generate_supercell/create_atom</a></li>
+<li>3.4.9.2.   <a href="#robo11">generate_supercell/destroy_scgenerator</a></li>
+<li>3.4.9.3.   <a href="#robo12">generate_supercell/hash</a></li>
+<li>3.4.9.4.   <a href="#robo13">generate_supercell/init_queue</a></li>
+<li>3.4.9.5.   <a href="#robo14">generate_supercell/insert</a></li>
+<li>3.4.9.6.   <a href="#robo15">generate_supercell/is_inside_cell</a></li>
+<li>3.4.9.7.   <a href="#robo16">generate_supercell/remove</a></li>
+<li>3.4.10.   <a href="#robo46">supercell_core/init_cell</a></li>
+<li>3.4.11.   <a href="#robo47">supercell_core/interpolate</a></li>
+<li>3.4.12.   <a href="#robo48">supercell_core/normalize</a></li>
+<li>3.4.13.   <a href="#robo49">supercell_core/planetopoint</a></li>
+<li>3.4.14.   <a href="#robo50">supercell_core/rel2Act</a></li>
+<li>3.4.15.   <a href="#robo51">supercell_core/removeAtoms</a></li>
+<li>3.4.16.   <a href="#robo52">supercell_core/sort_cell</a></li>
+<li>3.4.16.1.   <a href="#robo35">sort_cell/qsort</a></li>
+<li>3.4.16.2.   <a href="#robo36">sort_cell/swap</a></li>
+<li>3.4.17.   <a href="#robo53">supercell_core/supercell</a></li>
+<li>3.4.18.   <a href="#robo54">supercell_core/unnormalize</a></li>
+<li>3.5.   <a href="#robo7">vasputil/supercell_io</a></li>
+<li>3.5.1.   <a href="#robo55">supercell_io/atomsDistance</a></li>
+<li>3.5.2.   <a href="#robo56">supercell_io/atomsMoved</a></li>
+<li>3.5.3.   <a href="#robo57">supercell_io/check_nn_POSCAR</a></li>
+<li>3.5.4.   <a href="#robo58">supercell_io/direct2cartesian_poscar</a></li>
+<li>3.5.5.   <a href="#robo59">supercell_io/dumpcoords</a></li>
+<li>3.5.6.   <a href="#robo60">supercell_io/importcoords</a></li>
+<li>3.5.7.   <a href="#robo61">supercell_io/interpolate_POSCAR</a></li>
+<li>3.5.8.   <a href="#robo62">supercell_io/kspace2xyz</a></li>
+<li>3.5.9.   <a href="#robo63">supercell_io/lock_atoms</a></li>
+<li>3.5.10.   <a href="#robo64">supercell_io/normalize_POSCAR</a></li>
+<li>3.5.11.   <a href="#robo65">supercell_io/planetoatom</a></li>
+<li>3.5.12.   <a href="#robo66">supercell_io/planetolayer</a></li>
+<li>3.5.13.   <a href="#robo67">supercell_io/POSCAR2xyz</a></li>
+<li>3.5.14.   <a href="#robo68">supercell_io/read_POSCAR</a></li>
+<li>3.5.14.1.   <a href="#robo32">read_POSCAR/eat_whitespace</a></li>
+<li>3.5.14.2.   <a href="#robo33">read_POSCAR/read_species</a></li>
+<li>3.5.14.3.   <a href="#robo34">read_POSCAR/set_species</a></li>
+<li>3.5.15.   <a href="#robo69">supercell_io/read_xyz</a></li>
+<li>3.5.16.   <a href="#robo70">supercell_io/removeAtoms_POSCAR</a></li>
+<li>3.5.17.   <a href="#robo71">supercell_io/sc_generator_io</a></li>
+<li>3.5.18.   <a href="#robo72">supercell_io/unnormalize_POSCAR</a></li>
+<li>3.5.19.   <a href="#robo73">supercell_io/write_POSCAR</a></li>
+<li>3.5.20.   <a href="#robo74">supercell_io/write_xyz</a></li>
+<li>3.5.21.   <a href="#robo75">supercell_io/xyz2poscar</a></li>
+<li>3.6.   <a href="#robo76">vasputil/print_usage</a></li>
+<li>3.7.   <a href="#robo77">vasputil/print_version</a></li>
+<li>3.8.   <a href="#robo78">vasputil/runtest</a></li>
 </ul>
 <a name="robo0">
 <a name="2fkind5fparams">
@@ -100,15 +99,8 @@
 <span class="PURPOSE"><pre> Kind type parameters.
 </pre>
 </span><a name="robo1">
-<a name="2fkind5fparams">
-<h1>2.  /kind_params  </h1>
-<p>[<a href="#robo_top_of_doc">top</a>]</p>
-<p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Kind type parameters.
-</pre>
-</span><a name="robo2">
 <a name="2fmathconst">
-<h1>3.  /mathconst  </h1>
+<h1>2.  /mathconst  </h1>
 <p>[<a href="#robo_top_of_doc">top</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>  Contains mathematical constants.
@@ -120,9 +112,9 @@
  Special thanks to Howard W. Ludwig.
  Modified by Janne Blomqvist.
 </pre>
-</span><a name="robo3">
+</span><a name="robo2">
 <a name="2fvasputil">
-<h1>4.  /vasputil  </h1>
+<h1>3.  /vasputil  </h1>
 <p>[<a href="#robo_top_of_doc">top</a>]</p>
 <p><strong>COPYRIGHT</strong></p>
 <span class="COPYRIGHT"><pre>  Copyright (c) 2004, 2005 Janne Blomqvist
@@ -143,32 +135,32 @@
  argument for the name of the command to run, and from that
  determining what to do.
 </pre>
-</span><a name="robo4">
+</span><a name="robo3">
 <a name="vasputil2fconf">
-<h2>4.1.  vasputil/conf  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.1.  vasputil/conf  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Global configuration data for the application
 </pre>
-</span><a name="robo9">
+</span><a name="robo8">
 <a name="conf2ferror5fmsg">
-<h3>4.1.1.  conf/error_msg  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
+<h3>3.1.1.  conf/error_msg  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>  Depending on the presence of the optional parameter,
-  set the status flag or call <a href="#robo10">error_stop</a>
+  set the status flag or call <a href="#robo9">error_stop</a>
 </pre>
-</span><a name="robo10">
+</span><a name="robo9">
 <a name="conf2ferror5fstop">
-<h3>4.1.2.  conf/error_stop  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
+<h3>3.1.2.  conf/error_stop  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Print an error message and stop the program.
 </pre>
-</span><a name="robo5">
+</span><a name="robo4">
 <a name="vasputil2fgeometry">
-<h2>4.2.  vasputil/geometry  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.2.  vasputil/geometry  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>NAME</strong></p>
 <span class="NAME"><pre> <strong>geometry</strong>
 </pre>
@@ -189,83 +181,83 @@
 </span><p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Some geometric shapes and operations.
 </pre>
-</span><a name="robo18">
+</span><a name="robo17">
 <a name="geometry2f2ecross2e">
-<h3>4.2.1.  geometry/.cross.  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.1.  geometry/.cross.  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Cross product operator.
 </pre>
-</span><a name="robo19">
+</span><a name="robo18">
 <a name="geometry2fcross">
-<h3>4.2.2.  geometry/cross  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.2.  geometry/cross  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Cross product between two 3d vectors.
 </pre>
-</span><a name="robo20">
+</span><a name="robo19">
 <a name="geometry2fdistanceFrom">
-<h3>4.2.3.  geometry/distanceFrom  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.3.  geometry/distanceFrom  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Distance between a plane and a point.
 </pre>
-</span><a name="robo21">
+</span><a name="robo20">
 <a name="geometry2fis5flin5fdependent">
-<h3>4.2.4.  geometry/is_lin_dependent  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.4.  geometry/is_lin_dependent  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Check if a set of vectors are linearly dependent
 </pre>
-</span><a name="robo22">
+</span><a name="robo21">
 <a name="geometry2fnew">
-<h3>4.2.5.  geometry/new  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.5.  geometry/new  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Generic interface for creating a <strong>new</strong> plane.
 </pre>
-</span><a name="robo23">
+</span><a name="robo22">
 <a name="geometry2fnew5fp3">
-<h3>4.2.6.  geometry/new_p3  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.6.  geometry/new_p3  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Initialize a plane, using three points which lie in the plane.
 </pre>
-</span><a name="robo24">
+</span><a name="robo23">
 <a name="geometry2fnew5fpn">
-<h3>4.2.7.  geometry/new_pn  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.7.  geometry/new_pn  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Initialize a plane, using a point on the plane and the normal.
 </pre>
-</span><a name="robo25">
+</span><a name="robo24">
 <a name="geometry2fnorm">
-<h3>4.2.8.  geometry/norm  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.8.  geometry/norm  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> The length of a 3d vector.
 </pre>
-</span><a name="robo26">
+</span><a name="robo25">
 <a name="geometry2fpl5fintersect">
-<h3>4.2.9.  geometry/pl_intersect  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.9.  geometry/pl_intersect  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Calcultes the point of intersection between a line and a plane
 </pre>
 </span><p><strong>NOTES</strong></p>
 <span class="NOTES"><pre> See e.g. <a href="http://astronomy.swin.edu.au/~pbourke/geometry/planeline/">http://astronomy.swin.edu.au/~pbourke/geometry/planeline/</a>
 </pre>
-</span><a name="robo27">
+</span><a name="robo26">
 <a name="geometry2fplane3">
-<h3>4.2.10.  geometry/plane3  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
+<h3>3.2.10.  geometry/plane3  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo4">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Plane in a 3d space.
 </pre>
-</span><a name="robo6">
+</span><a name="robo5">
 <a name="vasputil2flattice">
-<h2>4.3.  vasputil/lattice  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.3.  vasputil/lattice  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>COPYRIGHT</strong></p>
 <span class="COPYRIGHT"><pre>  Copyright (c) 2004, 2005 Janne Blomqvist
   This program is free software; you can redistribute it and/or modify
@@ -284,51 +276,51 @@
 <span class="PURPOSE"><pre> This module defines a <strong>lattice</strong> type and procedures for manipulating 
  lattices.
 </pre>
-</span><a name="robo28">
+</span><a name="robo27">
 <a name="lattice2fcart2Direct">
-<h3>4.3.1.  lattice/cart2Direct  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
+<h3>3.3.1.  lattice/cart2Direct  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Change coordinates from cartesian to direct. This is done by
- solving Ax=b where A is the <a href="#robo6">lattice</a> vectors, x are the coordinates
+ solving Ax=b where A is the <a href="#robo5">lattice</a> vectors, x are the coordinates
  in direct space and b are the coordinates in cartesian space.
 </pre>
-</span><a name="robo29">
+</span><a name="robo28">
 <a name="lattice2fdirect2recip">
-<h3>4.3.2.  lattice/direct2recip  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
+<h3>3.3.2.  lattice/direct2recip  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Convert a set of points from the direct to the reciprocal <a href="#robo6">lattice</a>.
+<span class="PURPOSE"><pre> Convert a set of points from the direct to the reciprocal <a href="#robo5">lattice</a>.
  This would be more efficient by using a Fast Fourier transform, but
  this is simple and fast enough.
 </pre>
-</span><a name="robo30">
+</span><a name="robo29">
 <a name="lattice2flatt">
-<h3>4.3.3.  lattice/latt  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
+<h3>3.3.3.  lattice/latt  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Type for lattices. Contains the <a href="#robo6">lattice</a> vectors, <a href="#robo6">lattice</a> constant and
+<span class="PURPOSE"><pre> Type for lattices. Contains the <a href="#robo5">lattice</a> vectors, <a href="#robo5">lattice</a> constant and
  volume.
 </pre>
-</span><a name="robo31">
+</span><a name="robo30">
 <a name="lattice2flatt5finit">
-<h3>4.3.4.  lattice/latt_init  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
+<h3>3.3.4.  lattice/latt_init  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Call this subroutine to calculate the reciprocal <a href="#robo6">lattice</a> vectors
+<span class="PURPOSE"><pre> Call this subroutine to calculate the reciprocal <a href="#robo5">lattice</a> vectors
  and the volume.
 </pre>
-</span><a name="robo32">
+</span><a name="robo31">
 <a name="lattice2fread5flattice">
-<h3>4.3.5.  lattice/read_lattice  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
+<h3>3.3.5.  lattice/read_lattice  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo5">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Read <a href="#robo6">lattice</a> constant and vectors from stdin.
+<span class="PURPOSE"><pre> Read <a href="#robo5">lattice</a> constant and vectors from stdin.
 </pre>
-</span><a name="robo7">
+</span><a name="robo6">
 <a name="vasputil2fsupercell5fcore">
-<h2>4.4.  vasputil/supercell_core  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.4.  vasputil/supercell_core  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>NAME</strong></p>
 <span class="NAME"><pre>   <strong>supercell_core</strong>
 </pre>
@@ -350,96 +342,96 @@
 <span class="PURPOSE"><pre> This module defines types for supercells and procedures for manipulating 
  these.
 </pre>
-</span><a name="robo38">
+</span><a name="robo37">
 <a name="supercell5fcore2fact2Rel">
-<h3>4.4.1.  supercell_core/act2Rel  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.1.  supercell_core/act2Rel  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Change <a href="#robo54">supercell</a> coordinates from actual to relative.
+<span class="PURPOSE"><pre> Change <a href="#robo53">supercell</a> coordinates from actual to relative.
 </pre>
-</span><a name="robo39">
+</span><a name="robo38">
 <a name="supercell5fcore2fatom">
-<h3>4.4.2.  supercell_core/atom  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.2.  supercell_core/atom  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Type for an <strong>atom</strong>, containing the atomic sumbol and the 3D selective flag.
 </pre>
-</span><a name="robo40">
+</span><a name="robo39">
 <a name="supercell5fcore2fatomdist">
-<h3>4.4.3.  supercell_core/atomdist  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.3.  supercell_core/atomdist  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Calculate the distance between two atoms in a <a href="#robo54">supercell</a>.
+<span class="PURPOSE"><pre> Calculate the distance between two atoms in a <a href="#robo53">supercell</a>.
  This function takes into account periodic boundary conditions.
 </pre>
-</span><a name="robo41">
+</span><a name="robo40">
 <a name="supercell5fcore2fcartesian2Direct">
-<h3>4.4.4.  supercell_core/cartesian2Direct  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.4.  supercell_core/cartesian2Direct  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Change <a href="#robo54">supercell</a> coordinates from cartesian to direct.
+<span class="PURPOSE"><pre> Change <a href="#robo53">supercell</a> coordinates from cartesian to direct.
 </pre>
-</span><a name="robo42">
+</span><a name="robo41">
 <a name="supercell5fcore2fcheck5fnndist">
-<h3>4.4.5.  supercell_core/check_nndist  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.5.  supercell_core/check_nndist  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Check that all atoms in a <a href="#robo54">supercell</a> are at least a specified distance
+<span class="PURPOSE"><pre> Check that all atoms in a <a href="#robo53">supercell</a> are at least a specified distance
  from each other.
 </pre>
-</span><a name="robo43">
+</span><a name="robo42">
 <a name="supercell5fcore2fcheckCells">
-<h3>4.4.6.  supercell_core/checkCells  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.6.  supercell_core/checkCells  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Check that two supercells are consistent so that e.g. interpolation
  is sensible.
 </pre>
-</span><a name="robo44">
+</span><a name="robo43">
 <a name="supercell5fcore2fdestroy5fcell">
-<h3>4.4.7.  supercell_core/destroy_cell  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.7.  supercell_core/destroy_cell  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Destructor for cell types.
 </pre>
-</span><a name="robo45">
+</span><a name="robo44">
 <a name="supercell5fcore2fdirect2Cartesian">
-<h3>4.4.8.  supercell_core/direct2Cartesian  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.8.  supercell_core/direct2Cartesian  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Change <a href="#robo54">supercell</a> coordinates from direct to cartesian.
+<span class="PURPOSE"><pre> Change <a href="#robo53">supercell</a> coordinates from direct to cartesian.
 </pre>
-</span><a name="robo46">
+</span><a name="robo45">
 <a name="supercell5fcore2fgenerate5fsupercell">
-<h3>4.4.9.  supercell_core/generate_supercell  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.9.  supercell_core/generate_supercell  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre>   Generate a <a href="#robo54">supercell</a>.
+<span class="PURPOSE"><pre>   Generate a <a href="#robo53">supercell</a>.
 </pre>
 </span><p><strong>INPUTS</strong></p>
-<span class="INPUTS"><pre> cell - The <a href="#robo54">supercell</a> which contains the basis set of the <a href="#robo22">new</a> <a href="#robo54">supercell</a>.
- scell - The <a href="#robo54">supercell</a> which is to be created. The <a href="#robo6">lattice</a> vectors of
+<span class="INPUTS"><pre> cell - The <a href="#robo53">supercell</a> which contains the basis set of the <a href="#robo21">new</a> <a href="#robo53">supercell</a>.
+ scell - The <a href="#robo53">supercell</a> which is to be created. The <a href="#robo5">lattice</a> vectors of
          this cell should already be set up before calling this procedure.
 </pre>
 </span><p><strong>NOTES</strong></p>
-<span class="NOTES"><pre> The algorithm works by using the <a href="#robo6">lattice</a> vectors from "cell" as the basis
+<span class="NOTES"><pre> The algorithm works by using the <a href="#robo5">lattice</a> vectors from "cell" as the basis
  and using 
- those to fill the <a href="#robo54">supercell</a>.
+ those to fill the <a href="#robo53">supercell</a>.
 </pre>
 </span><p><strong>BUGS</strong></p>
 <span class="BUGS"><pre> None. The code is perfect.
 </pre>
-</span><a name="robo11">
+</span><a name="robo10">
 <a name="generate5fsupercell2fcreate5fatom">
-<h4>4.4.9.1.  generate_supercell/create_atom  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.1.  generate_supercell/create_atom  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre>   Given a <a href="#robo22">new</a> <a href="#robo39">atom</a>, initialize it by creating the children.
+<span class="PURPOSE"><pre>   Given a <a href="#robo21">new</a> <a href="#robo38">atom</a>, initialize it by creating the children.
 </pre>
-</span><a name="robo12">
+</span><a name="robo11">
 <a name="generate5fsupercell2fdestroy5fscgenerator">
-<h4>4.4.9.2.  generate_supercell/destroy_scgenerator  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.2.  generate_supercell/destroy_scgenerator  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Destructor procedure for the graph.
 </pre>
@@ -449,12 +441,12 @@
 </span><p><strong>NOTES</strong></p>
 <span class="NOTES"><pre> Should do a depth first traversal of the graph and deallocate.
 </pre>
-</span><a name="robo13">
+</span><a name="robo12">
 <a name="generate5fsupercell2fhash">
-<h4>4.4.9.3.  generate_supercell/hash  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.3.  generate_supercell/hash  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre>   The <strong>hash</strong> function used for <a href="#robo39">atom</a> coordinates.
+<span class="PURPOSE"><pre>   The <strong>hash</strong> function used for <a href="#robo38">atom</a> coordinates.
 </pre>
 </span><p><strong>TODO</strong></p>
 <span class="TODO"><pre>   Use a better <strong>hash</strong> function, this one creates lots of collisions.
@@ -463,124 +455,124 @@
 <span class="ARGUMENTS"><pre>   coords    - Input coordinates to <strong>hash</strong>.
    tsize     - Size of the <strong>hash</strong> table.
 </pre>
-</span><a name="robo14">
+</span><a name="robo13">
 <a name="generate5fsupercell2finit5fqueue">
-<h4>4.4.9.4.  generate_supercell/init_queue  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.4.  generate_supercell/init_queue  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Initialize a queue.
 </pre>
-</span><a name="robo15">
+</span><a name="robo14">
 <a name="generate5fsupercell2finsert">
-<h4>4.4.9.5.  generate_supercell/insert  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.5.  generate_supercell/insert  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Insert an element into the ready queue.
 </pre>
-</span><a name="robo16">
+</span><a name="robo15">
 <a name="generate5fsupercell2fis5finside5fcell">
-<h4>4.4.9.6.  generate_supercell/is_inside_cell  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.6.  generate_supercell/is_inside_cell  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Check that a coordinate point is inside the <a href="#robo54">supercell</a> boundary.
+<span class="PURPOSE"><pre> Check that a coordinate point is inside the <a href="#robo53">supercell</a> boundary.
 </pre>
 </span><p><strong>NOTES</strong></p>
 <span class="NOTES"><pre> Calculate the crossing number (Jordan curve theorem). Or rather,
  just check that direct coordinates are \in [0,1].
 </pre>
-</span><a name="robo17">
+</span><a name="robo16">
 <a name="generate5fsupercell2fremove">
-<h4>4.4.9.7.  generate_supercell/remove  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo46">parent</a>]</p>
+<h4>3.4.9.7.  generate_supercell/remove  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo45">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Remove an element from the queue (FIFO).
 </pre>
-</span><a name="robo47">
+</span><a name="robo46">
 <a name="supercell5fcore2finit5fcell">
-<h3>4.4.10.  supercell_core/init_cell  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.10.  supercell_core/init_cell  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Constructor for cell types.
 </pre>
-</span><a name="robo48">
+</span><a name="robo47">
 <a name="supercell5fcore2finterpolate">
-<h3>4.4.11.  supercell_core/interpolate  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.11.  supercell_core/interpolate  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Interpolate <a href="#robo39">atom</a> coordinates between two supercells.
+<span class="PURPOSE"><pre> Interpolate <a href="#robo38">atom</a> coordinates between two supercells.
  The result is returned in the first cell, whose coordinates
  are replaced with the interpolated ones.
 </pre>
-</span><a name="robo49">
+</span><a name="robo48">
 <a name="supercell5fcore2fnormalize">
-<h3>4.4.12.  supercell_core/normalize  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.12.  supercell_core/normalize  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Normalize the <a href="#robo39">atom</a> coordinates in a cell, i.e. make sure that
+<span class="PURPOSE"><pre> Normalize the <a href="#robo38">atom</a> coordinates in a cell, i.e. make sure that
  the relative coordinates of all atoms are between 0 and 1.
 </pre>
-</span><a name="robo50">
+</span><a name="robo49">
 <a name="supercell5fcore2fplanetopoint">
-<h3>4.4.13.  supercell_core/planetopoint  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.13.  supercell_core/planetopoint  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Calculates the average distance from a plane to a set of atoms
 </pre>
-</span><a name="robo51">
+</span><a name="robo50">
 <a name="supercell5fcore2frel2Act">
-<h3>4.4.14.  supercell_core/rel2Act  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.14.  supercell_core/rel2Act  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Change <a href="#robo54">supercell</a> coordinates from relative to actual.
+<span class="PURPOSE"><pre> Change <a href="#robo53">supercell</a> coordinates from relative to actual.
 </pre>
-</span><a name="robo52">
+</span><a name="robo51">
 <a name="supercell5fcore2fremoveAtoms">
-<h3>4.4.15.  supercell_core/removeAtoms  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.15.  supercell_core/removeAtoms  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Remove atoms specified by their indexes starting from 1.
 </pre>
-</span><a name="robo53">
+</span><a name="robo52">
 <a name="supercell5fcore2fsort5fcell">
-<h3>4.4.16.  supercell_core/sort_cell  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.16.  supercell_core/sort_cell  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Sort a cell so that atoms of the same species are next to each other.
 </pre>
-</span><a name="robo36">
+</span><a name="robo35">
 <a name="sort5fcell2fqsort">
-<h4>4.4.16.1.  sort_cell/qsort  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo53">parent</a>]</p>
+<h4>3.4.16.1.  sort_cell/qsort  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo52">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> The quicksort algorithm, with the middle array
  element chosen as pivot.
 </pre>
-</span><a name="robo37">
+</span><a name="robo36">
 <a name="sort5fcell2fswap">
-<h4>4.4.16.2.  sort_cell/swap  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo53">parent</a>]</p>
+<h4>3.4.16.2.  sort_cell/swap  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo52">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Swap two atoms.
 </pre>
-</span><a name="robo54">
+</span><a name="robo53">
 <a name="supercell5fcore2fsupercell">
-<h3>4.4.17.  supercell_core/supercell  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.17.  supercell_core/supercell  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre>   A <strong>supercell</strong> type. Contains an array of <a href="#robo39">atom</a> types and their coordinates.
+<span class="PURPOSE"><pre>   A <strong>supercell</strong> type. Contains an array of <a href="#robo38">atom</a> types and their coordinates.
 </pre>
-</span><a name="robo55">
+</span><a name="robo54">
 <a name="supercell5fcore2funnormalize">
-<h3>4.4.18.  supercell_core/unnormalize  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<h3>3.4.18.  supercell_core/unnormalize  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo6">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> "Unnormalize" <a href="#robo39">atom</a> coordinates in a cell. Useful when one wants
- to make a <a href="#robo54">supercell</a> box-like e.g. for visualization.
+<span class="PURPOSE"><pre> "Unnormalize" <a href="#robo38">atom</a> coordinates in a cell. Useful when one wants
+ to make a <a href="#robo53">supercell</a> box-like e.g. for visualization.
 </pre>
-</span><a name="robo8">
+</span><a name="robo7">
 <a name="vasputil2fsupercell5fio">
-<h2>4.5.  vasputil/supercell_io  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.5.  vasputil/supercell_io  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>NAME</strong></p>
 <span class="NAME"><pre>   <strong>supercell_io</strong>
 </pre>
@@ -602,200 +594,200 @@
 <span class="PURPOSE"><pre>   This module defines I/O helper procedures for 
    reading and writing supercells.
 </pre>
-</span><a name="robo56">
+</span><a name="robo55">
 <a name="supercell5fio2fatomsDistance">
-<h3>4.5.1.  supercell_io/atomsDistance  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.1.  supercell_io/atomsDistance  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Calculate the distance between two atoms.
 </pre>
-</span><a name="robo57">
+</span><a name="robo56">
 <a name="supercell5fio2fatomsMoved">
-<h3>4.5.2.  supercell_io/atomsMoved  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.2.  supercell_io/atomsMoved  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>FUNCTION</strong></p>
-<span class="FUNCTION"><pre> Compare two POSCAR files and print out a list of <a href="#robo39">atom</a> indexes for those
+<span class="FUNCTION"><pre> Compare two POSCAR files and print out a list of <a href="#robo38">atom</a> indexes for those
  atoms that have moved more than the specified distance.
 </pre>
-</span><a name="robo58">
+</span><a name="robo57">
 <a name="supercell5fio2fcheck5fnn5fPOSCAR">
-<h3>4.5.3.  supercell_io/check_nn_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.3.  supercell_io/check_nn_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>FUNCTION</strong></p>
-<span class="FUNCTION"><pre> Check nearest neighbor distances between atoms in a <a href="#robo54">supercell</a>.
+<span class="FUNCTION"><pre> Check nearest neighbor distances between atoms in a <a href="#robo53">supercell</a>.
 </pre>
-</span><a name="robo59">
+</span><a name="robo58">
 <a name="supercell5fio2fdirect2cartesian5fposcar">
-<h3>4.5.4.  supercell_io/direct2cartesian_poscar  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.4.  supercell_io/direct2cartesian_poscar  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Convert POSCAR from direct to cartesian coordinates.
 </pre>
-</span><a name="robo60">
+</span><a name="robo59">
 <a name="supercell5fio2fdumpcoords">
-<h3>4.5.5.  supercell_io/dumpcoords  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.5.  supercell_io/dumpcoords  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Dump cartesian coordinates to stdout.
 </pre>
-</span><a name="robo61">
+</span><a name="robo60">
 <a name="supercell5fio2fimportcoords">
-<h3>4.5.6.  supercell_io/importcoords  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.6.  supercell_io/importcoords  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Import cartesian coordinates from stdin.
 </pre>
-</span><a name="robo62">
+</span><a name="robo61">
 <a name="supercell5fio2finterpolate5fPOSCAR">
-<h3>4.5.7.  supercell_io/interpolate_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.7.  supercell_io/interpolate_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Interpolate coordinates between two POSCAR files.
 </pre>
-</span><a name="robo63">
+</span><a name="robo62">
 <a name="supercell5fio2fkspace2xyz">
-<h3>4.5.8.  supercell_io/kspace2xyz  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.8.  supercell_io/kspace2xyz  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Convert a POSCAR file to .xyz format, in reciprocal coordinates.
 </pre>
-</span><a name="robo64">
+</span><a name="robo63">
 <a name="supercell5fio2flock5fatoms">
-<h3>4.5.9.  supercell_io/lock_atoms  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.9.  supercell_io/lock_atoms  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Switch on selective dynamics and lock some atoms.
 </pre>
-</span><a name="robo65">
+</span><a name="robo64">
 <a name="supercell5fio2fnormalize5fPOSCAR">
-<h3>4.5.10.  supercell_io/normalize_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.10.  supercell_io/normalize_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Normalize the coordinates, i.e. make sure that they are between 0 and
    1 in direct coordinates, in a POSCAR file.
 </pre>
-</span><a name="robo66">
+</span><a name="robo65">
 <a name="supercell5fio2fplanetoatom">
-<h3>4.5.11.  supercell_io/planetoatom  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.11.  supercell_io/planetoatom  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Calculate the average distance from a plane to a set of atoms.
 </pre>
-</span><a name="robo67">
+</span><a name="robo66">
 <a name="supercell5fio2fplanetolayer">
-<h3>4.5.12.  supercell_io/planetolayer  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.12.  supercell_io/planetolayer  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Calculate the distance from a plane to a layer.
 </pre>
-</span><a name="robo68">
+</span><a name="robo67">
 <a name="supercell5fio2fPOSCAR2xyz">
-<h3>4.5.13.  supercell_io/POSCAR2xyz  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.13.  supercell_io/POSCAR2xyz  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>NAME</strong></p>
 <span class="NAME"><pre>   <strong>POSCAR2xyz</strong>
 </pre>
 </span><p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Convert a POSCAR file to .xyz format.
 </pre>
-</span><a name="robo69">
+</span><a name="robo68">
 <a name="supercell5fio2fread5fPOSCAR">
-<h3>4.5.14.  supercell_io/read_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.14.  supercell_io/read_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Read a POSCAR file into a derived type.
 </pre>
-</span><a name="robo33">
+</span><a name="robo32">
 <a name="read5fPOSCAR2feat5fwhitespace">
-<h4>4.5.14.1.  read_POSCAR/eat_whitespace  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo69">parent</a>]</p>
+<h4>3.5.14.1.  read_POSCAR/eat_whitespace  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo68">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Increase the index until a non-whitespace character is encountered.
 </pre>
-</span><a name="robo34">
+</span><a name="robo33">
 <a name="read5fPOSCAR2fread5fspecies">
-<h4>4.5.14.2.  read_POSCAR/read_species  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo69">parent</a>]</p>
+<h4>3.5.14.2.  read_POSCAR/read_species  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo68">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Read the <a href="#robo39">atom</a> species from the terminal.
+<span class="PURPOSE"><pre> Read the <a href="#robo38">atom</a> species from the terminal.
 </pre>
-</span><a name="robo35">
+</span><a name="robo34">
 <a name="read5fPOSCAR2fset5fspecies">
-<h4>4.5.14.3.  read_POSCAR/set_species  </h4>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo69">parent</a>]</p>
+<h4>3.5.14.3.  read_POSCAR/set_species  </h4>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo68">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Set the atomic species from a string.
 </pre>
-</span><a name="robo70">
+</span><a name="robo69">
 <a name="supercell5fio2fread5fxyz">
-<h3>4.5.15.  supercell_io/read_xyz  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.15.  supercell_io/read_xyz  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Read a .xyz file.
 </pre>
-</span><a name="robo71">
+</span><a name="robo70">
 <a name="supercell5fio2fremoveAtoms5fPOSCAR">
-<h3>4.5.16.  supercell_io/removeAtoms_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.16.  supercell_io/removeAtoms_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   Remove atoms from a POSCAR file.
 </pre>
-</span><a name="robo72">
+</span><a name="robo71">
 <a name="supercell5fio2fsc5fgenerator5fio">
-<h3>4.5.17.  supercell_io/sc_generator_io  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.17.  supercell_io/sc_generator_io  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>NAME</strong></p>
-<span class="NAME"><pre>   <strong>sc_generator_io</strong> -- Generate a <a href="#robo54">supercell</a>
+<span class="NAME"><pre>   <strong>sc_generator_io</strong> -- Generate a <a href="#robo53">supercell</a>
 </pre>
-</span><a name="robo73">
+</span><a name="robo72">
 <a name="supercell5fio2funnormalize5fPOSCAR">
-<h3>4.5.18.  supercell_io/unnormalize_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.18.  supercell_io/unnormalize_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre>   "Unnormalize" a POSCAR file, i.e. try to make the atoms fit in a box.
 </pre>
 </span><p><strong>NOTES</strong></p>
 <span class="NOTES"><pre>   Somewhat ad hoc and semimanual, don't expect magic results.
 </pre>
-</span><a name="robo74">
+</span><a name="robo73">
 <a name="supercell5fio2fwrite5fPOSCAR">
-<h3>4.5.19.  supercell_io/write_POSCAR  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.19.  supercell_io/write_POSCAR  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre>   Write a POSCAR file using the supplies <a href="#robo54">supercell</a>.
+<span class="PURPOSE"><pre>   Write a POSCAR file using the supplies <a href="#robo53">supercell</a>.
+</pre>
+</span><a name="robo74">
+<a name="supercell5fio2fwrite5fxyz">
+<h3>3.5.20.  supercell_io/write_xyz  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
+<p><strong>PURPOSE</strong></p>
+<span class="PURPOSE"><pre>   Write a .xyz file using the supplied <a href="#robo53">supercell</a>.
 </pre>
 </span><a name="robo75">
-<a name="supercell5fio2fwrite5fxyz">
-<h3>4.5.20.  supercell_io/write_xyz  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
-<p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre>   Write a .xyz file using the supplied <a href="#robo54">supercell</a>.
-</pre>
-</span><a name="robo76">
 <a name="supercell5fio2fxyz2poscar">
-<h3>4.5.21.  supercell_io/xyz2poscar  </h3>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo8">parent</a>]</p>
+<h3>3.5.21.  supercell_io/xyz2poscar  </h3>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo7">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Convert a xyz file to POSCAR format.
 </pre>
-</span><a name="robo77">
+</span><a name="robo76">
 <a name="vasputil2fprint5fusage">
-<h2>4.6.  vasputil/print_usage  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.6.  vasputil/print_usage  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
-<span class="PURPOSE"><pre> Print the usage information for <a href="#robo3">vasputil</a>.
+<span class="PURPOSE"><pre> Print the usage information for <a href="#robo2">vasputil</a>.
 </pre>
-</span><a name="robo78">
+</span><a name="robo77">
 <a name="vasputil2fprint5fversion">
-<h2>4.7.  vasputil/print_version  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.7.  vasputil/print_version  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Print the version number of the program to the screen.
 </pre>
-</span><a name="robo79">
+</span><a name="robo78">
 <a name="vasputil2fruntest">
-<h2>4.8.  vasputil/runtest  </h2>
-<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo3">parent</a>]</p>
+<h2>3.8.  vasputil/runtest  </h2>
+<p>[<a href="#robo_top_of_doc">top</a>][<a href="#robo2">parent</a>]</p>
 <p><strong>PURPOSE</strong></p>
 <span class="PURPOSE"><pre> Print some diagnostics information and run testsuite (whenever I
  get around to actually implementing the testsuite).
