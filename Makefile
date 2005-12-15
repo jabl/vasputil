@@ -58,7 +58,7 @@ install: $(PROG)
 	cp $(SCRIPTS) $(PREFIX)/bin
 	if [ ! -d "$(PREFIX)/$(LIBDIR)" ]; then mkdir $(PREFIX)/$(LIBDIR); fi
 	if [ ! -d "$(PREFIX)/$(LIBDIR)/m" ]; then mkdir $(PREFIX)/$(LIBDIR)/m; fi
-	cp $(LIBS) $(PREFIX)/lib/m/ 
+	cp $(MLIBS) $(PREFIX)/lib/m/ 
 
 dist: doc depend
 	if [ -d $(PROG)-$(VERSION) -o -f $(PROG)-$(VERSION) ]; then \
