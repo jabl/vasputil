@@ -1,0 +1,97 @@
+2005-12-14	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* vasputil.f90: New utility, runtest.
+
+2005-10-26	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* vasputil.f90: New utility, importcoords.
+
+	* comp-ifort9.mk: New file.
+
+	* lib/m/printcoords.m: New file.
+
+	* lib/m/rotatez.m: New file.
+
+	* Makefile: Updated to include new files.
+
+2005-10-18	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* vasputil.f90: New utility: dumpcoords.
+
+2005-09-20	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* supercell_io.f90 (write_POSCAR): Bugfix in symbols.
+
+	* vasputil.f90: Bugfix in reading atoms for unnormalize.
+
+2005-09-19	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* vasputil.f90: Remove symlink stuff, rename some utilities.
+
+	* Makefile: Likewise.
+
+2005-09-16	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* supercell_core.f90 (qsort): Fix bug in quicksort.
+
+2005-09-08	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* vasputil.f90: Correct typo in lockatoms help text.
+
+2005-08-17	Janne Blomqvist	<job@fyslab.hut.fi>
+
+	* vasputil.f90: Add new utility, direct2cartesian.
+
+	* supercell_io.f90 (direct2cartesian_poscar): New subroutine.
+
+2005-07-19	Janne Blomqvist	<job@fyslab.hut.fi>
+
+	* supercell_io.f90 (atomsDistance): Fix bug due to aliasing.
+
+
+2005-07-18  Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* vasputil.f90: Add new utility, xyz2poscar.
+
+	* supercell_io.f90 (xyz2poscar, read_xyz): New subroutines.
+
+	* supercell_core.f90 (sort_cell): New subroutine.
+
+	
+2005-05-04	Janne Blomqvist	<job@fyslab.hut.fi>
+
+	* supercell_io.f90 (write_POSCAR): Increased precision (now
+	F18.14).
+
+	* supercell_io.f90 (atomsDistance): Bugfix.
+	
+
+2005-04-18	Janne Blomqvist	<job@fyslab.hut.fi>
+
+	* vasputil.f90 (_MAIN): New utility included: lockatoms.
+
+	* supercell_io.f90 (lock_atoms): New subroutine.
+
+
+2005-04-13	Janne Blomqvist <job@fyslab.hut.fi>
+
+	* supercell_io.f90 (read_POSCAR): Minor improvement to species
+	recognition.
+
+	* supercell_core.f90 (scgenerator/hash): slightly better hash
+	function for the supercell generator.
+
+
+2005-04-13	Janne Blomqvist	<job@fyslab.hut.fi>
+
+	* supercell_io.f90 (read_POSCAR): Improved species recognition and
+	input methods when reading POSCAR.
+
+
+2005-04-12	Janne Blomqvist	<job@fyslab.hut.fi>
+
+	* supercell_core (scgenerator): Added a supercell
+	generator. (removeAtoms): Workaround for bug in Portland pgf90
+	5.2-4 compiler.
+
+	* vasputil.f90 (_MAIN): Code to call the supercell generator.

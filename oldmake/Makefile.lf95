@@ -1,0 +1,10 @@
+FC = lf95
+
+MAKE=make
+
+OFLAG = --o2 --ntrace --prefetch --tpp
+DEBUG = -g --chk --chkglobal --trace
+LINK = -llapackmt -lblasmt --staticlink
+FFLAGS = ${DEBUG} --f95 --info --wo --warn --trap
+
+include Makefile.common

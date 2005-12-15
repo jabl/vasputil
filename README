@@ -1,0 +1,66 @@
+
+Vasputil release 3.2
+
+Vasputil is a command-line utility designed to make life with VASP
+easier. It provides a set of commands to manipulate POSCAR files.
+
+Available commands are:
+poscar2xyz: Convert a POSCAR file to a xyz format file.
+plane2atom: Calculate the average distance from a plane to a set of atoms.
+plane2layer: Calculate the average distance from a plane to a layer.
+atomsdistance: Calculate the distance between two atoms.
+atomsmoved: Check which atoms have moved from one POSCAR to another.
+interpolate: Interpolate the coordinates between two POSCAR files.
+normalize: Normalize the coordinates in a POSCAR file.
+unnormalize: Unnormalize coordinates in a POSCAR file.
+removeatoms: Remove atoms from a POSCAR file.
+kspace2xyz: Convert a POSCAR file to a xyz file with reciprocal coordinates.
+check_nndist: Check nearest neighbor distances.
+scgenerator: Generate a supercell.
+lockatoms: Lock atom coordinates in a supercell.
+xyz2poscar: Convert a XYZ file to a POSCAR file.
+dumpcoords: Dump cartesian coordinates to stdout.
+importcoords: Read cartesian coordinates from stdin.
+test: Run self-tests.
+
+Documentation for each utility is available by running it without any
+arguments, e.g. "vasputil poscar2xyz".
+
+Vasputil is written in the Fortran 95 programming language, and should
+be compilable by any compiler that conforms to said
+standard. Makefiles for IBM xlf95, Lahey lf95, Pathscale pathf90,
+Intel ifort and Portland pgf90 are provided.
+
+Vasputil depends on the LAPACK and BLAS libraries. The provided
+Makefiles use different platform-specific optimized versions of the
+BLAS library; the xlf Makefile uses ESSL, the Lahey Makefile uses the
+BLAS that is provided with the Lahey compiler, and the Portland and
+Pathscale Makefiles use the AMD ACML library.
+
+To regenerate the source code documentation (file doc/vasputil.html),
+the robodoc utility is needed. To regenerate the dependency list, the
+makedepf90 utility is needed.
+
+
+QUICK INSTALLATION INSTRUCTIONS
+
+1) Unpack the source code.
+
+$ tar xvzf vasputil-$(VERSION).tar.gz
+
+2) Edit Makefile and set the appropriate installation prefix (default
+is $(HOME)) and include the makefile fragment for your compiler. See
+the instructions in the Makefile.
+
+3) Compile and install. In case the default make does not support
+immediate evaluation, you can use GNU make instead, on proprietary
+systems this is sometimes installed as 'gmake'.
+
+$ make && make install
+
+To use the Octave/Matlab scripts it is recommended to add the path
+where the scripts are found to the search path. E.g. if the PREFIX in
+Makefile is $(HOME), for octave add the following line to ~/.octaverc:
+
+LOADPATH = ['~/lib/m/', LOADPATH];
+

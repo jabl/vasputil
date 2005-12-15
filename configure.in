@@ -1,0 +1,9 @@
+AC_INIT(vasputil, 2.5)
+AC_CONFIG_SRCDIR(src/vasputil.f90)
+AM_INIT_AUTOMAKE
+
+AC_CONFIG_AUX_DIR(config)
+
+AC_PROG_F90
+
+AC_CONFIG_FILES([Makefile])

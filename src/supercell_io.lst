@@ -1,0 +1,2668 @@
+
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Wed Dec 14 13:09:49 2005
+ Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
+ Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
+
+ Compilation information
+   Current directory : /home/job/src/vasputil_f90
+   Source file       : src/supercell_io.f90
+   Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
+                     : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 
+                     : --nmldefault --o0 --no --nocl --nopenmp --nparallel 
+                     : --nprefetch --pca --nprivate --nquad --quiet --nsav 
+                     : --nshared --nsse2 --nstaticlink --nswm --tp 
+                     : --nthreadheap --nthreads --trace --trap --nunroll 
+                     : --nvarheap --nversion --warn --nwide --nwisk --wo --nzfm 
+                     : --xref
+
+ Module "supercell_io"
+  (line-no.)(nest)
+          1        !****h* vasputil/supercell_io
+          2        ! NAME
+          3        !   supercell_io
+          4        ! COPYRIGHT
+          5        !  Copyright (c) 2004, 2005 Janne Blomqvist
+          6        
+          7        !  This program is free software; you can redistribute it and/or modify
+          8        !  it under the terms of the GNU General Public License as published by
+          9        !  the Free Software Foundation; either version 2 of the License, or
+         10        !  (at your option) any later version.
+         11        
+         12        !  This program is distributed in the hope that it will be useful,
+         13        !  but WITHOUT ANY WARRANTY; without even the implied warranty of
+         14        !  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+         15        !  GNU General Public License for more details.
+         16        
+         17        !  You should have received a copy of the GNU General Public License
+         18        !  along with this program; if not, write to the Free Software
+         19        !  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+         20        
+         21        ! PURPOSE
+         22        !   This module defines I/O helper procedures for
+         23        !   reading and writing supercells.
+         24        !****
+         25        module supercell_io
+         26          use conf
+         27          use supercell_core
+         28        
+         29          implicit none
+         30        
+         31          contains
+         32        
+         33            !****f* supercell_io/POSCAR2xyz
+         34            ! NAME
+         35            !   POSCAR2xyz
+         36            ! PURPOSE
+         37            !   Convert a POSCAR file to .xyz format.
+         38            !****
+         39            subroutine POSCAR2xyz(infile, outfile)
+         40              character(len=*), intent(in) :: infile, outfile
+         41              type(supercell) :: cell
+         42              call read_POSCAR(cell, infile)
+         43        !      call normalize(cell)
+         44              call write_xyz(cell, outfile)
+         45            end subroutine POSCAR2xyz
+         46        
+         47        
+         48            !****f* supercell_io/direct2cartesian_poscar
+         49            ! PURPOSE
+         50            ! Convert POSCAR from direct to cartesian coordinates.
+         51            !****
+         52            subroutine direct2cartesian_poscar (infile, outfile)
+         53              character(len=*), intent(in) :: infile, outfile
+         54              type(supercell) :: cell
+         55              call read_POSCAR (cell, infile)
+         56              call direct2Cartesian (cell)
+         57              call write_POSCAR (cell, outfile)
+         58            end subroutine direct2cartesian_poscar
+         59        
+         60        
+         61            !****f* supercell_io/kspace2xyz
+         62            ! PURPOSE
+         63            !   Convert a POSCAR file to .xyz format, in reciprocal coordinates.
+         64            !****
+         65            subroutine kspace2xyz(infile, outfile)
+         66              character(len=*), intent(in) :: infile, outfile
+         67              type(supercell) :: cell
+         68              call read_POSCAR(cell, infile)
+         69              call direct2Cartesian(cell)
+         70        !      call rel2Act(cell)
+         71              call direct2recip(cell%lattice, cell%atomCoords)
+         72              call write_xyz(cell, outfile)
+         73            end subroutine kspace2xyz
+         74        
+         75        
+         76            !****f* supercell_io/xyz2poscar
+         77            ! PURPOSE
+         78            ! Convert a xyz file to POSCAR format.
+         79            !****
+         80            subroutine xyz2poscar (infile, outfile)
+         81              character(len=*), intent(in) :: infile, outfile
+         82              type(supercell) :: cell
+         83              call read_xyz (cell, infile)
+         84              call write_POSCAR (cell, outfile)
+         85            end subroutine xyz2poscar
+         86        
+         87        
+         88            !****f* supercell_io/planetoatom
+         89            ! PURPOSE
+         90            !   Calculate the average distance from a plane to a set of atoms.
+         91            !****
+         92            subroutine planetoatom(infile, pa1, pa2, pa3, atoms)
+         93              character(len=*), intent(in) :: infile
+         94              type(supercell) :: cell
+         95              integer, intent(in) :: pa1, pa2, pa3
+         96              integer, dimension(:), intent(in) :: atoms
+         97              call read_POSCAR(cell, infile)
+         98              print *, '(Average) distance from plane to atom(s) is: ', &
+         99                   planetopoint(cell, pa1, pa2, pa3, atoms)
+        100            end subroutine planetoatom
+        101        
+        102        
+        103            !****f* supercell_io/planetolayer
+        104            ! PURPOSE
+        105            !   Calculate the distance from a plane to a layer.
+        106            !****
+        107            subroutine planetolayer(infile, pa1, pa2, pa3, lheight, tol, bulk)
+        108              character(len=*), intent(in) :: infile
+        109              type(supercell) :: cell
+        110              integer, intent(in) :: pa1, pa2, pa3
+        111              real(wp), intent(in) :: lheight
+        112              real(wp), intent(in), optional :: tol, bulk
+        113              real(wp) :: t
+        114              logical, dimension(:), allocatable :: layermask
+        115              integer, dimension(:), allocatable :: atoms
+        116              integer :: i, j
+        117              call read_POSCAR(cell, infile)
+        118     1        if (present(tol)) then
+        119     1           t = tol
+        120     1        else
+        121     1           t = 0.5_wp
+        122     1        end if
+        123              allocate(layermask(size(cell%atoms)))
+        124              layermask = .FALSE.
+        125              call direct2Cartesian(cell)
+        126              call rel2Act(cell)
+        127        !      print *, cell%atomCoords(:, 3)
+        128     1        where (abs(cell%atomCoords(3, :) - lheight) < t)
+        129     1           layermask = .TRUE.
+        130     1        end where
+        131        !      print *, layermask
+        132              allocate(atoms(count(layermask)))
+        133              j = 1
+        134     1        do i = 1, size(layermask)
+        135     2           if (layermask(i)) then
+        136     2              atoms(j) = i
+        137     2              j = j+1
+        138     2           end if
+        139     1        end do
+        140              t = planetopoint( cell, pa1, pa2, pa3, atoms)
+        141              print *, 'Total of ', size(atoms), ' atoms included in layer.'
+        142              print *, 'Atom numbers included in layer are: ', atoms
+        143              print *, 'Average distance from plane to layer is ', t
+        144     1        if (present(bulk)) then
+        145     1           print '(A, F7.2, A)', 'Relaxation compared to bulk is: ', (t/bulk - 1.0_wp)*100.0_wp, ' %.'
+        146     1        end if
+        147            end subroutine planetolayer
+        148        
+        149        
+        150            !****f* supercell_io/atomsDistance
+        151            ! PURPOSE
+        152            !   Calculate the distance between two atoms.
+        153            !****
+        154            subroutine atomsDistance(infile1, atom1, infile2, atom2)
+        155              character(len=*), intent(in) :: infile1
+        156              character(len=*), intent(in), optional :: infile2
+        157              integer, intent(in) :: atom1, atom2
+        158              type(supercell) :: cell1, cell2
+        159              real(wp) :: dist
+        160              character(len=132) :: errmesg = ''
+        161              call read_POSCAR(cell1, infile1)
+        162     1        if (present (infile2)) then
+        163     2           if (infile1 /= infile2) then
+        164     2              call read_POSCAR(cell2, infile2)
+        165     2              dist = atomdist (cell1, atom1, cell2=cell2, atom2=atom2, errmsg=errmesg)
+        166     2           else
+        167     2              dist = atomdist (cell1, atom1, atom2=atom2, errmsg=errmesg)
+        168     2           end if
+        169     1        else
+        170     1           dist = atomdist (cell1, atom1=atom1, atom2=atom2, errmsg=errmesg)
+        171     1        end if
+        172     1        if (errmesg /= "") then
+        173     1           call error_stop (errmesg)
+        174     1        else
+        175     1           print *, 'Distance between atoms is: ', dist
+        176     1        end if
+        177            end subroutine atomsDistance
+        178        
+        179        
+        180            !****f* supercell_io/normalize_POSCAR
+        181            ! PURPOSE
+        182            !   Normalize the coordinates, i.e. make sure that they are between 0 and
+        183            !   1 in direct coordinates, in a POSCAR file.
+        184            !****
+        185            subroutine normalize_POSCAR(infile, outfile)
+        186              character(len=*), intent(in) :: infile, outfile
+        187              type(supercell) :: cell
+        188              call read_POSCAR(cell, infile)
+        189              call normalize(cell)
+        190              call write_POSCAR(cell, outfile)
+        191            end subroutine normalize_POSCAR
+        192        
+        193        
+        194            !****f* supercell_io/unnormalize_POSCAR
+        195            ! PURPOSE
+        196            !   "Unnormalize" a POSCAR file, i.e. try to make the atoms fit in a box.
+        197            ! NOTES
+        198            !   Somewhat ad hoc and semimanual, don't expect magic results.
+        199            !****
+        200            subroutine unnormalize_POSCAR(infile, dir, atoms, outfile)
+        201              character(len=*), intent(in) :: infile, outfile
+        202              integer, intent(in) :: dir, atoms(:)
+        203              type(supercell) :: cell
+        204              call read_POSCAR (cell, infile)
+        205     1        if (debug) then
+        206     1           print *, 'Unnormalizing dir: ', dir, ' atoms: ', atoms
+        207     1        end if
+        208              call unnormalize (cell, dir, atoms)
+        209              call write_POSCAR (cell, outfile)
+        210            end subroutine unnormalize_POSCAR
+        211        
+        212        
+        213            !****f* supercell_io/dumpcoords
+        214            ! PURPOSE
+        215            ! Dump cartesian coordinates to stdout.
+        216            !****
+        217            subroutine dumpcoords (infile)
+        218              character(len=*), intent(in) :: infile
+        219              type(supercell) :: cell
+        220              call read_POSCAR (cell, infile)
+        221              call direct2Cartesian (cell)
+        222              call rel2Act (cell)
+        223              print '(3F18.14)', cell%atomCoords
+        224            end subroutine dumpcoords
+        225        
+        226        
+        227            !****f* supercell_io/importcoords
+        228            ! PURPOSE
+        229            ! Import cartesian coordinates from stdin.
+        230            !****
+        231            subroutine importcoords (infile)
+        232              character(len=*), intent(in) :: infile
+        233              type(supercell) :: cell
+        234              integer :: i, k
+        235              call read_POSCAR (cell, infile)
+        236              call direct2Cartesian (cell)
+        237              call rel2Act (cell)
+        238        !      read (*, '(3F13.8)') (cell%atomCoords (:, i), i=1,3)
+        239        !      read (*, *) (cell%atomCoords (:, i), i=1,3)
+        240     1        do k = 1, size (cell%atoms)
+        241     1           read (*, *) &
+        242     1                (cell%atomCoords(i, k), i=1,3)
+        243     1        end do
+        244              call write_POSCAR (cell, infile)
+        245            end subroutine importcoords
+        246        
+        247        
+        248            !****f* supercell_io/interpolate_POSCAR
+        249            ! PURPOSE
+        250            !   Interpolate coordinates between two POSCAR files.
+        251            !****
+        252            subroutine interpolate_POSCAR(infile1, infile2, fraction, outfile)
+        253              character(len=*), intent(in) :: infile1, infile2, outfile
+        254              type(supercell) :: cell1, cell2
+        255              real(wp), intent(in) :: fraction
+        256              call read_POSCAR(cell1, infile1)
+        257              call read_POSCAR(cell2, infile2)
+        258     1        if (.not. checkCells(cell1, cell2)) then
+        259     1           print *, 'Error: Cells are not consistent!'
+        260     1           return
+        261     1        end if
+        262              call interpolate(cell1, cell2, fraction)
+        263              call write_POSCAR(cell1, outfile)
+        264            end subroutine interpolate_POSCAR
+        265        
+        266        
+        267            !****f* supercell_io/atomsMoved
+        268            ! FUNCTION
+        269            ! Compare two POSCAR files and print out a list of atom indexes for those
+        270            ! atoms that have moved more than the specified distance.
+        271            !****
+        272            subroutine atomsMoved(infile1, infile2, tol)
+        273              character(len=*), intent(in) :: infile1, infile2
+        274              real(wp), intent(in), optional :: tol
+        275              real(wp) :: t, dist
+        276              type(supercell) :: cell1, cell2
+        277              integer :: i
+        278        
+        279              call read_POSCAR(cell1, infile1)
+        280              call read_POSCAR(cell2, infile2)
+        281     1        if (.not. checkCells(cell1, cell2)) then
+        282     1           print *, 'Error: Cells not consistent!'
+        283     1           return
+        284     1        end if
+        285     1        if (present(tol)) then
+        286     1           t = tol
+        287     1        else
+        288     1           t = 0.1_wp
+        289     1        end if
+        290              call direct2Cartesian(cell1)
+        291              call direct2Cartesian(cell2)
+        292              call rel2Act(cell1)
+        293              call rel2Act(cell2)
+        294              print *, 'Atoms that have moved more than ', t, ' Å:'
+        295     1        do i = 1, size(cell1%atoms)
+        296     1           dist = norm(cell1%atomCoords(:,i) - cell2%atomCoords(:,i))
+        297     2           if (dist > t) then
+        298     2              print *, i, ': ', dist, ' Å'
+        299     2           end if
+        300     1        end do
+        301            end subroutine atomsMoved
+        302        
+        303        
+        304            !****f* supercell_io/removeAtoms_POSCAR
+        305            ! PURPOSE
+        306            !   Remove atoms from a POSCAR file.
+        307            !****
+        308            subroutine removeAtoms_POSCAR(infile, outfile, atomnums)
+        309              character(len=*), intent(in) :: infile, outfile
+        310              integer, dimension(:), intent(in) :: atomnums
+        311              type(supercell) :: cell
+        312              call read_POSCAR(cell, infile)
+        313              print *, 'Removing ', size(atomnums), ' atoms.'
+        314              call removeAtoms(cell, atomnums)
+        315              call write_POSCAR(cell, outfile)
+        316            end subroutine removeAtoms_POSCAR
+        317        
+        318        
+        319            !****f* supercell_io/check_nn_POSCAR
+        320            ! FUNCTION
+        321            ! Check nearest neighbor distances between atoms in a supercell.
+        322            !****
+        323            subroutine check_nn_POSCAR(infile, tol)
+        324              character(len=*), intent(in) :: infile
+        325              real(wp), intent(in), optional :: tol
+        326              type(supercell) :: cell
+        327        
+        328              call read_POSCAR(cell, infile)
+        329     1        if (present(tol)) then
+        330     1           call check_nndist(cell, tol)
+        331     1        else
+        332     1           call check_nndist(cell)
+        333     1        end if
+        334            end subroutine check_nn_POSCAR
+        335        
+        336        
+        337            !****f* supercell_io/lock_atoms
+        338            ! PURPOSE
+        339            ! Switch on selective dynamics and lock some atoms.
+        340            !****
+        341            subroutine lock_atoms (infile, outfile, atomnums)
+        342              character(len=*), intent(in) :: infile, outfile
+        343              integer, intent(in) :: atomnums(:)
+        344              type (supercell) :: cell
+        345              integer :: i
+        346              call read_POSCAR (cell, infile)
+        347              cell%selective = .true.
+        348     1        do i = 1, size(atomnums)
+        349     1           cell%atoms(atomnums(i))%selective = .false.
+        350     1        end do
+        351              call write_POSCAR (cell, outfile)
+        352            end subroutine lock_atoms
+        353        
+        354        
+        355            !****f* supercell_io/sc_generator_io
+        356            ! NAME
+        357            !   sc_generator_io -- Generate a supercell
+        358            !****
+        359            subroutine sc_generator_io (infile, infile2, outfile)
+        360              character(len=*), intent(in) :: infile, outfile
+        361              character(len=*), optional, intent(in) :: infile2
+        362              type(supercell) :: cell, scell
+        363              integer :: stat
+        364        
+        365     1        if (present (infile2)) then
+        366     1           call read_POSCAR (scell, infile2, stat)
+        367     1           !call write_POSCAR (scell, "test")
+        368     1        else
+        369     1           call read_lattice (scell%lattice)
+        370     1        end if
+        371              ! Read the basis of the cell that is to be replicated in the
+        372              ! new supercell.
+        373              call read_POSCAR (cell, infile)
+        374              ! Fill out the new supercell
+        375              call generate_supercell (cell, scell, error_stop)
+        376              ! Write the new supercell
+        377              call cartesian2Direct (scell)
+        378              call act2rel (scell)
+        379              call write_POSCAR (scell, outfile)
+        380            end subroutine sc_generator_io
+        381        
+        382        
+        383            !****f* supercell_io/read_POSCAR
+        384            ! PURPOSE
+        385            ! Read a POSCAR file into a derived type.
+        386            !****
+        387            subroutine read_POSCAR(cell, infile, status)
+        388              character(len=*), intent(in) :: infile
+        389              type(supercell), intent(out) :: cell
+        390              integer, intent(out), optional :: status
+        391              integer, parameter :: pos_iu = 10, & ! IO unit for POSCAR
+        392                   pot_iu = 11 ! IO unit for POTCAR
+        393              character(len=132) :: first, line
+        394              integer :: i, j, spec_counter, k, lower, upper, stat
+        395              logical :: spc, & ! Last before current character in string is a space?
+        396                   pot_ex
+        397              integer, dimension(:), allocatable :: species
+        398        
+        399              cell%relative = .TRUE.
+        400              open(unit=pos_iu, file=infile, form='formatted', &
+        401                   access='sequential', action='read', status='old')
+        402              read(pos_iu, '(A)') first ! First line, a comment?
+        403              read (pos_iu, '(F16.10)') cell%lattice%a
+        404        !      read(pos_iu, '(3(5X, F16.1))') (cell%latticeVectors(j,:), j=1,3)
+        405              read(pos_iu, *) (cell%lattice%t(:, j), j=1,3)
+        406     1        if (is_lin_dependent (cell%lattice%t)) then
+        407     1           call error_stop ("ERROR: Lattice vectors are not linearly independent!")
+        408     1        end if
+        409              !print *, 'Lattice(2,1): ', cell%lattice%t(2,1)
+        410              spec_counter = 0 ! how many atom species are there?
+        411              read(pos_iu, '(A)') line
+        412              line = adjustl(line)
+        413        !      print *, len_trim(line)
+        414        !      line = trim(line)
+        415              spc = .TRUE.
+        416     1        do i = 1,len_trim(line)
+        417     2           if ( line(i:i) /= ' ' .and. spc ) then
+        418     2              spec_counter = spec_counter + 1
+        419     2              spc = .FALSE.
+        420     2           else if ( line(i:i) == ' ') then
+        421     2              spc = .TRUE.
+        422     2           end if
+        423     1        end do
+        424              allocate(species(spec_counter))
+        425        !      species = 0
+        426        !      print *, spec_counter, ' atom species found.'
+        427              read(line, *) species
+        428        !      print *, 'Atoms of each species: ', species
+        429              read(pos_iu, '(A)') line
+        430     1        if (line(1:1) == 'S' .or. line(1:1) == 's') then ! Selective dynamics
+        431     1           cell%selective = .TRUE.
+        432     1           read(pos_iu, '(A)') line ! Cartesian
+        433     1        else
+        434     1           cell%selective = .FALSE.
+        435     1        end if
+        436     1        if (line(1:1) == 'C' .or. line(1:1) == 'c' .or. &
+        437     1             line(1:1) == 'K' .or. line(1:1) == 'k') then
+        438     1           cell%cartesian = .TRUE.
+        439     1        else
+        440     1           cell%cartesian = .FALSE.
+        441     1        end if
+        442              ! Allocate memory for the atom coordinates and info
+        443              j = sum (species) ! How many atoms are there in total
+        444     1        if (debug) then
+        445     1           print *, 'Total of ', j, ' atoms of ', &
+        446     1                spec_counter, ' species found: ', species
+        447     1        end if
+        448              !allocate( cell%atoms(j), cell%atomCoords(3, j))
+        449              call init_cell (cell, j)
+        450              ! Read in the atom coordinates
+        451     1        do k = 1, j
+        452     2           if (cell%selective) then
+        453     2  !            read(pos_iu, '(3(2X, F16.10, 2X), 3(2X, L2))') &
+        454     2              read (pos_iu, *) &
+        455     2                   (cell%atomCoords(i, k), i=1,3), &
+        456     2                   (cell%atoms(k)%selective(i), i=1,3)
+        457     2           else
+        458     2  !            read(pos_iu, '(3(2X, F16.10, 2X))') &
+        459     2              read (pos_iu, *) &
+        460     2                   (cell%atomCoords(i, k), i=1,3)
+        461     2           end if
+        462     1        end do
+        463              close(pos_iu)
+        464        !!$      do i=1,sum(species)
+        465        !!$         print *, cell%atomCoords(i,:)
+        466        !!$         print *, cell%atoms(i)
+        467        !!$      end do
+        468        
+        469              ! Try to determine the atomic symbols of the atoms in the cell.
+        470              ! We have three ways to do this, we try in this order:
+        471              ! 1. Check if POTCAR exists and take symbols from it.
+        472              ! 2. Check if the first line of POSCAR contains them.
+        473              ! 3. Ask the user to supply them.
+        474        
+        475              ! See if POTCAR exists
+        476              inquire (file='POTCAR', exist= pot_ex)
+        477     1        if (pot_ex) then
+        478     1           open (unit=pot_iu, file='POTCAR', form='formatted', &
+        479     1                access='sequential', action='read', status='old')
+        480     1           j = 1
+        481     1           k = 0 !offset
+        482     2           do while (j <= size (species))
+        483     2              read(pot_iu, '(A)') line
+        484     3              if ( index (line, 'VRHFIN') == 0) then
+        485     3                 cycle
+        486     3              end if
+        487     2              upper = index (line, ':') - 1
+        488     2              lower = index (line, '=') + 1
+        489     3              do i = 1, species(j)
+        490     3                 cell%atoms(i+k)%symbol = trim (adjustl (line(lower:upper)))
+        491     3              end do
+        492     2              k = k + species(j)
+        493     2              j = j + 1
+        494     2           end do
+        495     1           close(pot_iu)
+        496     1  
+        497     1        else ! Check the first line
+        498     1           call set_species (cell%atoms, species, first, stat)
+        499     2           if (stat /= 0 .and. (.not. present (status))) then
+        500     2              print *, "Couldn't read species from ", trim (infile), &
+        501     2                   ", status code: ", stat
+        502     2              ! Some error has occured, ask the user instead
+        503     2              call read_species (cell%atoms, species)
+        504     2           else
+        505     3              if (present (status)) then
+        506     3                 status = stat
+        507     3              end if
+        508     2           end if
+        509     1        end if
+        510        
+        511              call latt_init (cell%lattice)
+        512        
+        513     1        if (debug) then
+        514     1           print *, trim (infile), ' read successfully.'
+        515     1        end if
+        516        
+        517            contains
+        518        
+        519        
+        520              !****f* read_POSCAR/eat_whitespace
+        521              ! PURPOSE
+        522              ! Increase the index until a non-whitespace character is encountered.
+        523              !****
+        524              subroutine eat_whitespace (string, cursor, status)
+        525                character(len=*), intent(in) :: string
+        526                integer, intent(inout) :: cursor
+        527                integer, intent(out), optional :: status
+        528        
+        529     1          if (present (status)) then
+        530     1             status = 0
+        531     1          end if
+        532     1          if (cursor >= len (string) .or. cursor < 0) then
+        533     1             call error_msg (1, 'Cursor is not within string bounds', status)
+        534     1          end if
+        535     1          do while (string(cursor:cursor) == ' ')
+        536     1             cursor = cursor + 1
+        537     2             if (cursor > len (string)) then
+        538     2                call error_msg (2, 'Encountered end of string', status)
+        539     2                exit
+        540     2             end if
+        541     1          end do
+        542              end subroutine eat_whitespace
+        543        
+        544        
+        545              !****f* read_POSCAR/read_species
+        546              ! PURPOSE
+        547              ! Read the atom species from the terminal.
+        548              !****
+        549              subroutine read_species (atoms, species)
+        550                type(atom), dimension(:), intent(inout) :: atoms
+        551                integer, intent(in) :: species(:)
+        552                character(len=132) :: symbols
+        553                integer :: stat
+        554        
+        555                print *, 'Enter the atomic symbols of the ', size(species), &
+        556                     ' species in the supercell, &
+        557                     &separated by space:'
+        558                read (*, '(A)') symbols
+        559                call set_species (atoms, species, symbols, stat)
+        560     1          if (stat /= 0) then
+        561     1             call error_stop ('Error occured when trying to read species from terminal')
+        562     1          end if
+        563              end subroutine read_species
+        564        
+        565        
+        566              !****f* read_POSCAR/set_species
+        567              ! PURPOSE
+        568              ! Set the atomic species from a string.
+        569              !****
+        570              subroutine set_species (atoms, species, string, status)
+        571                type(atom), intent(inout) :: atoms(:)
+        572                integer, intent(in) :: species(:)
+        573                character(len=*), intent(in) :: string
+        574                integer, intent(out) :: status
+        575                integer :: lower, upper, i, j, k, stat, strlen
+        576        
+        577                status = 0
+        578                lower = 1
+        579                k = 0 ! offset index
+        580     1          do i = 1, size(species)
+        581     1             call eat_whitespace (string, lower, stat)
+        582     1             !print *, 'lower after eat_whitespace: ', lower
+        583     1             upper = index(string(lower:), ' ') + lower - 1
+        584     1             strlen = upper - lower
+        585     1             !print *, '$', string(lower:upper - 1), '$', strlen
+        586     2             if (strlen < 1 .or. strlen > 2 .or. stat /= 0) then
+        587     2                !print *, 'strlen: ', strlen, ' stat: ', stat
+        588     2                !print *, string(lower:upper)
+        589     2                status = 1
+        590     2                return
+        591     2             end if
+        592     2             do j = 1, species(i)
+        593     2                atoms(j+k)%symbol = trim(string(lower:upper - 1))
+        594     2             end do
+        595     1             k = k + species(i)
+        596     1             lower = upper
+        597     1          end do
+        598              end subroutine set_species
+        599        
+        600            end subroutine read_POSCAR
+        601        
+        602        
+        603            !****f* supercell_io/write_POSCAR
+        604            ! PURPOSE
+        605            !   Write a POSCAR file using the supplies supercell.
+        606            !****
+        607            subroutine write_POSCAR(cell, outfile)
+        608              character(len=*), intent(in) :: outfile
+        609              type(supercell), intent(inout) :: cell
+        610              integer, parameter :: pos_iu = 13 ! IO unit for output file
+        611              integer :: i, j, spec, natoms
+        612              integer, dimension(:), allocatable :: species
+        613              character(len=2), dimension(:), allocatable :: symbols
+        614        
+        615              call act2Rel(cell) ! Make sure coordinates are relative
+        616        
+        617        !      do i = 1, size(cell%atoms)
+        618        !         print *, cell%atoms(i)%symbol
+        619        !      end do
+        620        
+        621              ! First determine how many atomic species we have
+        622              ! This algorithm assumes that the species are ordered.
+        623              natoms = size(cell%atoms)
+        624     1        if (natoms <= 1) then
+        625     1           spec = natoms
+        626     1        else if (natoms > 1) then
+        627     1           spec = 1
+        628     2           do i = 2, natoms
+        629     3              if (cell%atoms(i)%symbol /= cell%atoms(i-1)%symbol) then
+        630     3                 spec = spec + 1
+        631     3              end if
+        632     2           end do
+        633     1        end if
+        634        
+        635        !      print *, 'Allocating for ', spec, ' species.'
+        636              allocate( species(spec), symbols(spec))
+        637              species = 0
+        638     1        if (natoms == 1) then
+        639     1           species = 1
+        640     1           symbols(1) = cell%atoms(1)%symbol
+        641     1        else if (natoms > 1) then
+        642     1           species = 1
+        643     1           j = 1
+        644     1           symbols(1) = cell%atoms(1)%symbol
+        645     2           do i = 2, natoms
+        646     3              if (cell%atoms(i)%symbol == cell%atoms(i-1)%symbol) then
+        647     3                 species(j) = species(j) + 1
+        648     3              else
+        649     3                 j = j+1
+        650     3                 symbols(j) = cell%atoms(i)%symbol
+        651     3              end if
+        652     2           end do
+        653     1        end if
+        654        
+        655     1        if (debug) then
+        656     1           print *, 'Atoms: ', natoms
+        657     2           do i = 1, natoms
+        658     2              print *, cell%atoms(i)%symbol
+        659     2           end do
+        660     1           print *, 'species: ', species
+        661     2           do i = 1, size(symbols)
+        662     2              print *, 'symbols: ', symbols(i)
+        663     2           end do
+        664     1  
+        665     1        end if
+        666        
+        667              open(unit=pos_iu, file=outfile, form='formatted', &
+        668                   access='sequential', action='write', status='replace')
+        669              write(pos_iu, '(100(A, 1X))') symbols
+        670              write(pos_iu, *) cell%lattice%a
+        671              write(pos_iu, '(3(1X, F18.14))') cell%lattice%t
+        672              write(pos_iu, *) species
+        673     1        if (cell%selective) then
+        674     1           write(pos_iu, '(A)') 'Selective dynamics'
+        675     1        end if
+        676     1        if (cell%cartesian) then
+        677     1           write(pos_iu, '(A)') 'Cartesian'
+        678     1        else
+        679     1           write(pos_iu, '(A)') 'Direct'
+        680     1        end if
+        681     1        if (cell%selective) then
+        682     2           do i = 1, size(cell%atoms)
+        683     2              write(pos_iu, '(3(2X, F18.14, 2X), 3(2X, L2))') &
+        684     2                   cell%atomCoords(:,i), &
+        685     2                   cell%atoms(i)%selective
+        686     2           end do
+        687     1        else
+        688     1           write(pos_iu, '(3(1X, F18.14))') (cell%atomCoords(:, i), i=1, size(cell%atoms))
+        689     1        end if
+        690              close(pos_iu)
+        691              print *, trim(outfile), ' written successfully.'
+        692            end subroutine write_POSCAR
+        693        
+        694        
+        695            !****f* supercell_io/read_xyz
+        696            ! PURPOSE
+        697            ! Read a .xyz file.
+        698            !****
+        699            subroutine read_xyz (cell, infile)
+        700              character(len=*), intent(in) :: infile
+        701              type(supercell), intent(out) :: cell
+        702              integer, parameter :: xyz_iu = 12
+        703              integer :: natoms, i
+        704              character(len=5) :: symbol
+        705        
+        706              open (unit=xyz_iu, file=infile, form='formatted', &
+        707                   access='sequential', action='read', status='old')
+        708              read (xyz_iu, *) natoms
+        709              read (xyz_iu, '(A)') ! Comment line
+        710              call init_cell (cell, natoms)
+        711              cell%cartesian = .true.
+        712              cell%relative = .false.
+        713     1        do i = 1, natoms
+        714     1           read (xyz_iu, '((A5), 3(2X, F12.8))') symbol, cell%atomCoords(:,i)
+        715     1           cell%atoms(i)%symbol = adjustl (symbol)
+        716     1        end do
+        717              close (xyz_iu)
+        718              call read_lattice (cell%lattice)
+        719              call sort_cell (cell)
+        720            end subroutine read_xyz
+        721        
+        722            !****f* supercell_io/write_xyz
+        723            ! PURPOSE
+        724            !   Write a .xyz file using the supplied supercell.
+        725            !****
+        726            subroutine write_xyz(cell, outfile)
+        727              character(len=*), intent(in) :: outfile
+        728              type(supercell), intent(inout) :: cell
+        729              integer, parameter :: xyz_iu = 12 ! IO unit for .xyz file
+        730              integer :: i
+        731        
+        732              call direct2Cartesian(cell)
+        733              call rel2Act(cell)
+        734              open(unit=xyz_iu, file=outfile, form='formatted', &
+        735                   access='sequential', action='write', status='replace')
+        736              write(xyz_iu, '(I0)') size(cell%atoms)
+        737              write(xyz_iu, '(A)') 'Generated by vasputil, (C) 2004, 2005 Janne Blomqvist'
+        738     1        do i = 1, size(cell%atoms)
+        739     1           write(xyz_iu, '((A), 3(2X, F12.8))') cell%atoms(i)%symbol, cell%atomCoords(:,i)
+        740     1        end do
+        741              close(xyz_iu)
+        742              print *, trim(outfile), ' written successfully.'
+        743            end subroutine write_xyz
+        744        
+        745        
+        746        end module supercell_io
+
+ Procedure information
+   Lines      : 746
+   Statements : 484
+
+ Scoping unit of module : supercell_io
+   Attribute and Cross reference of name
+     conf
+      |(Class and Type) : module name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 26
+     supercell_core
+      |(Class and Type) : module name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 27
+     supercell_io
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 25
+      |(Definition)     : 
+      |(Reference)      : 746
+
+ Scoping unit of module sub-program : POSCAR2xyz
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 41
+      |(Definition)     : 42  44
+      |(Reference)      : 
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 39  40
+      |(Definition)     : 
+      |(Reference)      : 42
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 39  40
+      |(Definition)     : 
+      |(Reference)      : 44
+     POSCAR2xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 39
+      |(Reference)      : 45
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 42
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 41
+     write_xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 44
+
+ Scoping unit of module sub-program : direct2cartesian_poscar
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 54
+      |(Definition)     : 55  56  57
+      |(Reference)      : 
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 56
+     direct2cartesian_poscar
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 52
+      |(Reference)      : 58
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 52  53
+      |(Definition)     : 
+      |(Reference)      : 55
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 52  53
+      |(Definition)     : 
+      |(Reference)      : 57
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 55
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 54
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 57
+
+ Scoping unit of module sub-program : kspace2xyz
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 67
+      |(Definition)     : 68  69  71  71  72
+      |(Reference)      : 
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 69
+     direct2recip
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 71
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 65  66
+      |(Definition)     : 
+      |(Reference)      : 68
+     kspace2xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 65
+      |(Reference)      : 73
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 65  66
+      |(Definition)     : 
+      |(Reference)      : 72
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 68
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 67
+     write_xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 72
+
+ Scoping unit of module sub-program : xyz2poscar
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 82
+      |(Definition)     : 83  84
+      |(Reference)      : 
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 80  81
+      |(Definition)     : 
+      |(Reference)      : 83
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 80  81
+      |(Definition)     : 
+      |(Reference)      : 84
+     read_xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 83
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 82
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 84
+     xyz2poscar
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 80
+      |(Reference)      : 85
+
+ Scoping unit of module sub-program : planetoatom
+   Attribute and Cross reference of name
+     atoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 92  96
+      |(Definition)     : 
+      |(Reference)      : 98
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 94
+      |(Definition)     : 97  98
+      |(Reference)      : 
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 92  93
+      |(Definition)     : 
+      |(Reference)      : 97
+     pa1
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 92  95
+      |(Definition)     : 
+      |(Reference)      : 98
+     pa2
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 92  95
+      |(Definition)     : 
+      |(Reference)      : 98
+     pa3
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 92  95
+      |(Definition)     : 
+      |(Reference)      : 98
+     planetoatom
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 92
+      |(Reference)      : 100
+     planetopoint
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 98
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 97
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 94
+
+ Scoping unit of module sub-program : planetolayer
+   Attribute and Cross reference of name
+     abs
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 128
+     atoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 115
+      |(Definition)     : 132  136
+      |(Reference)      : 140  141  142
+     bulk
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 107  112
+      |(Definition)     : 
+      |(Reference)      : 144  145
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 109
+      |(Definition)     : 117  125  126  140
+      |(Reference)      : 123  128
+     count
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 132
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 125
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 116
+      |(Definition)     : 134
+      |(Reference)      : 135  136
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 107  108
+      |(Definition)     : 
+      |(Reference)      : 117
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 116
+      |(Definition)     : 133  137
+      |(Reference)      : 136  137
+     layermask
+      |(Class and Type) : variable name, LOGICAL(4)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 114
+      |(Definition)     : 123  124  129
+      |(Reference)      : 132  134  135
+     lheight
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 107  111
+      |(Definition)     : 
+      |(Reference)      : 128
+     pa1
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 107  110
+      |(Definition)     : 
+      |(Reference)      : 140
+     pa2
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 107  110
+      |(Definition)     : 
+      |(Reference)      : 140
+     pa3
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 107  110
+      |(Definition)     : 
+      |(Reference)      : 140
+     planetolayer
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 107
+      |(Reference)      : 147
+     planetopoint
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 140
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 118  144
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 117
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 126
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 123  134  141
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 109
+     t
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 113
+      |(Definition)     : 119  121  140
+      |(Reference)      : 128  143  145
+     tol
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 107  112
+      |(Definition)     : 
+      |(Reference)      : 118  119
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 111  112  113  121  145  145
+
+ Scoping unit of module sub-program : atomsDistance
+   Attribute and Cross reference of name
+     atom1
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 170
+     atom1
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 154  157
+      |(Definition)     : 
+      |(Reference)      : 165  167  170
+     atom2
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 165  167  170
+     atom2
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 154  157
+      |(Definition)     : 
+      |(Reference)      : 165  167  170
+     atomdist
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 165  167  170
+     atomsDistance
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 154
+      |(Reference)      : 177
+     cell1
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 158
+      |(Definition)     : 161  165  167  170
+      |(Reference)      : 
+     cell2
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 165
+     cell2
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 158
+      |(Definition)     : 164  165
+      |(Reference)      : 
+     dist
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 159
+      |(Definition)     : 165  167  170
+      |(Reference)      : 175
+     errmesg
+      |(Class and Type) : variable name, CHARACTER(132,1)
+      |(Attributes)     : initialized
+      |(Declaration)    : 160
+      |(Definition)     : 165  167  170
+      |(Reference)      : 172  173
+     errmsg
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 165  167  170
+     error_stop
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 173
+     infile1
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 154  155
+      |(Definition)     : 
+      |(Reference)      : 161  163
+     infile2
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 154  156
+      |(Definition)     : 
+      |(Reference)      : 162  163  164
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 162
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 161  164
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 158
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 159
+
+ Scoping unit of module sub-program : normalize_POSCAR
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 187
+      |(Definition)     : 188  189  190
+      |(Reference)      : 
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 185  186
+      |(Definition)     : 
+      |(Reference)      : 188
+     normalize
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 189
+     normalize_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 185
+      |(Reference)      : 191
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 185  186
+      |(Definition)     : 
+      |(Reference)      : 190
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 188
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 187
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 190
+
+ Scoping unit of module sub-program : unnormalize_POSCAR
+   Attribute and Cross reference of name
+     atoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 200  202
+      |(Definition)     : 
+      |(Reference)      : 206  208
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 203
+      |(Definition)     : 204  208  209
+      |(Reference)      : 
+     debug
+      |(Class and Type) : named constant, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 205
+     dir
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 200  202
+      |(Definition)     : 
+      |(Reference)      : 206  208
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 200  201
+      |(Definition)     : 
+      |(Reference)      : 204
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 200  201
+      |(Definition)     : 
+      |(Reference)      : 209
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 204
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 203
+     unnormalize
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 208
+     unnormalize_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 200
+      |(Reference)      : 210
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 209
+
+ Scoping unit of module sub-program : dumpcoords
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 219
+      |(Definition)     : 220  221  222
+      |(Reference)      : 223
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 221
+     dumpcoords
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 217
+      |(Reference)      : 224
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 217  218
+      |(Definition)     : 
+      |(Reference)      : 220
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 220
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 222
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 219
+
+ Scoping unit of module sub-program : importcoords
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 233
+      |(Definition)     : 235  236  237  241  244
+      |(Reference)      : 240
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 236
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 234
+      |(Definition)     : 241
+      |(Reference)      : 241
+     importcoords
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 231
+      |(Reference)      : 245
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 231  232
+      |(Definition)     : 
+      |(Reference)      : 235  244
+     k
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 234
+      |(Definition)     : 240
+      |(Reference)      : 241
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 235
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 237
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 240
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 233
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 244
+
+ Scoping unit of module sub-program : interpolate_POSCAR
+   Attribute and Cross reference of name
+     cell1
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 254
+      |(Definition)     : 256  262  263
+      |(Reference)      : 258
+     cell2
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 254
+      |(Definition)     : 257  262
+      |(Reference)      : 258
+     checkCells
+      |(Class and Type) : module function name, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 258
+     fraction
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 252  255
+      |(Definition)     : 
+      |(Reference)      : 262
+     infile1
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 252  253
+      |(Definition)     : 
+      |(Reference)      : 256
+     infile2
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 252  253
+      |(Definition)     : 
+      |(Reference)      : 257
+     interpolate
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 262
+     interpolate_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 252
+      |(Reference)      : 264
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 252  253
+      |(Definition)     : 
+      |(Reference)      : 263
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 256  257
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 254
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 255
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 263
+
+ Scoping unit of module sub-program : atomsMoved
+   Attribute and Cross reference of name
+     atomsMoved
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 272
+      |(Reference)      : 301
+     cell1
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 276
+      |(Definition)     : 279  290  292
+      |(Reference)      : 281  295  296
+     cell2
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 276
+      |(Definition)     : 280  291  293
+      |(Reference)      : 281  296
+     checkCells
+      |(Class and Type) : module function name, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 281
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 290  291
+     dist
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 275
+      |(Definition)     : 296
+      |(Reference)      : 297  298
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 277
+      |(Definition)     : 295
+      |(Reference)      : 296  296  298
+     infile1
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 272  273
+      |(Definition)     : 
+      |(Reference)      : 279
+     infile2
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 272  273
+      |(Definition)     : 
+      |(Reference)      : 280
+     norm
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : host-associated, PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 296
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 285
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 279  280
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 292  293
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 295
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 276
+     t
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 275
+      |(Definition)     : 286  288
+      |(Reference)      : 294  297
+     tol
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 272  274
+      |(Definition)     : 
+      |(Reference)      : 285  286
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 274  275  288
+
+ Scoping unit of module sub-program : removeAtoms_POSCAR
+   Attribute and Cross reference of name
+     atomnums
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 308  310
+      |(Definition)     : 
+      |(Reference)      : 313  314
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 311
+      |(Definition)     : 312  314  315
+      |(Reference)      : 
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 308  309
+      |(Definition)     : 
+      |(Reference)      : 312
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 308  309
+      |(Definition)     : 
+      |(Reference)      : 315
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 312
+     removeAtoms
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 314
+     removeAtoms_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 308
+      |(Reference)      : 316
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 313
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 311
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 315
+
+ Scoping unit of module sub-program : check_nn_POSCAR
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 326
+      |(Definition)     : 328  330  332
+      |(Reference)      : 
+     check_nn_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 323
+      |(Reference)      : 334
+     check_nndist
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 330  332
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 323  324
+      |(Definition)     : 
+      |(Reference)      : 328
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 329
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 328
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 326
+     tol
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 323  325
+      |(Definition)     : 
+      |(Reference)      : 329  330
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 325
+
+ Scoping unit of module sub-program : lock_atoms
+   Attribute and Cross reference of name
+     atomnums
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 341  343
+      |(Definition)     : 
+      |(Reference)      : 348  349
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 344
+      |(Definition)     : 346  347  349  351
+      |(Reference)      : 
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 345
+      |(Definition)     : 348
+      |(Reference)      : 349
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 341  342
+      |(Definition)     : 
+      |(Reference)      : 346
+     lock_atoms
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 341
+      |(Reference)      : 352
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 341  342
+      |(Definition)     : 
+      |(Reference)      : 351
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 346
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 348
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 344
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 351
+
+ Scoping unit of module sub-program : sc_generator_io
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 378
+     cartesian2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 377
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 362
+      |(Definition)     : 373  375
+      |(Reference)      : 
+     error_stop
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 375
+     generate_supercell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 375
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 359  360
+      |(Definition)     : 
+      |(Reference)      : 373
+     infile2
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 359  361
+      |(Definition)     : 
+      |(Reference)      : 365  366
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 359  360
+      |(Definition)     : 
+      |(Reference)      : 379
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 365
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 366  373
+     read_lattice
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 369
+     sc_generator_io
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 359
+      |(Reference)      : 380
+     scell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : 
+      |(Declaration)    : 362
+      |(Definition)     : 366  369  375  377  378  379
+      |(Reference)      : 
+     stat
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 363
+      |(Definition)     : 366
+      |(Reference)      : 
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 362
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 379
+
+ Scoping unit of module sub-program : read_POSCAR
+   Attribute and Cross reference of name
+     adjustl
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 412  490
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(OUT), dummy-argument, default-initialized
+      |(Declaration)    : 387  389
+      |(Definition)     : 399  403  405  431  434  438  440  449  454  454  459  490  498  503  511
+      |(Reference)      : 406  452
+     debug
+      |(Class and Type) : named constant, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 444  513
+     error_stop
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 407
+     first
+      |(Class and Type) : variable name, CHARACTER(132,1)
+      |(Attributes)     : 
+      |(Declaration)    : 393
+      |(Definition)     : 402
+      |(Reference)      : 498
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 416  454  454  459  489
+      |(Reference)      : 417  417  420  420  454  454  459  490
+     index
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 484  487  488
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 387  388
+      |(Definition)     : 
+      |(Reference)      : 400  500  514
+     init_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 449
+     is_lin_dependent
+      |(Class and Type) : module function name, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 406
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 405  443  480  493
+      |(Reference)      : 405  445  449  451  482  489  492  493
+     k
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 451  481  492
+      |(Reference)      : 454  454  459  490  492
+     latt_init
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 511
+     len_trim
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 416
+     line
+      |(Class and Type) : variable name, CHARACTER(132,1)
+      |(Attributes)     : 
+      |(Declaration)    : 393
+      |(Definition)     : 411  412  429  432  483
+      |(Reference)      : 412  416  417  420  427  430  430  436  436  436  436  484  487  488  490
+     lower
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 488
+      |(Reference)      : 490
+     pos_iu
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 391
+      |(Definition)     : 
+      |(Reference)      : 400  402  403  405  411  429  432  454  459  463
+     pot_ex
+      |(Class and Type) : variable name, LOGICAL(4)
+      |(Attributes)     : 
+      |(Declaration)    : 395
+      |(Definition)     : 476
+      |(Reference)      : 477
+     pot_iu
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 391
+      |(Definition)     : 
+      |(Reference)      : 478  483  495
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 499  505
+     read_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 387
+      |(Reference)      : 600
+     read_species
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 503
+     set_species
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 498
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 482
+     spc
+      |(Class and Type) : variable name, LOGICAL(4)
+      |(Attributes)     : 
+      |(Declaration)    : 395
+      |(Definition)     : 415  419  421
+      |(Reference)      : 417
+     spec_counter
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 410  418
+      |(Reference)      : 418  424  445
+     species
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 397
+      |(Definition)     : 424  427
+      |(Reference)      : 443  445  482  489  492  498  503
+     stat
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 498
+      |(Reference)      : 499  500  506
+     status
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 387  390
+      |(Definition)     : 506
+      |(Reference)      : 499  505
+     sum
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 443
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 389
+     trim
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 490  500  514
+     upper
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 394
+      |(Definition)     : 487
+      |(Reference)      : 490
+
+ Scoping unit of internal sub-program : eat_whitespace
+   Attribute and Cross reference of name
+     cursor
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(INOUT), dummy-argument
+      |(Declaration)    : 524  526
+      |(Definition)     : 536
+      |(Reference)      : 532  532  535  535  536  537
+     eat_whitespace
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 524
+      |(Reference)      : 542
+     error_msg
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 533  538
+     len
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 532  537
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 529
+     status
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 524  527
+      |(Definition)     : 530  533  538
+      |(Reference)      : 529
+     string
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 524  525
+      |(Definition)     : 
+      |(Reference)      : 532  535  537
+
+ Scoping unit of internal sub-program : read_species
+   Attribute and Cross reference of name
+     atom
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 550
+     atoms
+      |(Class and Type) : variable name, TYPE(atom)
+      |(Attributes)     : DIMENSION, INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 549  550
+      |(Definition)     : 559
+      |(Reference)      : 
+     error_stop
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 561
+     read_species
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 549
+      |(Reference)      : 563
+     set_species
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 559
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 555
+     species
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 549  551
+      |(Definition)     : 
+      |(Reference)      : 555  559
+     stat
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 553
+      |(Definition)     : 559
+      |(Reference)      : 560
+     symbols
+      |(Class and Type) : variable name, CHARACTER(132,1)
+      |(Attributes)     : 
+      |(Declaration)    : 552
+      |(Definition)     : 558
+      |(Reference)      : 559
+
+ Scoping unit of internal sub-program : set_species
+   Attribute and Cross reference of name
+     atom
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 571
+     atoms
+      |(Class and Type) : variable name, TYPE(atom)
+      |(Attributes)     : DIMENSION, INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 570  571
+      |(Definition)     : 593
+      |(Reference)      : 
+     eat_whitespace
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 581
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 580
+      |(Reference)      : 592  595
+     index
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 583
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 592
+      |(Reference)      : 593
+     k
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 579  595
+      |(Reference)      : 593  595
+     lower
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 578  581  596
+      |(Reference)      : 583  583  584  593
+     set_species
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 570
+      |(Reference)      : 598
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 580
+     species
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 570  572
+      |(Definition)     : 
+      |(Reference)      : 580  592  595
+     stat
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 581
+      |(Reference)      : 586
+     status
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), dummy-argument
+      |(Declaration)    : 570  574
+      |(Definition)     : 577  589
+      |(Reference)      : 
+     string
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 570  573
+      |(Definition)     : 
+      |(Reference)      : 581  583  593
+     strlen
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 584
+      |(Reference)      : 586  586
+     trim
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 593
+     upper
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 575
+      |(Definition)     : 583
+      |(Reference)      : 584  593  596
+
+ Scoping unit of module sub-program : write_POSCAR
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 615
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 607  609
+      |(Definition)     : 615
+      |(Reference)      : 623  629  629  640  644  646  646  650  658  670  671  673  676  681  682  683  683  688  688
+     debug
+      |(Class and Type) : named constant, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 655
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 611
+      |(Definition)     : 628  645  657  661  682  688
+      |(Reference)      : 629  629  646  646  650  658  662  683  683  688
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 611
+      |(Definition)     : 643  649
+      |(Reference)      : 647  647  649  650
+     natoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 611
+      |(Definition)     : 623
+      |(Reference)      : 624  625  626  628  638  641  645  656  657
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 607  608
+      |(Definition)     : 
+      |(Reference)      : 667  691
+     pos_iu
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 610
+      |(Definition)     : 
+      |(Reference)      : 667  669  670  671  672  674  677  679  683  688  690
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 623  661  682  688
+     spec
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 611
+      |(Definition)     : 625  627  630
+      |(Reference)      : 630  636  636
+     species
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 612
+      |(Definition)     : 636  637  639  642  647
+      |(Reference)      : 647  660  672
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 609
+     symbols
+      |(Class and Type) : variable name, CHARACTER(2,1)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 613
+      |(Definition)     : 636  640  644  650
+      |(Reference)      : 661  662  669
+     trim
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 691
+     write_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 607
+      |(Reference)      : 692
+
+ Scoping unit of module sub-program : read_xyz
+   Attribute and Cross reference of name
+     adjustl
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 715
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(OUT), dummy-argument, default-initialized
+      |(Declaration)    : 699  701
+      |(Definition)     : 710  711  712  714  715  718  719
+      |(Reference)      : 
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 703
+      |(Definition)     : 713
+      |(Reference)      : 714  715
+     infile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 699  700
+      |(Definition)     : 
+      |(Reference)      : 706
+     init_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 710
+     natoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 703
+      |(Definition)     : 708
+      |(Reference)      : 710  713
+     read_lattice
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 718
+     read_xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 699
+      |(Reference)      : 720
+     sort_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 719
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 701
+     symbol
+      |(Class and Type) : variable name, CHARACTER(5,1)
+      |(Attributes)     : 
+      |(Declaration)    : 704
+      |(Definition)     : 714
+      |(Reference)      : 715
+     xyz_iu
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 702
+      |(Definition)     : 
+      |(Reference)      : 706  708  709  714  717
+
+ Scoping unit of module sub-program : write_xyz
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 726  728
+      |(Definition)     : 732  733
+      |(Reference)      : 736  738  739  739
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 732
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 730
+      |(Definition)     : 738
+      |(Reference)      : 739  739
+     outfile
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 726  727
+      |(Definition)     : 
+      |(Reference)      : 734  742
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 733
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 736  738
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 728
+     trim
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 742
+     write_xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 726
+      |(Reference)      : 743
+     xyz_iu
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 729
+      |(Definition)     : 
+      |(Reference)      : 734  736  737  739  741
+
+ Total information
+   Procedures       : 1
+   Total lines      : 746
+   Total statements : 484
+

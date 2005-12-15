@@ -1,0 +1,122 @@
+
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Mon Sep 19 12:45:00 2005
+ Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
+ Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
+
+ Compilation information
+   Current directory : /home/job/src/vasputil_f90
+   Source file       : src/kind_params.f90
+   Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
+                     : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 
+                     : --nmldefault --o0 --no --nocl --nopenmp --nparallel 
+                     : --nprefetch --pca --nprivate --nquad --quiet --nsav 
+                     : --nshared --nsse2 --nstaticlink --nswm --tp 
+                     : --nthreadheap --nthreads --trace --trap --nunroll 
+                     : --nvarheap --nversion --warn --nwide --nwisk --wo --nzfm 
+                     : --xref
+
+ Module "kind_params"
+  (line-no.)(nest)
+          1        !****h* /kind_params
+          2        ! PURPOSE
+          3        ! Kind type parameters.
+          4        !****
+          5        module kind_params
+          6        
+          7          implicit none
+          8        
+          9          ! 1, 2, 4 and 8 byte integers.
+         10          integer, parameter :: i1b = selected_int_kind(2)
+         11          integer, parameter :: i2b = selected_int_kind(4)
+         12          integer, parameter :: i4b = selected_int_kind(9)
+         13          integer, parameter :: i8b = selected_int_kind(18)
+         14        
+         15          ! IEEE Single precision floating point.
+         16          integer, parameter :: sp = selected_real_kind(6)
+         17        
+         18          !  integer, parameter :: dp = kind(1.0d0) ! Double precision
+         19        
+         20          ! At least IEEE 754 double precision.
+         21          integer, parameter :: dp = selected_real_kind(15, 307)
+         22        
+         23          ! quad precision, fall back on double if quad is not available.
+         24          integer, parameter :: qp_preferred = selected_real_kind(30,1000)
+         25          ! Portland compiler doesn't understand the following although it is
+         26          ! valid Fortran 95.
+         27          !integer, parameter :: qp = (1+sign(1,qp_preferred))/2*qp_preferred+ &
+         28          !                            (1-sign(1,qp_preferred))/2*dp
+         29        
+         30        end module kind_params
+
+ Procedure information
+   Lines      : 30
+   Statements : 10
+
+ Scoping unit of module : kind_params
+   Attribute and Cross reference of name
+     dp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 21
+      |(Definition)     : 
+      |(Reference)      : 
+     i1b
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 10
+      |(Definition)     : 
+      |(Reference)      : 
+     i2b
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 11
+      |(Definition)     : 
+      |(Reference)      : 
+     i4b
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 12
+      |(Definition)     : 
+      |(Reference)      : 
+     i8b
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 13
+      |(Definition)     : 
+      |(Reference)      : 
+     kind_params
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 5
+      |(Definition)     : 
+      |(Reference)      : 30
+     qp_preferred
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 24
+      |(Definition)     : 
+      |(Reference)      : 
+     selected_int_kind
+      |(Class and Type) : intrinsic function name, none
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 10  11  12  13
+     selected_real_kind
+      |(Class and Type) : intrinsic function name, none
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 16  21  24
+     sp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 16
+      |(Definition)     : 
+      |(Reference)      : 
+
+ Total information
+   Procedures       : 1
+   Total lines      : 30
+   Total statements : 10
+

@@ -1,0 +1,2731 @@
+
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Wed Dec 14 13:09:48 2005
+ Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
+ Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
+
+ Compilation information
+   Current directory : /home/job/src/vasputil_f90
+   Source file       : src/supercell_core.f90
+   Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
+                     : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 
+                     : --nmldefault --o0 --no --nocl --nopenmp --nparallel 
+                     : --nprefetch --pca --nprivate --nquad --quiet --nsav 
+                     : --nshared --nsse2 --nstaticlink --nswm --tp 
+                     : --nthreadheap --nthreads --trace --trap --nunroll 
+                     : --nvarheap --nversion --warn --nwide --nwisk --wo --nzfm 
+                     : --xref
+
+ Module "supercell_core"
+  (line-no.)(nest)
+          1        !****h* vasputil/supercell_core
+          2        ! NAME
+          3        !   supercell_core
+          4        ! COPYRIGHT
+          5        !  Copyright (c) 2004, 2005 Janne Blomqvist
+          6        
+          7        !  This program is free software; you can redistribute it and/or modify
+          8        !  it under the terms of the GNU General Public License as published by
+          9        !  the Free Software Foundation; either version 2 of the License, or
+         10        !  (at your option) any later version.
+         11        
+         12        !  This program is distributed in the hope that it will be useful,
+         13        !  but WITHOUT ANY WARRANTY; without even the implied warranty of
+         14        !  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+         15        !  GNU General Public License for more details.
+         16        
+         17        !  You should have received a copy of the GNU General Public License
+         18        !  along with this program; if not, write to the Free Software
+         19        !  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+         20        
+         21        ! PURPOSE
+         22        ! This module defines types for supercells and procedures for manipulating
+         23        ! these.
+         24        !****
+         25        module supercell_core
+         26          use conf
+         27          use geometry
+         28          use lattice
+         29        
+         30          implicit none
+         31        
+         32        
+         33          !****t* supercell_core/atom
+         34          ! PURPOSE
+         35          !   Type for an atom, containing the atomic sumbol and the 3D selective flag.
+         36          !****
+         37          type atom
+         38             character(len = 2) :: symbol = " H"
+         39             logical, dimension(3) :: selective = .true.
+         40          end type atom
+         41        
+         42        
+         43          !****t* supercell_core/supercell
+         44          ! PURPOSE
+         45          !   A supercell type. Contains an array of atom types and their coordinates.
+         46          !****
+         47          type supercell
+         48             type(latt) :: lattice
+         49             ! Fortran 95 doesn't allow allocatable components
+         50             ! in derived types. Thus we use pointers.
+         51             real(wp), dimension(:, :), pointer :: atomCoords => NULL()
+         52             type(atom), dimension(:), pointer :: atoms => NULL()
+         53             logical :: cartesian = .FALSE. , relative = .TRUE., selective = .false.
+         54          end type supercell
+         55        
+         56          contains
+         57        
+         58        
+         59            !****f* supercell_core/removeAtoms
+         60            ! PURPOSE
+         61            ! Remove atoms specified by their indexes starting from 1.
+         62            !****
+         63            subroutine removeAtoms(cell, atomnums)
+         64              type(supercell), intent(inout) :: cell
+         65              integer, dimension(:), intent(in) :: atomnums
+         66              real(wp), dimension(3, size(cell%atoms) - size(atomnums)) :: atomCoords
+         67              ! Portland pgf90 5.2-4 chokes on the line below, allocate manually
+         68              ! instead.
+         69              !type(atom), dimension(size(cell%atoms) - size(atomnums)) :: atoms
+         70              type(atom), dimension(:), allocatable :: atoms
+         71              logical, dimension(size(cell%atoms)) :: mask
+         72              integer :: i, j
+         73        
+         74              !pgf90 fix
+         75              allocate (atoms(size(cell%atoms) - size(atomnums)))
+         76              mask = .TRUE.
+         77     1        do i = 1, size(atomnums)
+         78     1           mask(atomnums(i)) = .FALSE.
+         79     1        end do
+         80              j = 1
+         81     1        do i = 1, size(cell%atoms)
+         82     2           if (mask(i)) then
+         83     2              atoms(j) = cell%atoms(i)
+         84     2              atomCoords(:,j) = cell%atomCoords(:,i)
+         85     2              j = j+1
+         86     2           end if
+         87     1        end do
+         88              i = size(cell%atoms)-size(atomnums) ! atoms in new cell
+         89              deallocate(cell%atoms, cell%atomCoords)
+         90              allocate(cell%atoms(i), cell%atomCoords(3,i))
+         91              cell%atoms = atoms
+         92              cell%atomCoords = atomCoords
+         93            end subroutine removeAtoms
+         94        
+         95        
+         96            !****f* supercell_core/direct2Cartesian
+         97            ! PURPOSE
+         98            ! Change supercell coordinates from direct to cartesian.
+         99            !****
+        100            subroutine direct2Cartesian(cell)
+        101              type(supercell), intent(inout) :: cell
+        102        !      print *, 'latt. vect size: ', size(cell%latticeVectors, 1)
+        103        !      print *, 'atomCoord matrix size: ', size(cell%atomCoords, 1)
+        104     1        if (cell%cartesian) then
+        105     1           return
+        106     1        end if
+        107              cell%atomCoords = matmul( cell%lattice%t, &
+        108                   cell%atomCoords)
+        109              cell%cartesian = .TRUE.
+        110            end subroutine direct2Cartesian
+        111        
+        112        
+        113            !****f* supercell_core/cartesian2Direct
+        114            ! PURPOSE
+        115            ! Change supercell coordinates from cartesian to direct.
+        116            !****
+        117            subroutine cartesian2Direct(cell)
+        118              type(supercell), intent(inout) :: cell
+        119     1        if (.not. cell%cartesian) then
+        120     1           return
+        121     1        end if
+        122              !call error_stop('cartesian2Direct not implemented yet!')
+        123              call cart2Direct(cell%lattice, cell%atomCoords)
+        124              cell%cartesian = .false.
+        125            end subroutine cartesian2Direct
+        126        
+        127        
+        128            !****f* supercell_core/rel2Act
+        129            ! PURPOSE
+        130            ! Change supercell coordinates from relative to actual.
+        131            !****
+        132            subroutine rel2Act(cell)
+        133              type(supercell), intent(inout) :: cell
+        134     1        if (cell%relative) then
+        135     1           cell%atomCoords = cell%atomCoords * cell%lattice%a
+        136     1           cell%relative = .FALSE.
+        137     1        end if
+        138            end subroutine rel2Act
+        139        
+        140        
+        141            !****f* supercell_core/act2Rel
+        142            ! PURPOSE
+        143            ! Change supercell coordinates from actual to relative.
+        144            !****
+        145            subroutine act2Rel(cell)
+        146              type(supercell), intent(inout) :: cell
+        147     1        if (.not. cell%relative) then
+        148     1           cell%atomCoords = cell%atomCoords / cell%lattice%a
+        149     1           cell%relative = .TRUE.
+        150     1        end if
+        151            end subroutine act2Rel
+        152        
+        153        
+        154            !****f* supercell_core/checkCells
+        155            ! PURPOSE
+        156            ! Check that two supercells are consistent so that e.g. interpolation
+        157            ! is sensible.
+        158            !****
+        159            function checkCells(cell1, cell2, errmsg)
+        160              type(supercell), intent(in) :: cell1, cell2
+        161              character(len=*), intent(out), optional :: errmsg !Error message
+        162              logical :: checkCells
+        163        
+        164     1        if (present (errmsg)) then
+        165     1           errmsg = ''
+        166     1        end if
+        167              ! We start by assuming they are compatible
+        168              checkCells = .TRUE.
+        169              ! Check that latticeConstants match
+        170     1        if ( abs(cell1%lattice%a - cell2%lattice%a) > &
+        171     1             sqrt(epsilon(cell1%lattice%a))) then
+        172     2           if (present(errmsg)) then
+        173     2              errmsg = "Lattice constants of cells don't match."
+        174     2           end if
+        175     1           checkCells = .FALSE.
+        176     1           return
+        177     1        end if
+        178              ! Check lattice vectors.
+        179     1        if (any( abs(cell1%lattice%t - cell2%lattice%t) > &
+        180     1             sqrt( epsilon(cell1%lattice%t)) )) then
+        181     2           if (present(errmsg)) then
+        182     2              errmsg = "Lattice vectors of cells don't match."
+        183     2           end if
+        184     1           checkCells = .FALSE.
+        185     1           return
+        186     1        end if
+        187              ! Check number of atoms
+        188     1        if (size(cell1%atoms) /= size(cell2%atoms)) then
+        189     2           if (present(errmsg)) then
+        190     2              errmsg = 'Number of atoms in cells not consistent.'
+        191     2           end if
+        192     1           checkCells = .FALSE.
+        193     1           return
+        194     1        end if
+        195            end function checkCells
+        196        
+        197        
+        198            !****f* supercell_core/normalize
+        199            ! PURPOSE
+        200            ! Normalize the atom coordinates in a cell, i.e. make sure that
+        201            ! the relative coordinates of all atoms are between 0 and 1.
+        202            !****
+        203            subroutine normalize(cell)
+        204              type(supercell), intent(inout) :: cell
+        205     1        if (cell%cartesian) then
+        206     1           call cartesian2Direct(cell)
+        207     1        end if
+        208     1        if (.not. cell%relative) then
+        209     1           call act2Rel(cell)
+        210     1        end if
+        211              cell%atomCoords = mod(cell%atomCoords, 1.0_wp)
+        212              cell%atomCoords = cell%atomCoords + 1.0_wp
+        213              cell%atomCoords = mod(cell%atomCoords, 1.0_wp)
+        214            end subroutine normalize
+        215        
+        216        
+        217            !****f* supercell_core/unnormalize
+        218            ! PURPOSE
+        219            ! "Unnormalize" atom coordinates in a cell. Useful when one wants
+        220            ! to make a supercell box-like e.g. for visualization.
+        221            !****
+        222            subroutine unnormalize (cell, dir, atoms, status)
+        223              type(supercell), intent(inout) :: cell
+        224              integer, intent(in) :: dir, atoms(:)
+        225              integer, intent(out), optional :: status
+        226              integer :: i
+        227        
+        228     1        if (dir < 1 .or. dir > 3) then
+        229     1           call error_msg (1, "Direction to unnormalize in must be 1, 2 or 3.", status)
+        230     1           return
+        231     1        end if
+        232     1        if (cell%cartesian) then
+        233     1           call cartesian2Direct(cell)
+        234     1        end if
+        235     1        if (.not. cell%relative) then
+        236     1           call act2Rel(cell)
+        237     1        end if
+        238     1        do i = 1, size(atoms)
+        239     1           cell%atomCoords(dir, atoms(i)) = cell%atomCoords(dir, atoms(i)) - 1.0_wp
+        240     1        end do
+        241            end subroutine unnormalize
+        242        
+        243        
+        244            !****f* supercell_core/atomdist
+        245            ! PURPOSE
+        246            ! Calculate the distance between two atoms in a supercell.
+        247            ! This function takes into account periodic boundary conditions.
+        248            !****
+        249            function atomdist(cell1, atom1, cell2, atom2, errmsg)
+        250              type(supercell), intent(inout), target :: cell1
+        251              type(supercell), intent(inout), optional, target :: cell2
+        252              integer :: atom1, atom2
+        253              character(len=*), intent(out), optional :: errmsg
+        254              real(wp) :: atomdist
+        255              type(supercell), pointer :: cello
+        256              real(wp), dimension(3) :: distVect
+        257        
+        258     1        if (present (errmsg)) then
+        259     1           errmsg = ""
+        260     1        end if
+        261     1        if (present (cell2)) then
+        262     1           cello => cell2
+        263     2           if (.not. checkCells(cell1, cell2, errmsg)) then
+        264     2              return
+        265     2           end if
+        266     1           call cartesian2Direct (cello)
+        267     1           call act2Rel (cello)
+        268     1        else
+        269     1           cello => cell1
+        270     1        end if
+        271        
+        272              call cartesian2Direct (cell1)
+        273              call act2Rel (cell1)
+        274              ! Sanity check
+        275     1        if (atom1 > size (cell1%atoms) .or. atom2 > size (cello%atoms)) then
+        276     2           if (present (errmsg)) then
+        277     2              errmsg = "Atom index larger than the number of atoms in the cell"
+        278     2           end if
+        279     1           return
+        280     1        end if
+        281        
+        282              distVect = cell1%atomCoords(:, atom1) - cello%atomCoords(:, atom2)
+        283              print *, 'cell1 atom: ', cell1%atomCoords(:, atom1)
+        284              print *, 'cell2 atom: ', cello%atomCoords(:, atom2)
+        285              print *, 'distvect is: ', distvect
+        286              distVect = distVect - anint (distVect)
+        287              distVect = matmul (cell1%lattice%t, distVect)
+        288              atomdist = sqrt (dot_product (distVect, distVect)) * cell1%lattice%a
+        289            end function atomdist
+        290        
+        291        
+        292            !****f* supercell_core/planetopoint
+        293            ! PURPOSE
+        294            ! Calculates the average distance from a plane to a set of atoms
+        295            !****
+        296            function planetopoint(cell, planeatom1, planeatom2, planeatom3, atoms)
+        297              type(supercell), intent(inout) :: cell
+        298              integer, intent(in) :: planeatom1, planeatom2, planeatom3
+        299              integer, dimension(:), intent(in) :: atoms
+        300              type(plane3) :: plane
+        301              real(wp) :: planetopoint, tot_dist
+        302              integer :: i
+        303        
+        304        !      call normalize(cell)
+        305              call direct2Cartesian(cell)
+        306              call rel2Act(cell)
+        307              call new(plane, cell%atomCoords(:, planeatom1), &
+        308                   cell%atomCoords(:, planeatom2), cell%atomCoords(:, planeatom3))
+        309              tot_dist = 0._wp
+        310     1        do i = 1, size(atoms)
+        311     1           tot_dist = tot_dist + distanceFrom(plane, cell%atomCoords(:, atoms(i)))
+        312     1        end do
+        313              planetopoint = tot_dist/size(atoms)
+        314            end function planetopoint
+        315        
+        316        
+        317            !****f* supercell_core/interpolate
+        318            ! PURPOSE
+        319            ! Interpolate atom coordinates between two supercells.
+        320            ! The result is returned in the first cell, whose coordinates
+        321            ! are replaced with the interpolated ones.
+        322            !****
+        323            subroutine interpolate(cell1, cell2, fraction)
+        324              type(supercell), intent(inout) :: cell1
+        325              type(supercell), intent(inout) :: cell2
+        326              real(wp), intent(in) :: fraction
+        327              real(wp), dimension(3, size(cell1%atoms)) :: dist
+        328        
+        329              call cartesian2Direct(cell1)
+        330              call cartesian2Direct(cell2)
+        331              call act2rel(cell1)
+        332              call act2rel(cell2)
+        333        
+        334        !      call normalize(cell1)
+        335        !      call normalize(cell2)
+        336              dist = cell2%atomCoords - cell1%atomCoords
+        337        
+        338              ! Take periodic bc into account
+        339     1        where (dist > 0.5_wp)
+        340     1           dist = dist - 1.0_wp
+        341     1        end where
+        342     1        where (dist < -0.5_wp)
+        343     1           dist = dist + 1.0_wp
+        344     1        end where
+        345        
+        346              cell1%atomCoords = cell1%atomCoords + fraction * dist
+        347              call normalize(cell1)
+        348              call check_nndist(cell1)
+        349            end subroutine interpolate
+        350        
+        351        
+        352            !****f* supercell_core/check_nndist
+        353            ! PURPOSE
+        354            ! Check that all atoms in a supercell are at least a specified distance
+        355            ! from each other.
+        356            !****
+        357            subroutine check_nndist(cell, tol)
+        358              type(supercell), intent(inout) :: cell
+        359              real(wp), intent(in), optional :: tol
+        360              real(wp) :: t, dist
+        361              integer :: i,j
+        362        
+        363     1        if (present(tol)) then
+        364     1           t = tol
+        365     1        else
+        366     1           t = 1.0_wp ! Minimum 1 Å
+        367     1        end if
+        368        
+        369              call direct2Cartesian(cell)
+        370              call rel2Act(cell)
+        371        
+        372     1        do j = 1, size(cell%atoms)
+        373     2           do i = 1, j-1
+        374     2              dist = norm(cell%atomcoords(:, i) - cell%atomcoords(:, j))
+        375     3              if (dist < t) then
+        376     3                 print *, 'WARNING: Distance between atoms ', i, ' and ', &
+        377     3                      j, ' is only ', dist, ' Å!'
+        378     3              end if
+        379     2           end do
+        380     1        end do
+        381            end subroutine check_nndist
+        382        
+        383        
+        384            !****f* supercell_core/generate_supercell
+        385            ! PURPOSE
+        386            !   Generate a supercell.
+        387            ! INPUTS
+        388            ! cell - The supercell which contains the basis set of the new supercell.
+        389            ! scell - The supercell which is to be created. The lattice vectors of
+        390            !         this cell should already be set up before calling this procedure.
+        391            ! NOTES
+        392            ! The algorithm works by using the lattice vectors from "cell" as the basis
+        393            ! and using
+        394            ! those to fill the supercell.
+        395            ! BUGS
+        396            ! None. The code is perfect.
+        397            !****
+        398            subroutine generate_supercell (cell, scell, err_proc)
+        399              type(supercell), intent(inout) :: cell
+        400              type(supercell), intent(inout) :: scell
+        401              interface
+        402                 subroutine err_proc (msg)
+        403                   character(len=*), intent(in) :: msg
+        404                 end subroutine err_proc
+        405              end interface
+        406              !real(wp) :: arel
+        407              integer :: natoms, i, j, natoms_created, hcol, hitot, hlookup
+        408              type atom_edge
+        409                 type(atom_vertex), pointer :: v => NULL()
+        410              end type atom_edge
+        411              type atom_vertex
+        412                 ! Whether we have visited all vertexes connected to this one.
+        413                 logical :: explored = .false.
+        414                 ! Atom coordinates.
+        415                 !real(wp) :: acoords(3) = (/ 0.0_wp, 0.0_wp, 0.0_wp /)
+        416                 integer :: acoords(3) = (/0, 0, 0/)
+        417                 ! List of atoms connected to this one via a single basis vector.
+        418                 ! In 3D space we have 6 degrees of freedom
+        419                 type(atom_edge), dimension(6) :: alist
+        420              end type atom_vertex
+        421              ! Queue type, implemented using a circular array.
+        422              type queue_t
+        423                 type(atom_edge), dimension(:), pointer :: elems => NULL()
+        424                 integer :: head = 1, tail = 1
+        425              end type queue_t
+        426              type(atom_vertex), target :: av
+        427              type(atom_vertex), pointer :: avcur => NULL(), & ! Current atom vertex
+        428                   avnext => NULL() ! Next atom vertex
+        429              ! The ready list
+        430              type(queue_t) :: rlist
+        431        
+        432     1        if (is_lin_dependent (cell%lattice%t)) then
+        433     1           call err_proc ("ERROR: Lattice vectors are not linearly independent!")
+        434     1        end if
+        435        
+        436              call latt_init (scell%lattice)
+        437              ! Calculate the ratio between the lattice constants
+        438              !arel = scell%lattice%a / cell%lattice%a
+        439              !print *, scell%lattice%omega, cell%lattice%omega
+        440              ! Estimate for the number of atoms in the supercell
+        441              natoms = ceiling (size (cell%atoms) * scell%lattice%omega / cell%lattice%omega)
+        442              print *, 'Estimated ', natoms, ' atoms in the supercell.'
+        443        
+        444              ! Allocate the ready queue
+        445              call init_queue (rlist, 2*natoms)
+        446        
+        447              ! This algorithm is a variation of a graph traversal algorithm, e.g.
+        448              ! "visit all the nodes in a graph". In this case "node" = atom, i.e.
+        449              ! atoms
+        450              ! are created by starting from origo and adding the integer multiples of
+        451              ! the basis vectors and checking that they are inside the bounding box
+        452              ! created by the lattice vectors of scell.
+        453        
+        454              ! We do a breadth first search.
+        455              call insert (rlist, av)
+        456              natoms_created = 1
+        457              hcol = 0
+        458              hitot = 0
+        459              hlookup = 0
+        460              j = 1
+        461              av%explored = .true.
+        462     1        do
+        463     1           call remove (rlist, avcur)
+        464     2           if (.not. associated (avcur)) then
+        465     2              exit
+        466     2           end if
+        467     1           call create_atom_children (avcur)
+        468     2           do i = 1, size (avcur%alist)
+        469     2              avnext => avcur%alist(i)%v
+        470     3              if (associated (avnext)) then
+        471     4                 if (.not. avnext%explored) then
+        472     4                    avnext%explored = .true.
+        473     4                    j = j + 1
+        474     4                    call insert (rlist, avnext)
+        475     4                 end if
+        476     3              end if
+        477     2           end do
+        478     1        end do
+        479        
+        480     1        if (hcol /= 0) then
+        481     1           print *, 'A total of ', hlookup, &
+        482     1                ' hash lookups were made, of which ', hcol, &
+        483     1                ' resulted in collisions. The collisions were handled by a &
+        484     1                &total of ', &
+        485     1                hitot, 'rehashing operations.'
+        486     1        end if
+        487              print *, 'Explored ', j, ' atoms.'
+        488        
+        489              ! Now all the atoms have been created in the graph. Next we walk
+        490              ! through the graph again and fill the supercell coordinate array.
+        491              print *, 'But really, we have ', natoms_created, ' atoms in the supercell.'
+        492              call init_cell (scell, natoms_created)
+        493              scell%atoms%symbol = cell%atoms(1)%symbol
+        494              scell%cartesian = .true.
+        495              scell%relative = .false.
+        496              ! Reinitialize the ready list
+        497              call init_queue (rlist, natoms_created)
+        498              avcur => NULL()
+        499              call insert (rlist, av)
+        500              j = 1
+        501              scell%atomCoords(:, j) = cell%lattice%a * matmul (cell%lattice%t, av%acoords)
+        502              av%explored = .false.
+        503     1        do
+        504     1           call remove (rlist, avcur)
+        505     2           if (.not. associated (avcur)) then
+        506     2              exit
+        507     2           end if
+        508     2           do i = 1, size (avcur%alist)
+        509     2              avnext => avcur%alist(i)%v
+        510     3              if (associated (avnext)) then
+        511     4                 if (avnext%explored) then
+        512     4                    avnext%explored = .false.
+        513     4                    j = j + 1
+        514     4                    scell%atomCoords(:, j) = cell%lattice%a * matmul (cell%lattice%t, avnext%acoords)
+        515     4                    call insert (rlist, avnext)
+        516     4                 end if
+        517     3              end if
+        518     2           end do
+        519     1        end do
+        520              print *, 'Coordinates for ', j, ' atoms were copied to scell.'
+        521        
+        522              contains
+        523        
+        524                !****f* generate_supercell/hash
+        525                ! PURPOSE
+        526                !   The hash function used for atom coordinates.
+        527                ! TODO
+        528                !   Use a better hash function, this one creates lots of collisions.
+        529                ! ARGUMENTS
+        530                !   coords    - Input coordinates to hash.
+        531                !   tsize     - Size of the hash table.
+        532                !****
+        533                pure function hash (coords, tsize)
+        534                  integer, intent(in) :: coords(3), tsize
+        535                  integer :: hash
+        536                  integer :: i, j, k, hkey
+        537                  ! Golden ratio of a signed 32-bit integer
+        538                  integer, parameter :: gr = 2654435761/2
+        539                  i = coords(1) * gr
+        540                  j = not (coords(2)) * gr
+        541                  k = ishftc (coords(3), 15) * gr
+        542                  ! \sum_{l}(i+j+k)^l  mod tsize
+        543                  !hash = modulo (i + j + k + (i + j + k)**2 &
+        544                  !     + (i + j + k)**3, tsize)
+        545                  ! Golden ratio of 2^32: 2654435761
+        546                  hkey = ieor (i, ior (j, k))
+        547                  hash = modulo (hkey, tsize) + 1
+        548                end function hash
+        549        
+        550        
+        551                !****f* generate_supercell/create_atom
+        552                ! PURPOSE
+        553                !   Given a new atom, initialize it by creating the children.
+        554                !****
+        555                subroutine create_atom_children (a)
+        556                  type(atom_vertex) :: a
+        557                  integer :: i, j, k, hval, coords(3), ind(3), hi
+        558                  ! Hash table for fast coordinate based lookup
+        559                  type(atom_edge), allocatable, save :: htable(:)
+        560        
+        561     1            if (.not. allocated (htable)) then
+        562     1               allocate(htable(2*natoms + 1)) ! 2* is usually sparse enough.
+        563     1               ! Insert the origin node
+        564     1               hval = hash ((/0, 0, 0/), size (htable))
+        565     1               htable(hval)%v => av
+        566     1            end if
+        567        
+        568                  k = 1
+        569     1            do i = -1, 1, 2
+        570     2               do j = 1, 3
+        571     2                  ind = 0
+        572     2                  ind(j) = i
+        573     2                  ! Check that we're inside the box
+        574     2                  coords = (/ a%acoords(1) + ind(1), a%acoords(2) + ind(2), &
+        575     2                       a%acoords(3) + ind(3)/)
+        576     3                  if (.not. is_inside_cell (scell, cell, coords)) then
+        577     3                     cycle
+        578     3                  end if
+        579     2                  hval = hash (coords, size (htable))
+        580     2                  !print *, i, j, hval, coords
+        581     2                  ! Check if the atom has already been created, in which case
+        582     2                  ! we just set the value of the pointer.
+        583     2                  hi = 1
+        584     3                  do
+        585     4                     if (.not. associated (htable(hval)%v)) then
+        586     4                        ! Create a new atom.
+        587     4                        allocate(a%alist(k)%v)
+        588     4                        natoms_created = natoms_created + 1
+        589     4                        ! .. and update the hash table.
+        590     4                        htable(hval)%v => a%alist(k)%v
+        591     4                        ! Update the coords
+        592     4                        a%alist(k)%v%acoords = coords
+        593     4                        hlookup = hlookup + 1
+        594     4                        exit
+        595     4                     else if (htable(hval)%v%acoords(1) /= coords(1) .or. &
+        596     4                          htable(hval)%v%acoords(2) /= coords(2) .or. &
+        597     4                          htable(hval)%v%acoords(3) /= coords(3) ) then
+        598     4                        ! Hash collision
+        599     5                        if (hi == 1) then
+        600     5                           hcol = hcol + 1
+        601     5                        end if
+        602     4                        hval = modulo (hval + 1 * hi**2, size (htable)) + 1
+        603     4                        hi = hi + 1
+        604     4                        !hlookup = hlookup + 1
+        605     4                     else
+        606     4                        ! We hit an existing atom that is not a hash collison,
+        607     4                        ! so we point to it.
+        608     4                        hitot = hitot + hi - 1
+        609     4                        a%alist(k)%v => htable(hval)%v
+        610     4                        hlookup = hlookup + 1
+        611     4                        exit
+        612     4                     end if
+        613     3                  end do
+        614     2                  k = k + 1
+        615     2               end do
+        616     1            end do
+        617                  !print *, 'Needed ', hitot, ' rehashing ops.'
+        618                end subroutine create_atom_children
+        619        
+        620        
+        621                !****f* generate_supercell/is_inside_cell
+        622                ! PURPOSE
+        623                ! Check that a coordinate point is inside the supercell boundary.
+        624                ! NOTES
+        625                ! Calculate the crossing number (Jordan curve theorem). Or rather,
+        626                ! just check that direct coordinates are \in [0,1].
+        627                !****
+        628                function is_inside_cell (scell, cell, coords, tol)
+        629                  type(supercell), intent(in) :: scell
+        630                  type(supercell), intent(inout) :: cell
+        631                  integer, intent(in) :: coords(3)
+        632                  real(wp), intent(in), optional :: tol
+        633                  logical :: is_inside_cell
+        634                  real(wp) :: zert, onet, tole
+        635        
+        636     1            if (present (tol)) then
+        637     1               tole = tol
+        638     1            else
+        639     1               tole = 1000 * sqrt (epsilon (1.0_wp))
+        640     1            end if
+        641                  zert = 0.0_wp - tole
+        642                  onet = 1.0_wp - tole
+        643                  ! Get the coordinate in cartesian.
+        644                  cell%cartesian = .false.
+        645                  cell%relative = .true.
+        646                  cell%atomCoords(:,1) = (/real (coords(1), wp), &
+        647                       real (coords(2), wp), real (coords(3), wp) /)
+        648                  call direct2Cartesian (cell)
+        649                  call rel2Act (cell)
+        650                  ! Convert cartesian coordinate to scell direct coord.
+        651                  call cart2Direct (scell%lattice, cell%atomCoords)
+        652                  cell%atomCoords = cell%atomCoords / scell%lattice%a
+        653        
+        654                  ! Finally, check whether coordinate is inside scell
+        655     1            if (cell%atomCoords(1, 1) >= zert .and. &
+        656     1                 cell%atomCoords(1, 1) < onet .and. &
+        657     1                 cell%atomCoords(2, 1) >= zert .and. &
+        658     1                 cell%atomCoords(2, 1) < onet .and. &
+        659     1                 cell%atomCoords(3, 1) >= zert .and. &
+        660     1                 cell%atomCoords(3, 1) < onet) then
+        661     1               is_inside_cell = .true.
+        662     1            else
+        663     1               is_inside_cell = .false.
+        664     1            end if
+        665                end function is_inside_cell
+        666        
+        667        
+        668                !****f* generate_supercell/insert
+        669                ! PURPOSE
+        670                ! Insert an element into the ready queue.
+        671                !****
+        672                subroutine insert (queue, element)
+        673                  type(queue_t), intent(inout) :: queue
+        674                  type(atom_vertex), intent(in), target :: element
+        675        
+        676                  queue%elems(queue%tail)%v => element
+        677                  queue%tail = modulo (queue%tail + 1, size (queue%elems))
+        678                end subroutine insert
+        679        
+        680        
+        681                !****f* generate_supercell/remove
+        682                ! PURPOSE
+        683                ! Remove an element from the queue (FIFO).
+        684                !****
+        685                subroutine remove (queue, element)
+        686                  type(queue_t), intent(inout) :: queue
+        687                  type(atom_vertex), pointer :: element
+        688        
+        689                  element => queue%elems(queue%head)%v
+        690                  queue%elems(queue%head)%v => NULL()
+        691                  queue%head = modulo (queue%head + 1, size (queue%elems))
+        692                end subroutine remove
+        693        
+        694        
+        695                !****f* generate_supercell/init_queue
+        696                ! PURPOSE
+        697                ! Initialize a queue.
+        698                !****
+        699                subroutine init_queue (queue, qsize)
+        700                  type(queue_t), intent(inout) :: queue
+        701                  integer, intent(in) :: qsize
+        702                  integer :: i, j
+        703        
+        704     1            if (associated (queue%elems)) then
+        705     1               j = 0
+        706     2               do i = 1, size (queue%elems)
+        707     3                  if (associated (queue%elems(i)%v)) then
+        708     3                     j = j + 1
+        709     3                  end if
+        710     2               end do
+        711     2               if (j /= 0) then
+        712     2                  print *, 'WARNING (init_queue): Associated elements in queue: ', j
+        713     2               end if
+        714     1               deallocate (queue%elems)
+        715     1            end if
+        716                  allocate (queue%elems(qsize))
+        717                  queue%head = 1
+        718                  queue%tail = 1
+        719                end subroutine init_queue
+        720        
+        721        
+        722                !****f* generate_supercell/destroy_scgenerator
+        723                ! PURPOSE
+        724                ! Destructor procedure for the graph.
+        725                ! BUGS
+        726                ! So far it does (almost) nothing.
+        727                ! NOTES
+        728                ! Should do a depth first traversal of the graph and deallocate.
+        729                !****
+        730                subroutine destroy_scgenerator ()
+        731                  deallocate (rlist%elems)
+        732                end subroutine destroy_scgenerator
+        733        
+        734            end subroutine generate_supercell
+        735        
+        736        
+        737            !****f* supercell_core/init_cell
+        738            ! PURPOSE
+        739            ! Constructor for cell types.
+        740            !****
+        741            subroutine init_cell (cell, size, stat)
+        742              type(supercell), intent(inout) :: cell
+        743              integer, intent(in) :: size
+        744              integer, optional, intent(out) :: stat
+        745              ! Clean out old goop, if present
+        746              call destroy_cell (cell, stat)
+        747     1        if (present (stat)) then
+        748     1           allocate (cell%atoms(size), cell%atomCoords(3, size), stat=stat)
+        749     1        else
+        750     1           allocate (cell%atoms(size), cell%atomCoords(3, size))
+        751     1        end if
+        752            end subroutine init_cell
+        753        
+        754        
+        755            !****f* supercell_core/destroy_cell
+        756            ! PURPOSE
+        757            ! Destructor for cell types.
+        758            !****
+        759            subroutine destroy_cell (cell, stat)
+        760              type(supercell), intent(inout) :: cell
+        761              integer, optional, intent(out) :: stat
+        762     1        if (associated (cell%atoms) .and. associated (cell%atomCoords)) then
+        763     2           if (present (stat)) then
+        764     2              deallocate (cell%atoms, cell%atomCoords, stat=stat)
+        765     2           else
+        766     2              deallocate (cell%atoms, cell%atomCoords)
+        767     2           end if
+        768     1        else ! This shouldn't happen..
+        769     2           if (present (stat)) then
+        770     2              stat = -9999
+        771     2           end if
+        772     1        end if
+        773            end subroutine destroy_cell
+        774        
+        775        
+        776            !****f* supercell_core/sort_cell
+        777            ! PURPOSE
+        778            ! Sort a cell so that atoms of the same species are next to each other.
+        779            !****
+        780            subroutine sort_cell (cell)
+        781              type(supercell), intent(inout) :: cell
+        782        
+        783     1        if (debug) then
+        784     1           print *, 'qsort: lbound: ', lbound (cell%atoms, dim=1)
+        785     1           print *, 'qsort: ubound: ', ubound (cell%atoms, dim=1)
+        786     1        end if
+        787        
+        788              call qsort (lbound (cell%atoms, dim=1), ubound (cell%atoms, dim=1))
+        789        
+        790            contains
+        791        
+        792              !****f* sort_cell/qsort
+        793              ! PURPOSE
+        794              ! The quicksort algorithm, with the middle array
+        795              ! element chosen as pivot.
+        796              !****
+        797              recursive subroutine qsort (begin, end)
+        798                integer, intent(in) :: begin, end
+        799                integer :: ipivot, left, right
+        800                character(len=2) :: apivot
+        801        
+        802        !        print *, 'qsort called with begin: ', begin, ' end: ', end
+        803     1          if (end > begin + 1) then
+        804     1             left = begin
+        805     1             right = end
+        806     1             ipivot = (begin + end) / 2
+        807     1             apivot = adjustl (cell%atoms(ipivot)%symbol)
+        808     1  !           call swap (begin, ipivot)
+        809     2             qout: do
+        810     3                do while (llt (adjustl (cell%atoms(left)%symbol), apivot))
+        811     3                   left = left + 1
+        812     3  !                 print *, 'increasing left'
+        813     3                end do
+        814     3                do while (llt ( apivot, adjustl (cell%atoms(right)%symbol)))
+        815     3                   right = right - 1
+        816     3  !                 print *, 'decreasing right'
+        817     3                end do
+        818     3                if (left < right) then
+        819     3                   call swap (left, right)
+        820     4                   if (ipivot == left) then
+        821     4                      ipivot = right
+        822     4                   else if (ipivot == right) then
+        823     4                      ipivot = left
+        824     4                   end if
+        825     3                   left = left + 1
+        826     3                   right = right - 1
+        827     3                else if (left == right) then
+        828     3                   left = left + 1
+        829     3                   right = right - 1
+        830     3                   exit qout
+        831     3                else
+        832     3                   exit qout
+        833     3                end if
+        834     2             end do qout
+        835     1  !           print *, 'left: ', left, ' right: ', right
+        836     1  !           left = left - 1
+        837     1  !           call swap (begin, left)
+        838     1             call qsort (begin, right)
+        839     1             call qsort (left, end)
+        840     1          else if (end - begin == 1) then
+        841     2             if (llt (adjustl (cell%atoms(end)%symbol), &
+        842     2                  adjustl (cell%atoms(begin)%symbol))) then
+        843     2                call swap (begin, end)
+        844     2             end if
+        845     1          end if
+        846              end subroutine qsort
+        847        
+        848              !****f* sort_cell/swap
+        849              ! PURPOSE
+        850              ! Swap two atoms.
+        851              !****
+        852              subroutine swap (i, j)
+        853                integer, intent(in) :: i, j
+        854                type(atom) :: tmpatom
+        855                real(wp) :: tmpcoords(3)
+        856        
+        857                tmpatom = cell%atoms(i)
+        858        !        if (debug) then
+        859        !           print *, 'tmpatom: ', tmpatom
+        860        !        end if
+        861                tmpcoords = cell%atomCoords(:, i)
+        862                cell%atoms(i) = cell%atoms(j)
+        863                cell%atomCoords(:, i) = cell%atomCoords(:, j)
+        864                cell%atoms(j) = tmpatom
+        865                cell%atomCoords(:, j) = tmpcoords
+        866              end subroutine swap
+        867        
+        868            end subroutine sort_cell
+        869        
+        870        end module supercell_core
+
+ Diagnostic messages: program name(supercell_core)
+   2023-I: "src/supercell_core.f90", line 39: Gap inserted for boundary alignment of components of derived type 'selective'.
+  Internal subprogram name(hash)
+   1092-I: "src/supercell_core.f90", line 538, column 38: Value of integer literal constant where kind type parameter is not specified exceeds range of default integer.
+
+ Procedure information
+   Lines      : 870
+   Statements : 524
+
+ Scoping unit of module : supercell_core
+   Attribute and Cross reference of name
+     atom
+      |(Class and Type) : type name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 37
+      |(Reference)      : 
+     conf
+      |(Class and Type) : module name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 26
+     geometry
+      |(Class and Type) : module name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 27
+     lattice
+      |(Class and Type) : module name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 28
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 
+      |(Definition)     : 47
+      |(Reference)      : 
+     supercell_core
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 25
+      |(Definition)     : 
+      |(Reference)      : 870
+   Derived type construction
+     atom
+      |  (Attributes) : 
+      |symbol
+      |  (Type and Attributes) : CHARACTER(2,1), default initialize
+      |selective
+      |  (Type and Attributes) : LOGICAL(4), DIMENSION, default initialize
+     supercell
+      |  (Attributes) : 
+      |lattice
+      |  (Type and Attributes) : TYPE(latt)
+      |atomCoords
+      |  (Type and Attributes) : REAL(8), POINTER, DIMENSION, default initialize
+      |atoms
+      |  (Type and Attributes) : TYPE(atom), POINTER, DIMENSION, default initialize
+      |cartesian
+      |  (Type and Attributes) : LOGICAL(4), default initialize
+      |relative
+      |  (Type and Attributes) : LOGICAL(4), default initialize
+      |selective
+      |  (Type and Attributes) : LOGICAL(4), default initialize
+
+ Scoping unit of module sub-program : removeAtoms
+   Attribute and Cross reference of name
+     atom
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 70
+     atomCoords
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 66
+      |(Definition)     : 84
+      |(Reference)      : 92
+     atomnums
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 63  65
+      |(Definition)     : 
+      |(Reference)      : 66  75  77  78  88
+     atoms
+      |(Class and Type) : variable name, TYPE(atom)
+      |(Attributes)     : ALLOCATABLE, DIMENSION, default-initialized
+      |(Declaration)    : 70
+      |(Definition)     : 75  83
+      |(Reference)      : 91
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 63  64
+      |(Definition)     : 89  89  90  90  91  92
+      |(Reference)      : 66  71  75  81  83  84  88
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 72
+      |(Definition)     : 77  81  88
+      |(Reference)      : 78  82  83  84  90  90
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 72
+      |(Definition)     : 80  85
+      |(Reference)      : 83  84  85
+     mask
+      |(Class and Type) : variable name, LOGICAL(4)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 71
+      |(Definition)     : 76  78
+      |(Reference)      : 82
+     removeAtoms
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 63
+      |(Reference)      : 93
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 66  66  71  75  75  77  81  88  88
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 64
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 66
+
+ Scoping unit of module sub-program : direct2Cartesian
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 100  101
+      |(Definition)     : 107  109
+      |(Reference)      : 104  107  107
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 100
+      |(Reference)      : 110
+     matmul
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 107
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 101
+
+ Scoping unit of module sub-program : cartesian2Direct
+   Attribute and Cross reference of name
+     cart2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 123
+     cartesian2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 117
+      |(Reference)      : 125
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 117  118
+      |(Definition)     : 123  124
+      |(Reference)      : 119  123
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 118
+
+ Scoping unit of module sub-program : rel2Act
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 132  133
+      |(Definition)     : 135  136
+      |(Reference)      : 134  135  135
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 132
+      |(Reference)      : 138
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 133
+
+ Scoping unit of module sub-program : act2Rel
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 145
+      |(Reference)      : 151
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 145  146
+      |(Definition)     : 148  149
+      |(Reference)      : 147  148  148
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 146
+
+ Scoping unit of module sub-program : checkCells
+   Attribute and Cross reference of name
+     abs
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 170  179
+     any
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 179
+     cell1
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(IN), dummy-argument, initialized
+      |(Declaration)    : 159  160
+      |(Definition)     : 
+      |(Reference)      : 170  170  179  179  188
+     cell2
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(IN), dummy-argument, initialized
+      |(Declaration)    : 159  160
+      |(Definition)     : 
+      |(Reference)      : 170  179  188
+     checkCells
+      |(Class and Type) : variable name, LOGICAL(4)
+      |(Attributes)     : result-value
+      |(Declaration)    : 162
+      |(Definition)     : 168  175  184  192
+      |(Reference)      : 
+     checkCells
+      |(Class and Type) : module function name, LOGICAL(4)
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 159
+      |(Reference)      : 195
+     epsilon
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 170  179
+     errmsg
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 159  161
+      |(Definition)     : 165  173  182  190
+      |(Reference)      : 164  172  181  189
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 164  172  181  189
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 188  188
+     sqrt
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 170  179
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 160
+
+ Scoping unit of module sub-program : normalize
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 209
+     cartesian2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 206
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 203  204
+      |(Definition)     : 206  209  211  212  213
+      |(Reference)      : 205  208  211  212  213
+     mod
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 211  213
+     normalize
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 203
+      |(Reference)      : 214
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 204
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 211  212  213
+
+ Scoping unit of module sub-program : unnormalize
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 236
+     atoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 222  224
+      |(Definition)     : 
+      |(Reference)      : 238  239  239
+     cartesian2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 233
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 222  223
+      |(Definition)     : 233  236  239
+      |(Reference)      : 232  235  239
+     dir
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 222  224
+      |(Definition)     : 
+      |(Reference)      : 228  228  239  239
+     error_msg
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 229
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 226
+      |(Definition)     : 238
+      |(Reference)      : 239  239
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 238
+     status
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 222  225
+      |(Definition)     : 229
+      |(Reference)      : 
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 223
+     unnormalize
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 222
+      |(Reference)      : 241
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 239
+
+ Scoping unit of module sub-program : atomdist
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 267  273
+     anint
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 286
+     atom1
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : dummy-argument
+      |(Declaration)    : 249  252
+      |(Definition)     : 
+      |(Reference)      : 275  282  283
+     atom2
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : dummy-argument
+      |(Declaration)    : 249  252
+      |(Definition)     : 
+      |(Reference)      : 275  282  284
+     atomdist
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : result-value
+      |(Declaration)    : 254
+      |(Definition)     : 288
+      |(Reference)      : 
+     atomdist
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 249
+      |(Reference)      : 289
+     cartesian2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 266  272
+     cell1
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), TARGET, dummy-argument, initialized
+      |(Declaration)    : 249  250
+      |(Definition)     : 272  273
+      |(Reference)      : 263  269  275  282  283  287  288
+     cell2
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), OPTIONAL, TARGET, dummy-argument, initialized
+      |(Declaration)    : 249  251
+      |(Definition)     : 
+      |(Reference)      : 261  262  263
+     cello
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : POINTER, initialized
+      |(Declaration)    : 255
+      |(Definition)     : 262  266  267  269
+      |(Reference)      : 275  282  284
+     checkCells
+      |(Class and Type) : module function name, LOGICAL(4)
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 263
+     distVect
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 256
+      |(Definition)     : 282  286  287
+      |(Reference)      : 285  286  286  287  288  288
+     dot_product
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 288
+     errmsg
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 249  253
+      |(Definition)     : 259  263  277
+      |(Reference)      : 258  276
+     matmul
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 287
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 258  261  276
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 275  275
+     sqrt
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 288
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 250  251  255
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 254  256
+
+ Scoping unit of module sub-program : planetopoint
+   Attribute and Cross reference of name
+     atoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 296  299
+      |(Definition)     : 
+      |(Reference)      : 310  311  313
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 296  297
+      |(Definition)     : 305  306
+      |(Reference)      : 307  307  307  311
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 305
+     distanceFrom
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : host-associated, PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 311
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 302
+      |(Definition)     : 310
+      |(Reference)      : 311
+     new
+      |(Class and Type) : generic name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 307
+     plane
+      |(Class and Type) : variable name, TYPE(plane3)
+      |(Attributes)     : 
+      |(Declaration)    : 300
+      |(Definition)     : 307
+      |(Reference)      : 311
+     plane3
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 300
+     planeatom1
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 296  298
+      |(Definition)     : 
+      |(Reference)      : 307
+     planeatom2
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 296  298
+      |(Definition)     : 
+      |(Reference)      : 307
+     planeatom3
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 296  298
+      |(Definition)     : 
+      |(Reference)      : 307
+     planetopoint
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : result-value
+      |(Declaration)    : 301
+      |(Definition)     : 313
+      |(Reference)      : 
+     planetopoint
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 296
+      |(Reference)      : 314
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 306
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 310  313
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 297
+     tot_dist
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 301
+      |(Definition)     : 309  311
+      |(Reference)      : 311  313
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 301  309
+
+ Scoping unit of module sub-program : interpolate
+   Attribute and Cross reference of name
+     act2Rel
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 331  332
+     cartesian2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 329  330
+     cell1
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 323  324
+      |(Definition)     : 329  331  346  347  348
+      |(Reference)      : 327  336  346
+     cell2
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 323  325
+      |(Definition)     : 330  332
+      |(Reference)      : 336
+     check_nndist
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 348
+     dist
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 327
+      |(Definition)     : 336  340  343
+      |(Reference)      : 339  340  342  343  346
+     fraction
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 323  326
+      |(Definition)     : 
+      |(Reference)      : 346
+     interpolate
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 323
+      |(Reference)      : 349
+     normalize
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 347
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 327
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 324  325
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 326  327  339  340  342  343
+
+ Scoping unit of module sub-program : check_nndist
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 357  358
+      |(Definition)     : 369  370
+      |(Reference)      : 372  374  374
+     check_nndist
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 357
+      |(Reference)      : 381
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 369
+     dist
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 360
+      |(Definition)     : 374
+      |(Reference)      : 375  376
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 361
+      |(Definition)     : 373
+      |(Reference)      : 374  376
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 361
+      |(Definition)     : 372
+      |(Reference)      : 373  374  376
+     norm
+      |(Class and Type) : module function name, REAL(8)
+      |(Attributes)     : host-associated, PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 374
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 363
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 370
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 372
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 358
+     t
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 360
+      |(Definition)     : 364  366
+      |(Reference)      : 375
+     tol
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 357  359
+      |(Definition)     : 
+      |(Reference)      : 363  364
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 359  360  366
+
+ Scoping unit of module sub-program : generate_supercell
+   Attribute and Cross reference of name
+     associated
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 464  470  505  510
+     atom_edge
+      |(Class and Type) : type name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 408
+      |(Reference)      : 
+     atom_vertex
+      |(Class and Type) : type name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 411
+      |(Reference)      : 426  427
+     av
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : TARGET
+      |(Declaration)    : 426
+      |(Definition)     : 461  502
+      |(Reference)      : 455  499  501
+     avcur
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : POINTER, initialized
+      |(Declaration)    : 427
+      |(Definition)     : 463  467  498  504
+      |(Reference)      : 464  468  469  505  508  509
+     avnext
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : POINTER, initialized
+      |(Declaration)    : 427
+      |(Definition)     : 469  472  509  512
+      |(Reference)      : 470  471  474  510  511  514  515
+     ceiling
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 441
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 398  399
+      |(Definition)     : 
+      |(Reference)      : 432  441  441  493  501  501  514  514
+     create_atom_children
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 467
+     err_proc
+      |(Class and Type) : external subroutine name
+      |(Attributes)     : dummy-argument
+      |(Declaration)    : 398
+      |(Definition)     : 
+      |(Reference)      : 433
+     generate_supercell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 398
+      |(Reference)      : 734
+     hcol
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 457
+      |(Reference)      : 480  481
+     hitot
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 458
+      |(Reference)      : 481
+     hlookup
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 459
+      |(Reference)      : 481
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 468  508
+      |(Reference)      : 469  509
+     init_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 492
+     init_queue
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 445  497
+     insert
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 455  474  499  515
+     is_lin_dependent
+      |(Class and Type) : module function name, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 432
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 460  473  500  513
+      |(Reference)      : 473  487  501  513  514  520
+     latt_init
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 436
+     matmul
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 501  514
+     NULL
+      |(Class and Type) : intrinsic function name, none
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 427  427  498
+     natoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 441
+      |(Reference)      : 442  445
+     natoms_created
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 407
+      |(Definition)     : 456
+      |(Reference)      : 491  492  497
+     queue_t
+      |(Class and Type) : type name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 422
+      |(Reference)      : 430
+     remove
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 463  504
+     rlist
+      |(Class and Type) : variable name, TYPE(queue_t)
+      |(Attributes)     : 
+      |(Declaration)    : 430
+      |(Definition)     : 445  455  463  474  497  499  504  515
+      |(Reference)      : 
+     scell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 398  400
+      |(Definition)     : 436  492  493  494  495  501  514
+      |(Reference)      : 441
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 441  468  508
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 399  400
+   Derived type construction
+     atom_edge
+      |  (Attributes) : 
+      |v
+      |  (Type and Attributes) : TYPE(atom_vertex), POINTER, default initialize
+     atom_vertex
+      |  (Attributes) : 
+      |explored
+      |  (Type and Attributes) : LOGICAL(4), default initialize
+      |acoords
+      |  (Type and Attributes) : INTEGER(4), DIMENSION, default initialize
+      |alist
+      |  (Type and Attributes) : TYPE(atom_edge), DIMENSION, default initialize
+     queue_t
+      |  (Attributes) : 
+      |elems
+      |  (Type and Attributes) : TYPE(atom_edge), POINTER, DIMENSION, default initialize
+      |head
+      |  (Type and Attributes) : INTEGER(4), default initialize
+      |tail
+      |  (Type and Attributes) : INTEGER(4), default initialize
+
+ Scoping unit of interface body : err_proc
+   Attribute and Cross reference of name
+     err_proc
+      |(Class and Type) : external subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 402
+      |(Definition)     : 
+      |(Reference)      : 404
+     msg
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 402  403
+      |(Definition)     : 
+      |(Reference)      : 
+
+ Scoping unit of internal sub-program : hash
+   Attribute and Cross reference of name
+     coords
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 533  534
+      |(Definition)     : 
+      |(Reference)      : 539  540  541
+     gr
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 538
+      |(Definition)     : 
+      |(Reference)      : 539  540  541
+     hash
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : result-value
+      |(Declaration)    : 535
+      |(Definition)     : 547
+      |(Reference)      : 
+     hash
+      |(Class and Type) : internal function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 533
+      |(Reference)      : 548
+     hkey
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 536
+      |(Definition)     : 546
+      |(Reference)      : 547
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 536
+      |(Definition)     : 539
+      |(Reference)      : 546
+     ieor
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 546
+     ior
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 546
+     ishftc
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 541
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 536
+      |(Definition)     : 540
+      |(Reference)      : 546
+     k
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 536
+      |(Definition)     : 541
+      |(Reference)      : 546
+     modulo
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 547
+     not
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 540
+     tsize
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 533  534
+      |(Definition)     : 
+      |(Reference)      : 547
+
+ Scoping unit of internal sub-program : create_atom_children
+   Attribute and Cross reference of name
+     a
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : dummy-argument, initialized
+      |(Declaration)    : 555  556
+      |(Definition)     : 587  592  609
+      |(Reference)      : 574  574  574  590
+     allocated
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 561
+     associated
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 585
+     atom_edge
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 559
+     atom_vertex
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 556
+     av
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : TARGET, host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 565
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, host-associated, initialized
+      |(Declaration)    : 
+      |(Definition)     : 576
+      |(Reference)      : 
+     coords
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 557
+      |(Definition)     : 574
+      |(Reference)      : 576  579  592  595  595  595
+     create_atom_children
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 555
+      |(Reference)      : 618
+     hash
+      |(Class and Type) : internal function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 564  579
+     hcol
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 600
+      |(Reference)      : 600
+     hi
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 557
+      |(Definition)     : 583  603
+      |(Reference)      : 599  602  603  608
+     hitot
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 608
+      |(Reference)      : 608
+     hlookup
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 593  610
+      |(Reference)      : 593  610
+     htable
+      |(Class and Type) : variable name, TYPE(atom_edge)
+      |(Attributes)     : ALLOCATABLE, DIMENSION, SAVE, default-initialized
+      |(Declaration)    : 559
+      |(Definition)     : 562  565  590
+      |(Reference)      : 561  564  579  585  595  595  595  602  609
+     hval
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 557
+      |(Definition)     : 564  579  602
+      |(Reference)      : 565  585  590  595  595  595  602  609
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 557
+      |(Definition)     : 569
+      |(Reference)      : 572
+     ind
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 557
+      |(Definition)     : 571  572
+      |(Reference)      : 574  574  574
+     is_inside_cell
+      |(Class and Type) : internal function name, LOGICAL(4)
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 576
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 557
+      |(Definition)     : 570
+      |(Reference)      : 572
+     k
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 557
+      |(Definition)     : 568  614
+      |(Reference)      : 587  590  592  609  614
+     modulo
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 602
+     natoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 562
+     natoms_created
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 588
+      |(Reference)      : 588
+     scell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, host-associated, initialized
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 576
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 564  579  602
+
+ Scoping unit of internal sub-program : is_inside_cell
+   Attribute and Cross reference of name
+     cart2Direct
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 651
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 628  630
+      |(Definition)     : 644  645  646  648  649  651  652
+      |(Reference)      : 652  655  655  655  655  655  655
+     coords
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(IN), dummy-argument
+      |(Declaration)    : 628  631
+      |(Definition)     : 
+      |(Reference)      : 646  646  646
+     direct2Cartesian
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 648
+     epsilon
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 639
+     is_inside_cell
+      |(Class and Type) : variable name, LOGICAL(4)
+      |(Attributes)     : result-value
+      |(Declaration)    : 633
+      |(Definition)     : 661  663
+      |(Reference)      : 
+     is_inside_cell
+      |(Class and Type) : internal function name, LOGICAL(4)
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 628
+      |(Reference)      : 665
+     onet
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 634
+      |(Definition)     : 642
+      |(Reference)      : 655  655  655
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 636
+     real
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 646  646  646
+     rel2Act
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 649
+     scell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(IN), dummy-argument, initialized
+      |(Declaration)    : 628  629
+      |(Definition)     : 
+      |(Reference)      : 651  652
+     sqrt
+      |(Class and Type) : intrinsic function name, REAL(8)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 639
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 629  630
+     tol
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 628  632
+      |(Definition)     : 
+      |(Reference)      : 636  637
+     tole
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 634
+      |(Definition)     : 637  639
+      |(Reference)      : 641  642
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 632  634  639  641  642  646  646  646
+     zert
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 634
+      |(Definition)     : 641
+      |(Reference)      : 655  655  655
+
+ Scoping unit of internal sub-program : insert
+   Attribute and Cross reference of name
+     atom_vertex
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 674
+     element
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : INTENT(IN), TARGET, dummy-argument, initialized
+      |(Declaration)    : 672  674
+      |(Definition)     : 
+      |(Reference)      : 676
+     insert
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 672
+      |(Reference)      : 678
+     modulo
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 677
+     queue
+      |(Class and Type) : variable name, TYPE(queue_t)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 672  673
+      |(Definition)     : 676  677
+      |(Reference)      : 676  677  677
+     queue_t
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 673
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 677
+
+ Scoping unit of internal sub-program : remove
+   Attribute and Cross reference of name
+     atom_vertex
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 687
+     element
+      |(Class and Type) : variable name, TYPE(atom_vertex)
+      |(Attributes)     : POINTER, dummy-argument, initialized
+      |(Declaration)    : 685  687
+      |(Definition)     : 689
+      |(Reference)      : 
+     modulo
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 691
+     NULL
+      |(Class and Type) : intrinsic function name, none
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 690
+     queue
+      |(Class and Type) : variable name, TYPE(queue_t)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 685  686
+      |(Definition)     : 690  691
+      |(Reference)      : 689  689  690  691  691
+     queue_t
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 686
+     remove
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 685
+      |(Reference)      : 692
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 691
+
+ Scoping unit of internal sub-program : init_queue
+   Attribute and Cross reference of name
+     associated
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 704  707
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 702
+      |(Definition)     : 706
+      |(Reference)      : 707
+     init_queue
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 699
+      |(Reference)      : 719
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 702
+      |(Definition)     : 705  708
+      |(Reference)      : 708  711  712
+     qsize
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 699  701
+      |(Definition)     : 
+      |(Reference)      : 716
+     queue
+      |(Class and Type) : variable name, TYPE(queue_t)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 699  700
+      |(Definition)     : 714  716  717  718
+      |(Reference)      : 704  706  707
+     queue_t
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 700
+     size
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 706
+
+ Scoping unit of internal sub-program : destroy_scgenerator
+   Attribute and Cross reference of name
+     destroy_scgenerator
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 730
+      |(Reference)      : 732
+     rlist
+      |(Class and Type) : variable name, TYPE(queue_t)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 731
+      |(Reference)      : 
+
+ Scoping unit of module sub-program : init_cell
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 741  742
+      |(Definition)     : 746  748  748  750  750
+      |(Reference)      : 
+     destroy_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 746
+     init_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 741
+      |(Reference)      : 752
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 747
+     size
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 741  743
+      |(Definition)     : 
+      |(Reference)      : 748  748  750  750
+     stat
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 741  744
+      |(Definition)     : 746  748
+      |(Reference)      : 747
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 742
+
+ Scoping unit of module sub-program : destroy_cell
+   Attribute and Cross reference of name
+     associated
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 762  762
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 759  760
+      |(Definition)     : 764  764  766  766
+      |(Reference)      : 762  762
+     destroy_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 759
+      |(Reference)      : 773
+     present
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 763  769
+     stat
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 759  761
+      |(Definition)     : 764  770
+      |(Reference)      : 763  769
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 760
+
+ Scoping unit of module sub-program : sort_cell
+   Attribute and Cross reference of name
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, initialized
+      |(Declaration)    : 780  781
+      |(Definition)     : 
+      |(Reference)      : 784  785  788  788
+     debug
+      |(Class and Type) : named constant, LOGICAL(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 783
+     dim
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 784  785  788  788
+     lbound
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 784  788
+     qsort
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : RECURSIVE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 788
+     sort_cell
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 780
+      |(Reference)      : 868
+     supercell
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 781
+     ubound
+      |(Class and Type) : intrinsic function name, INTEGER(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 785  788
+
+ Scoping unit of internal sub-program : qsort
+   Attribute and Cross reference of name
+     adjustl
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 807  810  814  841  841
+     apivot
+      |(Class and Type) : variable name, CHARACTER(2,1)
+      |(Attributes)     : 
+      |(Declaration)    : 800
+      |(Definition)     : 807
+      |(Reference)      : 810  814
+     begin
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 797  798
+      |(Definition)     : 
+      |(Reference)      : 803  804  806  838  840  841  843
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, host-associated, initialized
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 807  810  814  841  841
+     end
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 797  798
+      |(Definition)     : 
+      |(Reference)      : 803  805  806  839  840  841  843
+     ipivot
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 799
+      |(Definition)     : 806  821  823
+      |(Reference)      : 807  820  822
+     left
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 799
+      |(Definition)     : 804  811  825  828
+      |(Reference)      : 810  811  818  819  820  823  825  827  828  839
+     llt
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE, ELEMENTAL
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 810  814  841
+     qout
+      |(Class and Type) : construct name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 809
+      |(Reference)      : 830  832  834
+     qsort
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : RECURSIVE
+      |(Declaration)    : 
+      |(Definition)     : 797
+      |(Reference)      : 838  839  846
+     right
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 799
+      |(Definition)     : 805  815  826  829
+      |(Reference)      : 814  815  818  819  821  822  826  827  829  838
+     swap
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 819  843
+
+ Scoping unit of internal sub-program : swap
+   Attribute and Cross reference of name
+     atom
+      |(Class and Type) : type name
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 854
+     cell
+      |(Class and Type) : variable name, TYPE(supercell)
+      |(Attributes)     : INTENT(INOUT), dummy-argument, host-associated, initialized
+      |(Declaration)    : 
+      |(Definition)     : 862  863  864  865
+      |(Reference)      : 857  861  862  863
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 852  853
+      |(Definition)     : 
+      |(Reference)      : 857  861  862  863
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 852  853
+      |(Definition)     : 
+      |(Reference)      : 862  863  864  865
+     swap
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 852
+      |(Reference)      : 866
+     tmpatom
+      |(Class and Type) : variable name, TYPE(atom)
+      |(Attributes)     : 
+      |(Declaration)    : 854
+      |(Definition)     : 857
+      |(Reference)      : 864
+     tmpcoords
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 855
+      |(Definition)     : 861
+      |(Reference)      : 865
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : host-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 855
+
+ Total information
+   Procedures       : 1
+   Total lines      : 870
+   Total statements : 524
+

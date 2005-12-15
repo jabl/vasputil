@@ -1,0 +1,279 @@
+
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Mon Sep 19 12:45:00 2005
+ Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
+ Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
+
+ Compilation information
+   Current directory : /home/job/src/vasputil_f90
+   Source file       : src/f77_lapack.f90
+   Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
+                     : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 
+                     : --nmldefault --o0 --no --nocl --nopenmp --nparallel 
+                     : --nprefetch --pca --nprivate --nquad --quiet --nsav 
+                     : --nshared --nsse2 --nstaticlink --nswm --tp 
+                     : --nthreadheap --nthreads --trace --trap --nunroll 
+                     : --nvarheap --nversion --warn --nwide --nwisk --wo --nzfm 
+                     : --xref
+
+ Module "f77_lapack"
+  (line-no.)(nest)
+          1        !  Copyright (c) 2004 Janne Blomqvist
+          2        
+          3        ! This module blatantly steals some stuff from lapack95 (Fortran 95
+          4        ! interface to lapack). If you have the real thing, you can replace
+          5        ! this file with lapack95.
+          6        
+          7        module f77_lapack
+          8        
+          9          implicit none
+         10        
+         11          INTERFACE LA_GESV
+         12        
+         13             SUBROUTINE DGESV( N, NRHS, A, LDA, PIV, B, LDB, INFO )
+         14               USE LA_PRECISION, ONLY: WP => DP
+         15               INTEGER, INTENT(IN) :: LDA, LDB, NRHS, N
+         16               INTEGER, INTENT(OUT) :: INFO
+         17               INTEGER, INTENT(OUT) :: PIV(*)
+         18               REAL(WP), INTENT(INOUT) :: A(LDA,*), B(LDB,*)
+         19             END SUBROUTINE DGESV
+         20        
+         21          END INTERFACE
+         22        
+         23        
+         24          INTERFACE LA_GESDD
+         25        
+         26        
+         27             SUBROUTINE DGESDD( JOBZ, M, N, A, LDA, S, U, LDU, VT, LDVT,    &
+         28                  &                      WORK, LWORK, IWORK, INFO )
+         29               USE LA_PRECISION, ONLY: WP => DP
+         30               CHARACTER(LEN=1), INTENT(IN) :: JOBZ
+         31               INTEGER, INTENT(IN) :: M, N, LDA, LDU, LDVT, LWORK
+         32               INTEGER, INTENT(OUT) :: INFO
+         33               REAL(WP), INTENT(OUT) :: S(*)
+         34               REAL(WP), INTENT(INOUT) :: A(LDA,*)
+         35               REAL(WP), INTENT(OUT) :: U(LDU,*), VT(LDVT,*), WORK(*)
+         36               INTEGER :: IWORK(*)
+         37             END SUBROUTINE DGESDD
+         38        
+         39        
+         40          END INTERFACE
+         41        
+         42        
+         43        end module f77_lapack
+
+ Procedure information
+   Lines      : 43
+   Statements : 24
+
+ Scoping unit of module : f77_lapack
+   Attribute and Cross reference of name
+     f77_lapack
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 7
+      |(Definition)     : 
+      |(Reference)      : 43
+     LA_GESDD
+      |(Class and Type) : generic name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 24
+      |(Definition)     : 
+      |(Reference)      : 
+     LA_GESV
+      |(Class and Type) : generic name
+      |(Attributes)     : PUBLIC
+      |(Declaration)    : 11
+      |(Definition)     : 
+      |(Reference)      : 
+
+ Scoping unit of interface body : DGESV
+   Attribute and Cross reference of name
+     A
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(INOUT), dummy-argument
+      |(Declaration)    : 13  18
+      |(Definition)     : 
+      |(Reference)      : 
+     B
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(INOUT), dummy-argument
+      |(Declaration)    : 13  18
+      |(Definition)     : 
+      |(Reference)      : 
+     DGESV
+      |(Class and Type) : external subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 13
+      |(Definition)     : 
+      |(Reference)      : 19
+     DP
+      |(Class and Type) : use name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 14
+     INFO
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), dummy-argument
+      |(Declaration)    : 13  16
+      |(Definition)     : 
+      |(Reference)      : 
+     LA_PRECISION
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 14
+     LDA
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 13  15
+      |(Definition)     : 
+      |(Reference)      : 18
+     LDB
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 13  15
+      |(Definition)     : 
+      |(Reference)      : 18
+     N
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 13  15
+      |(Definition)     : 
+      |(Reference)      : 
+     NRHS
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 13  15
+      |(Definition)     : 
+      |(Reference)      : 
+     PIV
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, INTENT(OUT), dummy-argument
+      |(Declaration)    : 13  17
+      |(Definition)     : 
+      |(Reference)      : 
+     WP
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 14  18
+
+ Scoping unit of interface body : DGESDD
+   Attribute and Cross reference of name
+     A
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(INOUT), dummy-argument
+      |(Declaration)    : 27  34
+      |(Definition)     : 
+      |(Reference)      : 
+     DGESDD
+      |(Class and Type) : external subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 27
+      |(Definition)     : 
+      |(Reference)      : 37
+     DP
+      |(Class and Type) : use name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 29
+     INFO
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), dummy-argument
+      |(Declaration)    : 27  32
+      |(Definition)     : 
+      |(Reference)      : 
+     IWORK
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION, dummy-argument
+      |(Declaration)    : 27  36
+      |(Definition)     : 
+      |(Reference)      : 
+     JOBZ
+      |(Class and Type) : variable name, CHARACTER(1,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  30
+      |(Definition)     : 
+      |(Reference)      : 
+     LA_PRECISION
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 29
+     LDA
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  31
+      |(Definition)     : 
+      |(Reference)      : 34
+     LDU
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  31
+      |(Definition)     : 
+      |(Reference)      : 35
+     LDVT
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  31
+      |(Definition)     : 
+      |(Reference)      : 35
+     LWORK
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  31
+      |(Definition)     : 
+      |(Reference)      : 
+     M
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  31
+      |(Definition)     : 
+      |(Reference)      : 
+     N
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 27  31
+      |(Definition)     : 
+      |(Reference)      : 
+     S
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(OUT), dummy-argument
+      |(Declaration)    : 27  33
+      |(Definition)     : 
+      |(Reference)      : 
+     U
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(OUT), dummy-argument
+      |(Declaration)    : 27  35
+      |(Definition)     : 
+      |(Reference)      : 
+     VT
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(OUT), dummy-argument
+      |(Declaration)    : 27  35
+      |(Definition)     : 
+      |(Reference)      : 
+     WORK
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : DIMENSION, INTENT(OUT), dummy-argument
+      |(Declaration)    : 27  35
+      |(Definition)     : 
+      |(Reference)      : 
+     WP
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 29  33  34  35
+
+ Total information
+   Procedures       : 1
+   Total lines      : 43
+   Total statements : 24
+

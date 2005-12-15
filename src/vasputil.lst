@@ -1,0 +1,818 @@
+
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Wed Dec 14 15:24:32 2005
+ Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
+ Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
+
+ Compilation information
+   Current directory : /home/job/src/vasputil_f90
+   Source file       : src/vasputil.f90
+   Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
+                     : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 
+                     : --nmldefault --o0 --no --nocl --nopenmp --nparallel 
+                     : --nprefetch --pca --nprivate --nquad --quiet --nsav 
+                     : --nshared --nsse2 --nstaticlink --nswm --tp 
+                     : --nthreadheap --nthreads --trace --trap --nunroll 
+                     : --nvarheap --nversion --warn --nwide --nwisk --wo --nzfm 
+                     : --xref
+
+ Main program "vasputil"
+  (line-no.)(nest)
+          1        !****h* /vasputil
+          2        ! COPYRIGHT
+          3        !  Copyright (c) 2004, 2005 Janne Blomqvist
+          4        
+          5        !  This program is free software; you can redistribute it and/or modify
+          6        !  it under the terms of the GNU General Public License as published by
+          7        !  the Free Software Foundation; either version 2 of the License, or
+          8        !  (at your option) any later version.
+          9        
+         10        !  This program is distributed in the hope that it will be useful,
+         11        !  but WITHOUT ANY WARRANTY; without even the implied warranty of
+         12        !  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+         13        !  GNU General Public License for more details.
+         14        
+         15        !  You should have received a copy of the GNU General Public License
+         16        !  along with this program; if not, write to the Free Software
+         17        !  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+         18        
+         19        ! PURPOSE
+         20        ! VASP utils main program. It works by checking the 1:st command line
+         21        ! argument for the name of the command to run, and from that
+         22        ! determining what to do.
+         23        !****
+         24        program vasputil
+         25          use conf
+         26          use f2kcli
+         27          use supercell_io
+         28        
+         29          implicit none
+         30        
+         31          character(len=80) :: command
+         32          character(len=132), dimension(:), allocatable :: arg
+         33          integer :: status, i, j, iarg
+         34          integer, dimension(3) :: pta_arg
+         35          real(wp) :: fraction, lheight, tol, bulk
+         36          integer, dimension(:), allocatable :: atoms
+         37        
+         38          iarg = command_argument_count ()
+         39        
+         40     1    if (iarg == 0) then
+         41     1       call print_usage ()
+         42     1       stop
+         43     1    end if
+         44        
+         45          ! Get the command name
+         46          call get_command_argument (number=1,  value=command, status=status)
+         47     1    if ( status /= 0) then
+         48     1       print *, 'Could not retrieve name of command, status: ', status
+         49     1       stop
+         50     1    end if
+         51        
+         52          ! Allocate space for the arguments. We need two extra spaces for non-present
+         53          ! optional args.
+         54          allocate(arg(iarg+1))
+         55        
+         56     1    do j = 2, iarg
+         57     1       call get_command_argument (j, arg(j-1), status=status)
+         58     2       if (status /= 0) then
+         59     2          print *, 'Could not retrieve value of command argument ', j, &
+         60     2               ', status: ', status
+         61     2          stop
+         62     2       end if
+         63     1    end do
+         64        
+         65          i = iarg - 1
+         66        
+         67     1    select case (command)
+         68     1    case ('poscar2xyz')
+         69     2       select case (i)
+         70     2       case default
+         71     2          print *, 'Usage: poscar2xyz POSCAR [POSCAR.xyz]'
+         72     2          print *, ''
+         73     2          print *, 'Convert a POSCAR file to xyz format.'
+         74     2          print *, 'POSCAR is the POSCAR file you want to convert.'
+         75     2          print *, 'POSCAR.xyz is the filename of the .xyz file to be &
+         76     2               &created. If omitted, it defaults to the name of the &
+         77     2               &POSCAR file, plus the xyz extension.'
+         78     2       case (1, 2)
+         79     3          if ( i == 1) then
+         80     3             write(arg(2), '(A)') trim (arg(1)) // '.xyz'
+         81     3          end if
+         82     2          call POSCAR2xyz (arg(1), arg(2))
+         83     2       end select
+         84     1  
+         85     1    case ('direct2cartesian')
+         86     2       select case (i)
+         87     2       case default
+         88     2          print *, 'Usage: direct2cartesian POSCAR [POSCAR.cart]'
+         89     2          print *, ''
+         90     2          print *, 'Convert a POSCAR file in direct coordinates to cartesian.'
+         91     2          print *, 'POSCAR: The POSCAR file with the direct coordinates.'
+         92     2          print *, 'POSCAR.cart: The name of the output file. If omitted, &
+         93     2               &defaults to the name of the POSCAR file plus the .cart extension.'
+         94     2       case (1, 2)
+         95     3          if (i == 1) then
+         96     3             write (arg(2), '(A)') trim (arg(1)) // '.cart'
+         97     3          end if
+         98     2          call direct2cartesian_poscar (arg(1), arg(2))
+         99     2       end select
+        100     1  
+        101     1    case ('xyz2poscar')
+        102     2       select case (i)
+        103     2       case default
+        104     2          print *, 'Usage: xyz2poscar XYZfile POSCARfile'
+        105     2          print *, ''
+        106     2          print *, 'Convert a XYZ file to POSCAR format.'
+        107     2          print *, 'XYZfile: The name of the .xyz format file.'
+        108     2          print *, 'POSCARfile: The name of the output file.'
+        109     2       case (2)
+        110     2          call xyz2poscar (arg(1), arg(2))
+        111     2       end select
+        112     1  
+        113     1    case ('atomsmoved')
+        114     2       select case (i)
+        115     2       case default
+        116     2          print *, 'Usage: atomsmoved POSCAR1 POSCAR2 [tol]'
+        117     2          print *, ''
+        118     2          print *, 'Compare two POSCAR files to see which atoms have moved.'
+        119     2          print *, 'POSCAR[1,2]: The file names of the files to compare.'
+        120     2          print *, 'tol: Optional argument specifying the tolerance. ', &
+        121     2               'If omitted, defaults to 0.1 Å'
+        122     2       case (2, 3)
+        123     3          if (i==2) then
+        124     3             call atomsMoved (arg(1), arg(2))
+        125     3          else
+        126     3             read(arg(3), *) tol
+        127     3             call atomsMoved (arg(1), arg(2), tol)
+        128     3          end if
+        129     2       end select
+        130     1  
+        131     1    case ('plane2atom')
+        132     2       select case (i)
+        133     2       case (:4)
+        134     2          print *, 'Usage: plane2atom POSCAR planeatom1 planetatom2 planeatom3 atom1-N'
+        135     2          print *, ''
+        136     2          print *, 'Calculates the (average) distance between a plane and a set of atoms.'
+        137     2          print *, 'POSCAR: the file containing the coordinates.'
+        138     2          print *, 'planeatomX: The atoms defining the plane.'
+        139     2          print *, 'atom1-N: The atom(s) to calculate the (average) distance to.'
+        140     2       case default
+        141     3          do j = 2,4
+        142     3             read(arg(j), '(I3)') pta_arg(j-1)
+        143     3          end do
+        144     2          allocate(atoms(i-4))
+        145     3          do j = 5, i
+        146     3             read(arg(j), *) atoms(j-4)
+        147     3          end do
+        148     2          call planetoatom (arg(1), pta_arg(1), pta_arg(2), pta_arg(3), atoms)
+        149     2       end select
+        150     1  
+        151     1    case ('plane2layer')
+        152     2       select case (i)
+        153     2       case (:4, 8:)
+        154     2          print *, 'Usage: plane2layer POSCAR ptom1 patom2 patom3 &
+        155     2               &layerheight [tol] [bulk]'
+        156     2          print *, ''
+        157     2          print *, 'Calculates the distance between a plane and a set of atoms &
+        158     2               &determined by the value of their z coordinate.'
+        159     2          print *, ''
+        160     2          print *, 'POSCAR: the file containing the coordinates.'
+        161     2          print *, ''
+        162     2          print *, 'patomX: The atoms defining the plane.'
+        163     2          print *, ''
+        164     2          print *, 'layerheight: The approximate height (z coordinate) of the &
+        165     2               &layer to calculate the distance to.'
+        166     2          print *, ''
+        167     2          print *, 'tol: Optional argument specifying the tolerance for the &
+        168     2               &layerheight argument. If omitted, defaults to 0.5.'
+        169     2          print *, ''
+        170     2          print *, 'bulk: Optional argument specifying the bulk interlayer ', &
+        171     2               'distance. If specified, the program prints out the layer ', &
+        172     2               'relaxation in percent. The tol argument must also be present ', &
+        173     2               'for this to be calculated.'
+        174     2       case default
+        175     3          do j = 2, 4
+        176     3             read(arg(j), *) pta_arg(j-1)
+        177     3          end do
+        178     2          read(arg(5), *) lheight
+        179     3          if (i == 6) then
+        180     3             read(arg(6), *) tol
+        181     3             call planetolayer (arg(1), pta_arg(1), pta_arg(2), pta_arg(3), lheight, tol)
+        182     3          else if (i == 7) then
+        183     3             read(arg(6), *) tol
+        184     3             read(arg(7), *) bulk
+        185     3             call planetolayer (arg(1), pta_arg(1), pta_arg(2), pta_arg(3), lheight, tol, bulk)
+        186     3          else
+        187     3             call planetolayer (arg(1), pta_arg(1), pta_arg(2), pta_arg(3), lheight)
+        188     3          end if
+        189     2       end select
+        190     1  
+        191     1    case ('atomsdistance')
+        192     2       select case (i)
+        193     2       case default
+        194     2          print *, 'Usage: atomsdistance POSCAR1 atom1 [POSCAR2] atom2'
+        195     2          print *, ''
+        196     2          print *, 'Calculates the distance between two atoms.'
+        197     2          print *, 'POSCAR1: The file containing the coordinates.'
+        198     2          print *, 'POSCAR2: The optional file containing the coordinates ', &
+        199     2               'of the second atom. If omitted, the coordinates are taken ', &
+        200     2               'from the first file.'
+        201     2          print *, 'atomX: the numbers of the atoms.'
+        202     2       case (3, 4)
+        203     2          read(arg(2), '(I3)') pta_arg(1)
+        204     3          if (i == 3) then
+        205     3             read(arg(3), '(I3)') pta_arg(2)
+        206     3             arg(3) = arg(1)
+        207     3          else
+        208     3             read(arg(4), '(I3)') pta_arg(2)
+        209     3          end if
+        210     2          call atomsDistance (arg(1), pta_arg(1), arg(3), pta_arg(2))
+        211     2       end select
+        212     1  
+        213     1    case ('interpolate')
+        214     2       select case (i)
+        215     2       case default
+        216     2          print *, 'Usage: interpolate POSCAR1 POSCAR2 fraction POSCAR.out'
+        217     2          print *, ''
+        218     2          print *, 'Interpolates the coordinates between two POSCAR files.'
+        219     2          print *, 'POSCARX: The two files to interpolate between.'
+        220     2          print *, 'fraction: The fraction [0, 1] to interpolate with.'
+        221     2          print *, 'POSCAR.out: The output file.'
+        222     2       case (4)
+        223     2          read(arg(3), *) fraction
+        224     2          call interpolate_POSCAR (arg(1), arg(2), fraction, arg(4))
+        225     2       end select
+        226     1  
+        227     1  
+        228     1    case ('unnormalize')
+        229     2       select case (i)
+        230     2       case (:3)
+        231     2          print *, 'Usage: unnormalize POSCAR POSCAR.out dir atom1-N'
+        232     2          print *, ''
+        233     2          print *, 'Unnormalize a POSCAR file, e.g. for visualization.'
+        234     2          print *, 'POSCAR: The input file.'
+        235     2          print *, 'POSCAR.out: The output file.'
+        236     2          print *, 'dir: The lattice vector in which direction the ', &
+        237     2               'coordinates should be changed.'
+        238     2       case default
+        239     2          read(arg(3), *) status  ! reuse status variable for dir
+        240     2          allocate(atoms(i-3))
+        241     3          do j = 4, i
+        242     3             read(arg(j), *) atoms(j-3)
+        243     3          end do
+        244     2          call unnormalize_POSCAR (arg(1), status, atoms, arg(2))
+        245     2       end select
+        246     1  
+        247     1    case ('normalize')
+        248     2       select case (i)
+        249     2       case default
+        250     2          print *, 'Usage: normalize POSCAR [POSCAR.out]'
+        251     2          print *, ''
+        252     2          print *, 'Normalizes a POSCAR file.'
+        253     2          print *, 'POSCAR: The input file.'
+        254     2          print *, 'POSCAR.out: The output file. If omitted, defaults to ', &
+        255     2               'the name of the input file plus the .out extension.'
+        256     2       case (1, 2)
+        257     3          if (i == 1) then
+        258     3             write(arg(2), '(A)') trim(arg(1)) // '.out'
+        259     3          end if
+        260     2          call normalize_POSCAR (arg(1), arg(2))
+        261     2       end select
+        262     1  
+        263     1    case ('removeatoms')
+        264     2       select case (i)
+        265     2       case (:2)
+        266     2          print *, 'Usage: removeatoms POSCAR.in POSCAR.out atom[1-N]'
+        267     2          print *, ''
+        268     2          print *, 'Remove atoms from a POSCAR file.'
+        269     2          print *, 'POSCAR.in: The input file.'
+        270     2          print *, 'POSCAR.out: The output file.'
+        271     2          print *, 'atom[1-N]: The indexes of the atoms to remove.'
+        272     2       case default
+        273     2          allocate(atoms(i-2))
+        274     3          do j = 3, i
+        275     3             read(arg(j), *) atoms(j-2)
+        276     3          end do
+        277     2          call removeAtoms_POSCAR (arg(1), arg(2), atoms)
+        278     2       end select
+        279     1  
+        280     1    case ('lockatoms')
+        281     2       select case (i)
+        282     2       case (:2)
+        283     2          print *, 'Usage: lockatoms POSCAR.in POSCAR.out atom[1-N]'
+        284     2          print *, ''
+        285     2          print *, 'Lock atom coordinates in a POSCAR file.'
+        286     2          print *, 'POSCAR.in: The input file.'
+        287     2          print *, 'POSCAR.out: The output file.'
+        288     2          print *, 'atom[1-N]: The indexes of the atoms to lock.'
+        289     2       case default
+        290     2          allocate (atoms(i-2))
+        291     3          do j = 3, i
+        292     3             read (arg(j), *) atoms(j-2)
+        293     3          end do
+        294     2          call lock_atoms (arg(1), arg(2), atoms)
+        295     2       end select
+        296     1  
+        297     1    case ('kspace2xyz')
+        298     2       select case (i)
+        299     2       case default
+        300     2          print *, 'Usage: kspace2xyz POSCAR [POSCAR.k.xyz]'
+        301     2          print *, ''
+        302     2          print *, 'Convert a POSCAR file to xyz format with reciprocal &
+        303     2               &coordinates.'
+        304     2          print *, 'POSCAR is the POSCAR file you want to convert.'
+        305     2          print *, 'POSCAR.k.xyz is the filename of the .xyz file to be'
+        306     2          print *, 'created. If ommitted, it defaults to the name of the'
+        307     2          print *, 'POSCAR file, plus the k.xyz extension.'
+        308     2       case (1, 2)
+        309     3          if ( i == 1 ) then
+        310     3             write(arg(2), '(A)') trim(arg(1)) // '.k.xyz'
+        311     3          end if
+        312     2          call kspace2xyz (arg(1), arg(2))
+        313     2       end select
+        314     1  
+        315     1    case ('check_nndist')
+        316     2       select case (i)
+        317     2       case default
+        318     2          print *, 'Usage: check_nndist POSCAR [tol]'
+        319     2          print *, ''
+        320     2          print *, 'Check whether some atoms in the POSCAR file are closer '
+        321     2          print *, 'to each other than a specified tolerance.'
+        322     2          print *, 'POSCAR: The name of the input file.'
+        323     2          print *, 'tol: the tolerance, in Ångströms. If omitted, &
+        324     2               &defaults to 1.0 Å.'
+        325     2       case (1, 2)
+        326     3          if (i == 1) then
+        327     3             call check_nn_POSCAR (arg(1))
+        328     3          else if (i == 2) then
+        329     3             read(arg(2), *) tol
+        330     3             call check_nn_POSCAR (arg(1), tol)
+        331     3          end if
+        332     2       end select
+        333     1  
+        334     1    case ('scgenerator')
+        335     2       select case (i)
+        336     2       case default
+        337     2          print *, 'Usage: scgenerator POSCAR POSCAR2 POSCAR.out'
+        338     2          print *, ''
+        339     2          print *, 'Generate a supercell.'
+        340     2          print *, 'POSCAR: The name of the input file.'
+        341     2          print *, 'POSCAR2: The optional name of the input file containing the &
+        342     2               &supercell lattice vectors. If omitted, asks the user.'
+        343     2          print *, 'POSCAR.out: The name of the output file. If omitted, &
+        344     2               &defaults to the input file plus the .out extension'
+        345     2          print *, 'The input file should contain the coordinates of the &
+        346     2               &atoms to be replicated in the supercell using a space-filling &
+        347     2               &algorithm.'
+        348     2       case (1, 2, 3)
+        349     3          if (i == 1) then
+        350     3             write (arg(3), '(A)') trim (arg(1)) // '.out'
+        351     3             call sc_generator_io (arg(1), outfile=arg(3))
+        352     3          else
+        353     4             if (i == 2) then
+        354     4                write(arg(3), '(A)') trim (arg(1)) // '.out'
+        355     4             end if
+        356     3             call sc_generator_io (arg(1), arg(2), arg(3))
+        357     3          end if
+        358     2       end select
+        359     1  
+        360     1    case ('dumpcoords')
+        361     2       select case (i)
+        362     2       case default
+        363     2          print *, 'Usage: vasputil dumpcoords POSCAR'
+        364     2          print *, ''
+        365     2          print *, 'Dump cartesian coordinates suitable for importing into '
+        366     2          print *, 'e.g. octave or matlab.'
+        367     2       case (1)
+        368     2          call dumpcoords (arg(1))
+        369     2       end select
+        370     1  
+        371     1    case ('importcoords')
+        372     2       select case (i)
+        373     2       case default
+        374     2          print *, 'Usage: vasputil importcoords POSCAR < coords'
+        375     2          print *, ''
+        376     2          print *, 'Import cartesian coordinates from stdin.'
+        377     2       case (1)
+        378     2          call importcoords (arg(1))
+        379     2       end select
+        380     1  
+        381     1    case ('test')
+        382     1       call runtest ()
+        383     1  
+        384     1    case ('-V', '--version')
+        385     1       call print_version ()
+        386     1  
+        387     1    case default
+        388     1       call print_usage ()
+        389     1  
+        390     1    end select
+        391        
+        392        contains
+        393        
+        394        
+        395          !****f* vasputil/print_version
+        396          ! PURPOSE
+        397          ! Print the version number of the program to the screen.
+        398          !****
+        399          subroutine print_version ()
+        400            print '(A, //, A, /, A, /, A)', ' vasputil release 3.2', &
+        401                 ' Copyright (C) 2004, 2005 Janne Blomqvist.', &
+        402                 ' This is free software; see the source for copying conditions.  &
+        403                 &There is NO', &
+        404                 ' warranty; not even for MERCHANTABILITY or FITNESS FOR &
+        405                 &A PARTICULAR PURPOSE.'
+        406          end subroutine print_version
+        407        
+        408        
+        409          !****f* vasputil/print_usage
+        410          ! PURPOSE
+        411          ! Print the usage information for vasputil.
+        412          !****
+        413          subroutine print_usage ()
+        414            print *, 'Usage: vasputil [commandname|options] [command options] [files]'
+        415            print *, 'vasputil consists of many utilities, all in the ', &
+        416                 'same binary that behaves differently depending on the ', &
+        417                 'name by which it is called.'
+        418            print *, 'vasputil options:'
+        419            print '(T4, A, T8, A, T32, A)', '-V,', '--version', &
+        420                 'output version information.'
+        421            print *, ''
+        422            print *, 'Available utilities are:'
+        423            print *, 'poscar2xyz: Convert a POSCAR file to a xyz format file.'
+        424            print *, 'plane2atom: Calculate the average distance from a &
+        425                 &plane to a set of atoms.'
+        426            print *, 'plane2layer: Calculate the average distance from a &
+        427                 &plane to a layer.'
+        428            print *, 'atomsdistance: Calculate the distance between two atoms.'
+        429            print *, 'atomsmoved: Check which atoms have moved from one &
+        430                 &POSCAR to another.'
+        431            print *, 'interpolate: Interpolate the coordinates between &
+        432                 &two POSCAR files.'
+        433            print *, 'normalize: Normalize the coordinates in a POSCAR file.'
+        434            print *, 'unnormalize: Unnormalize coordinates in a POSCAR file.'
+        435            print *, 'removeatoms: Remove atoms from a POSCAR file.'
+        436            print *, 'kspace2xyz: Convert a POSCAR file to a xyz file with &
+        437                 &reciprocal coordinates.'
+        438            print *, 'check_nndist: Check nearest neighbor distances.'
+        439            print *, 'scgenerator: Generate a supercell.'
+        440            print *, 'lockatoms: Lock atom coordinates in a supercell.'
+        441            print *, 'xyz2poscar: Convert from XYZ format to POSCAR.'
+        442            print *, 'direct2cartesian: Convert POSCAR from direct to cartesian &
+        443                 &coordinates.'
+        444            print *, 'dumpcoords: Dump cartesian coordinates to stdout.'
+        445            print *, 'importcoords: Import cartesian coordinates from stdout.'
+        446            print *, 'test: Print some diagnostic information.'
+        447            print *, ''
+        448            print *, 'Run the utilities without arguments to get usage &
+        449                 &instructions.'
+        450          end subroutine print_usage
+        451        
+        452        
+        453          !****f* vasputil/runtest
+        454          ! PURPOSE
+        455          ! Print some diagnostics information and run testsuite (whenever I
+        456          ! get around to actually implementing the testsuite).
+        457          !****
+        458          subroutine runtest ()
+        459            use kind_params
+        460            print *, 'Real kinds supported by compiler:'
+        461            print *, 'Single     Double   Quad      max(dp,qp)'
+        462            print '(1X,I2,8X,I2,8X,I2,8X,I2)', sp, dp, qp_preferred, qp
+        463          end subroutine runtest
+        464        
+        465        end program vasputil
+
+ Procedure information
+   Lines      : 465
+   Statements : 351
+
+ Scoping unit of program : vasputil
+   Attribute and Cross reference of name
+     arg
+      |(Class and Type) : variable name, CHARACTER(132,1)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 32
+      |(Definition)     : 54  57  80  96  206  258  310  350  354
+      |(Reference)      : 80  82  82  96  98  98  110  110  124  124  126  127  127  142  146  148  176  178  180  181  183  184  185  187  203  205  206  208  210  210  223  224  224  224  239  242  244  244  258  260  260  275  277  277  292  294  294  310  312  312  327  329  330  350  351  351  354  356  356  356  368  378
+     atoms
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : ALLOCATABLE, DIMENSION
+      |(Declaration)    : 36
+      |(Definition)     : 144  146  240  242  273  275  290  292
+      |(Reference)      : 148  244  277  294
+     atomsDistance
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 210
+     atomsMoved
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 124  127
+     bulk
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 35
+      |(Definition)     : 184
+      |(Reference)      : 185
+     COMMAND_ARGUMENT_COUNT
+      |(Class and Type) : module function name, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 38
+     check_nn_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 327  330
+     command
+      |(Class and Type) : variable name, CHARACTER(80,1)
+      |(Attributes)     : 
+      |(Declaration)    : 31
+      |(Definition)     : 46
+      |(Reference)      : 67
+     conf
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 25
+     direct2cartesian_poscar
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 98
+     dumpcoords
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 368
+     f2kcli
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 26
+     fraction
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 35
+      |(Definition)     : 223
+      |(Reference)      : 224
+     GET_COMMAND_ARGUMENT
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 46  57
+     i
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 33
+      |(Definition)     : 65
+      |(Reference)      : 69  79  86  95  102  114  123  132  144  145  152  179  182  192  204  214  229  240  241  248  257  264  273  274  281  290  291  298  309  316  326  328  335  349  353  361  372
+     iarg
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 33
+      |(Definition)     : 38
+      |(Reference)      : 40  54  56  65
+     importcoords
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 378
+     interpolate_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 224
+     j
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 33
+      |(Definition)     : 56  141  145  175  241  274  291
+      |(Reference)      : 57  57  59  142  142  146  146  176  176  242  242  275  275  292  292
+     kspace2xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 312
+     lheight
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 35
+      |(Definition)     : 178
+      |(Reference)      : 181  185  187
+     lock_atoms
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 294
+     normalize_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 260
+     number
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 46
+     outfile
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 351
+     POSCAR2xyz
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 82
+     planetoatom
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 148
+     planetolayer
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 181  185  187
+     print_usage
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 41  388
+     print_version
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 385
+     pta_arg
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : DIMENSION
+      |(Declaration)    : 34
+      |(Definition)     : 142  176  203  205  208
+      |(Reference)      : 148  148  148  181  181  181  185  185  185  187  187  187  210  210
+     removeAtoms_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 277
+     runtest
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 382
+     sc_generator_io
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 351  356
+     status
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : 
+      |(Declaration)    : 33
+      |(Definition)     : 46  57  239
+      |(Reference)      : 47  48  58  59  244
+     status
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 46  57
+     supercell_io
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 27
+     tol
+      |(Class and Type) : variable name, REAL(8)
+      |(Attributes)     : 
+      |(Declaration)    : 35
+      |(Definition)     : 126  180  183  329
+      |(Reference)      : 127  181  185  330
+     trim
+      |(Class and Type) : intrinsic function name, CHARACTER((unknown),1)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 80  96  258  310  350  354
+     unnormalize_POSCAR
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 244
+     value
+      |(Class and Type) : keyword argument name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 46
+     vasputil
+      |(Class and Type) : program name
+      |(Attributes)     : 
+      |(Declaration)    : 24
+      |(Definition)     : 
+      |(Reference)      : 465
+     wp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 35
+     xyz2poscar
+      |(Class and Type) : module subroutine name
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 110
+
+ Scoping unit of internal sub-program : print_version
+   Attribute and Cross reference of name
+     print_version
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 399
+      |(Reference)      : 406
+
+ Scoping unit of internal sub-program : print_usage
+   Attribute and Cross reference of name
+     print_usage
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 413
+      |(Reference)      : 450
+
+ Scoping unit of internal sub-program : runtest
+   Attribute and Cross reference of name
+     dp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 462
+     kind_params
+      |(Class and Type) : module name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 459
+     qp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 462
+     qp_preferred
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 462
+     runtest
+      |(Class and Type) : internal subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 458
+      |(Reference)      : 463
+     sp
+      |(Class and Type) : named constant, INTEGER(4)
+      |(Attributes)     : use-associated
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 462
+
+ Total information
+   Procedures       : 1
+   Total lines      : 465
+   Total statements : 351
+

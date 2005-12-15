@@ -1,0 +1,117 @@
+
+ Lahey/Fujitsu Fortran 95 Compiler Release L6.20b  Mon Sep 19 12:45:00 2005
+ Copyright (C) 1994-2003 Lahey Computer Systems.  All rights reserved.
+ Copyright (C) 1998-2003 FUJITSU LIMITED. All rights reserved.
+
+ Compilation information
+   Current directory : /home/job/src/vasputil_f90
+   Source file       : src/la_erinfo.f90
+   Compiler options  : --ap -c --chk aesux --chkglobal --nco --dal --ndbl --f95 
+                     : -g --nin --info --li --lst --nlong --maxfatals 50 --nml 
+                     : --nmldefault --o0 --no --nocl --nopenmp --nparallel 
+                     : --nprefetch --pca --nprivate --nquad --quiet --nsav 
+                     : --nshared --nsse2 --nstaticlink --nswm --tp 
+                     : --nthreadheap --nthreads --trace --trap --nunroll 
+                     : --nvarheap --nversion --warn --nwide --nwisk --wo --nzfm 
+                     : --xref
+
+ External subroutine subprogram "ERINFO"
+  (line-no.)(nest)
+          1              SUBROUTINE ERINFO(LINFO, SRNAME, INFO, ISTAT)
+          2        !
+          3        !  -- LAPACK95 interface driver routine (version 3.0) --
+          4        !     UNI-C, Denmark; Univ. of Tennessee, USA; NAG Ltd., UK
+          5        !     September, 2000
+          6        !
+          7        !  .. IMPLICIT STATEMENT ..
+          8                 IMPLICIT NONE
+          9        !  .. SCALAR ARGUMENTS ..
+         10                 CHARACTER( LEN = * ), INTENT(IN)              :: SRNAME
+         11                 INTEGER             , INTENT(IN)              :: LINFO
+         12                 INTEGER             , INTENT(OUT), OPTIONAL   :: INFO
+         13                 INTEGER             , INTENT(IN), OPTIONAL    :: ISTAT
+         14        !  .. EXECUTABLE STATEMENTS ..
+         15        !         IF( ( LINFO < 0 .AND. LINFO > -200 ) .OR.                     &
+         16        !    &       ( LINFO > 0 .AND. .NOT.PRESENT(INFO) ) )THEN
+         17     1        IF( ( ( LINFO < 0 .AND. LINFO > -200 ) .OR. LINFO > 0 )           &
+         18     1       &           .AND. .NOT.PRESENT(INFO) )THEN
+         19     1          WRITE (*,*) 'Program terminated in LAPACK95 subroutine ',SRNAME
+         20     1          WRITE (*,*) 'Error indicator, INFO = ',LINFO
+         21     2          IF( PRESENT(ISTAT) )THEN
+         22     3            IF( ISTAT /= 0 ) THEN
+         23     4              IF( LINFO == -100 )THEN
+         24     4                WRITE (*,*) 'The statement ALLOCATE causes STATUS = ',    &
+         25     4       &                    ISTAT
+         26     4              ELSE
+         27     4                WRITE (*,*) 'LINFO = ', LINFO, ' not expected'
+         28     4              END IF
+         29     3            END IF
+         30     2          END IF
+         31     1          STOP
+         32     1           ELSE IF( LINFO <= -200 ) THEN
+         33     1             WRITE(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++'
+         34     1             WRITE(*,*) '*** WARNING, INFO = ', LINFO, ' WARNING ***'
+         35     2             IF( LINFO == -200 )THEN
+         36     2               WRITE(*,*)                                                 &
+         37     2       &        'Could not allocate sufficient workspace for the optimum'
+         38     2               WRITE(*,*)                                                 &
+         39     2       &        'blocksize, hence the routine may not have performed as'
+         40     2               WRITE(*,*) 'efficiently as possible'
+         41     2           ELSE
+         42     2             WRITE(*,*) 'Unexpected warning'
+         43     2           END IF
+         44     1             WRITE(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++'
+         45     1          END IF
+         46     1          IF( PRESENT(INFO) ) THEN
+         47     1            INFO = LINFO
+         48     1          END IF
+         49              END SUBROUTINE ERINFO
+
+ Procedure information
+   Lines      : 49
+   Statements : 35
+
+ Scoping unit of external sub-program : ERINFO
+   Attribute and Cross reference of name
+     ERINFO
+      |(Class and Type) : external subroutine name
+      |(Attributes)     : 
+      |(Declaration)    : 
+      |(Definition)     : 1
+      |(Reference)      : 49
+     INFO
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(OUT), OPTIONAL, dummy-argument
+      |(Declaration)    : 1  12
+      |(Definition)     : 47
+      |(Reference)      : 17  46
+     ISTAT
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), OPTIONAL, dummy-argument
+      |(Declaration)    : 1  13
+      |(Definition)     : 
+      |(Reference)      : 21  22  24
+     LINFO
+      |(Class and Type) : variable name, INTEGER(4)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 1  11
+      |(Definition)     : 
+      |(Reference)      : 17  17  17  20  23  27  32  34  35  47
+     PRESENT
+      |(Class and Type) : intrinsic function name, LOGICAL(4)
+      |(Attributes)     : PURE
+      |(Declaration)    : 
+      |(Definition)     : 
+      |(Reference)      : 17  21  46
+     SRNAME
+      |(Class and Type) : variable name, CHARACTER(*,1)
+      |(Attributes)     : INTENT(IN), dummy-argument
+      |(Declaration)    : 1  10
+      |(Definition)     : 
+      |(Reference)      : 19
+
+ Total information
+   Procedures       : 1
+   Total lines      : 49
+   Total statements : 35
+

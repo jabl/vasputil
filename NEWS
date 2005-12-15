@@ -1,0 +1,78 @@
+vasputil 3.2, 2005-12-??
+
+* New utility, test (run some self-tests).
+
+* Switched to CVS instead of RCS.
+
+-----------------------------------------------------------
+
+vasputil 3.1, 2005-10-26
+
+* New utilities, dumpcoords and importcoords.
+
+* New Octave/Matlab scripts: printcoords and rotatez.
+
+* Makefile fragment for Intel Fortran 9.0.
+
+------------------------------------------------------------
+
+vasputil 3.0, 2005-09-19
+
+* Removed symlinks, instead utilities are accessed via the main program.
+
+* New utility, xyz2poscar.
+
+* Renamed POSCAR2xyz to poscar2xyz.
+
+* Renamed planetoatom to plane2atom.
+
+* Renamed planetolayer to plane2layer.
+
+* Started to use RCS.
+
+----------------------------------------------------------
+
+vasputil 2.5, 2005-07-07
+
+* Directory reorganization, standard GNU files
+added.
+
+* Added Makefile fragment for Pathscale compiler.
+
+----------------------------------------------------------
+
+vasputil 2.4, 2005-05-04
+
+* Increased precision in write_POSCAR (now F18.14).
+
+* Bugfix in atomsdistance.
+
+------------------------------------------------------------
+	
+vasputil 2.3, 2005-04-18
+
+* New utility included: lockatoms.
+
+------------------------------------------------------------
+
+vasputil 2.2, 2005-04-13
+
+* Minor improvements to species recognition in read_POSCAR, slightly
+better hash function for the supercell generator.
+
+------------------------------------------------------------
+
+vasputil 2.1, 2005-04-13
+
+* Improved species recognition and input methods when reading POSCAR.
+
+-------------------------------------------------------------
+
+vasputil 2.0, 2005-04-12
+
+* Added a supercell generator (scgenerator)
+
+* Bugfix in supercell_core (removeAtoms): Workaround for bug in
+Portland pgf90 5.2-4 compiler.
+
+* Started to keep a ChangeLog.	
