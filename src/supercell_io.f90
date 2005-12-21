@@ -654,9 +654,9 @@ module supercell_io
 
       if (debug) then
          print *, 'Atoms: ', natoms
-         do i = 1, natoms
-            print *, cell%atoms(i)%symbol
-         end do
+!         do i = 1, natoms
+!            print *, cell%atoms(i)%symbol
+!         end do
          print *, 'species: ', species
          do i = 1, size(symbols)
             print *, 'symbols: ', symbols(i)

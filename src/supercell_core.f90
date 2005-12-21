@@ -385,15 +385,20 @@ module supercell_core
     ! PURPOSE
     !   Generate a supercell.
     ! INPUTS
-    ! cell - The supercell which contains the basis set of the new supercell.
+    ! cell - The supercell which contains the primitive translation
+    !        vectors and the basis set which is to be replicated into the
+    !        supercell.
     ! scell - The supercell which is to be created. The lattice vectors of
     !         this cell should already be set up before calling this procedure.
     ! NOTES
     ! The algorithm works by using the lattice vectors from "cell" as the basis
     ! and using 
-    ! those to fill the supercell.
+    ! those to fill the supercell. After that, the atoms in "cell" are
+    ! replicated into "scell".
     ! BUGS
-    ! None. The code is perfect.
+    ! Note that the variable names somewhat confusingly refer to
+    ! atoms, but they are really mostly referring to the primitive
+    ! translation vectors.
     !****
     subroutine generate_supercell (cell, scell, err_proc)
       type(supercell), intent(inout) :: cell
@@ -404,7 +409,8 @@ module supercell_core
          end subroutine err_proc
       end interface
       !real(wp) :: arel
-      integer :: natoms, i, j, natoms_created, hcol, hitot, hlookup
+      integer :: natoms, i, j, natoms_created, hcol, hitot, hlookup, &
+           natoms_tot, k
       type atom_edge
          type(atom_vertex), pointer :: v => NULL()
       end type atom_edge
@@ -439,14 +445,17 @@ module supercell_core
       !print *, scell%lattice%omega, cell%lattice%omega
       ! Estimate for the number of atoms in the supercell
       natoms = ceiling (size (cell%atoms) * scell%lattice%omega / cell%lattice%omega)
-      print *, 'Estimated ', natoms, ' atoms in the supercell.'
+      if (debug) then
+         print *, 'Estimated ', natoms, ' basis cells in the supercell.'
+      end if
 
       ! Allocate the ready queue
       call init_queue (rlist, 2*natoms)
 
       ! This algorithm is a variation of a graph traversal algorithm, e.g. 
-      ! "visit all the nodes in a graph". In this case "node" = atom, i.e. 
-      ! atoms
+      ! "visit all the nodes in a graph". In this case "node" =
+      ! primitive cell, i.e.
+      ! primitive cells in the supercell
       ! are created by starting from origo and adding the integer multiples of
       ! the basis vectors and checking that they are inside the bounding box
       ! created by the lattice vectors of scell.
@@ -477,28 +486,41 @@ module supercell_core
          end do
       end do
 
-      if (hcol /= 0) then
-         print *, 'A total of ', hlookup, &
-              ' hash lookups were made, of which ', hcol, &
-              ' resulted in collisions. The collisions were handled by a &
-              &total of ', &
-              hitot, 'rehashing operations.'
+      if (debug) then
+         if (hcol /= 0) then
+            print *, 'A total of ', hlookup, &
+                 ' hash lookups were made, of which ', hcol, &
+                 ' resulted in collisions. The collisions were handled by a &
+                 &total of ', &
+                 hitot, 'rehashing operations.'
+         end if
+         print *, 'Explored ', j, ' atoms.'
       end if
-      print *, 'Explored ', j, ' atoms.'
 
-      ! Now all the atoms have been created in the graph. Next we walk
+      ! Now all the primitive cells have been created in the graph. 
+      ! Next we walk
       ! through the graph again and fill the supercell coordinate array.
-      print *, 'But really, we have ', natoms_created, ' atoms in the supercell.'
-      call init_cell (scell, natoms_created)
-      scell%atoms%symbol = cell%atoms(1)%symbol
+      if (debug) then
+         print *, 'But really, we have ', natoms_created, ' basis cells in the supercell.'
+      end if
+      natoms_tot = natoms_created * size (cell%atoms)
+      call init_cell (scell, natoms_tot)
+!      scell%atoms%symbol = cell%atoms(1)%symbol
       scell%cartesian = .true.
       scell%relative = .false.
+      call direct2Cartesian (cell)
+      call rel2Act (cell)
       ! Reinitialize the ready list
       call init_queue (rlist, natoms_created)
       avcur => NULL()
       call insert (rlist, av)
-      j = 1
-      scell%atomCoords(:, j) = cell%lattice%a * matmul (cell%lattice%t, av%acoords)
+      j = 1 ! j is the 'first empty' index for scell%atomCoords.
+      do k = 1, size(cell%atoms)
+         scell%atomCoords(:, j) = cell%lattice%a * &
+              matmul (cell%lattice%t, av%acoords + cell%atomCoords(:,k))
+         scell%atoms(j)%symbol = cell%atoms(k)%symbol
+         j = j + 1
+      end do
       av%explored = .false.
       do
          call remove (rlist, avcur)
@@ -510,14 +532,20 @@ module supercell_core
             if (associated (avnext)) then
                if (avnext%explored) then
                   avnext%explored = .false.
-                  j = j + 1
-                  scell%atomCoords(:, j) = cell%lattice%a * matmul (cell%lattice%t, avnext%acoords)
+                  do k = 1, size (cell%atoms)
+                     scell%atomCoords(:, j) = cell%lattice%a * &
+                          matmul (cell%lattice%t, &
+                          avnext%acoords + cell%atomCoords(:,k))
+                     scell%atoms(j)%symbol = cell%atoms(k)%symbol
+                     j = j + 1
+                  end do
                   call insert (rlist, avnext)
                end if
             end if
          end do
       end do
-      print *, 'Coordinates for ', j, ' atoms were copied to scell.'
+      call sort_cell (scell)
+      print *, 'The supercell contains ', j-1, ' atoms.'
 
       contains
 
@@ -625,14 +653,20 @@ module supercell_core
         ! Calculate the crossing number (Jordan curve theorem). Or rather,
         ! just check that direct coordinates are \in [0,1].
         !****
-        function is_inside_cell (scell, cell, coords, tol)
+        function is_inside_cell (scell, pcell, coords, tol)
           type(supercell), intent(in) :: scell
-          type(supercell), intent(inout) :: cell
+          type(supercell), intent(in) :: pcell
           integer, intent(in) :: coords(3)
           real(wp), intent(in), optional :: tol
-          logical :: is_inside_cell
+          logical :: is_inside_cell, init = .false.
           real(wp) :: zert, onet, tole
+          type(supercell), save :: cell ! Scratch cell.
 
+          if (.not. init) then
+             call init_cell (cell, 1)
+             cell%lattice = pcell%lattice
+             init = .true.
+          end if
           if (present (tol)) then
              tole = tol
           else

@@ -2,7 +2,10 @@ vasputil 3.2, 2005-12-??
 
 * New utility, test (run some self-tests).
 
-* Switched to CVS instead of RCS.
+* Switched from RCS to CVS.
+
+* scgenerator now replicates the primitive cell, not only the basis
+vectors.
 
 -----------------------------------------------------------
 
@@ -75,4 +78,4 @@ vasputil 2.0, 2005-04-12
 * Bugfix in supercell_core (removeAtoms): Workaround for bug in
 Portland pgf90 5.2-4 compiler.
 
-* Started to keep a ChangeLog.	
+* Started to keep a ChangeLog and NEWS file.	

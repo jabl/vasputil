@@ -1,3 +1,13 @@
+2005-12-21	Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* supercell_core.f90 (scgenerator): Replicate primitive cells
+	instead of only basis vectors.
+	(is_inside_cell): Use a scratch cell instead of modifying the
+	input argument.
+
+	* supercell_io.f90 (write_POSCAR): Don't write symbol of every
+	atom in debug mode.
+	
 2005-12-14	Janne Blomqvist  <job@fyslab.hut.fi>
 
 	* vasputil.f90: New utility, runtest.
