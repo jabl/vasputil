@@ -1,6 +1,6 @@
 !****h* /vasputil
 ! COPYRIGHT
-!  Copyright (c) 2004, 2005 Janne Blomqvist
+!  Copyright (c) 2004, 2005, 2006 Janne Blomqvist
 
 !  This program is free software; you can redistribute it and/or modify
 !  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,10 @@
 program vasputil
   use conf
   use f2kcli
-  use supercell_io
+  use supercell_measure
+  use supercell_modify
+  use sc_file_convert
+  use supercell_generator
 
   implicit none
 
@@ -344,17 +347,16 @@ program vasputil
              &defaults to the input file plus the .out extension'
         print *, 'The input file should contain the coordinates of the &
              &atoms to be replicated in the supercell using a space-filling &
-             &algorithm.'
-     case (1, 2, 3)
-        if (i == 1) then
-           write (arg(3), '(A)') trim (arg(1)) // '.out'
-           call sc_generator_io (arg(1), outfile=arg(3))
-        else
-           if (i == 2) then
-              write(arg(3), '(A)') trim (arg(1)) // '.out'
-           end if
-           call sc_generator_io (arg(1), arg(2), arg(3))
-        end if
+             &algorithm. Note that you cannot omit only one of the arguments; &
+             &the allowed forms are thus with 1 or 3 arguments.'
+     case (1)
+        write (arg(3), '(A)') trim (arg(1)) // '.out'
+        call sc_generator_io (arg(1), outfile=arg(3))
+     case (3)
+!        if (i == 2) then
+!           write(arg(3), '(A)') trim (arg(1)) // '.out'
+!        end if
+        call sc_generator_io (arg(1), arg(2), arg(3))
      end select
 
   case ('dumpcoords')
@@ -397,8 +399,8 @@ contains
   ! Print the version number of the program to the screen.
   !****
   subroutine print_version ()
-    print '(A, //, A, /, A, /, A)', ' vasputil release 3.2', &
-         ' Copyright (C) 2004, 2005 Janne Blomqvist.', &
+    print '(A, //, A, /, A, /, A)', ' vasputil release 3.3', &
+         ' Copyright (C) 2004, 2005, 2006 Janne Blomqvist.', &
          ' This is free software; see the source for copying conditions.  &
          &There is NO', &
          ' warranty; not even for MERCHANTABILITY or FITNESS FOR &

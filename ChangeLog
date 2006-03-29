@@ -1,3 +1,14 @@
+2006-03-29  Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* poscar_io.f90: New file.
+	* sc_file_convert.f90: Likewise.
+	* supercell_generator.f90: Likewise.
+	* supercell_modify.f90: Likewise.
+	* supercell_measure.f90: Likewise.
+	* supercell_utils.f90: Likewise.
+	* supercell_io.f90: Removed.
+	* supercell_core.f90: Some procedures moved to new files.
+	
 2005-12-21	Janne Blomqvist  <job@fyslab.hut.fi>
 
 	* supercell_core.f90 (scgenerator): Replicate primitive cells
@@ -7,6 +18,8 @@
 
 	* supercell_io.f90 (write_POSCAR): Don't write symbol of every
 	atom in debug mode.
+
+	* vasputil.f90: Correct bug for scgenerator with 2 arguments.
 	
 2005-12-14	Janne Blomqvist  <job@fyslab.hut.fi>
 

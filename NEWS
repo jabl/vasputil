@@ -1,3 +1,7 @@
+vasputil 3.3, 2006-
+
+------------------------------------------------------------
+
 vasputil 3.2, 2005-12-21
 
 * New utility, test (run some self-tests).
@@ -5,7 +9,10 @@ vasputil 3.2, 2005-12-21
 * Switched from RCS to CVS.
 
 * scgenerator now replicates the primitive cell, not only the basis
-vectors.
+vectors. 
+
+* A bug in scgenerator was fixed. Thanks to Arijit Sen for bringing it
+to my attention.
 
 -----------------------------------------------------------
 

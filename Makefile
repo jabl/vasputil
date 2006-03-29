@@ -39,7 +39,7 @@ DISTFILES := $(wildcard $(SRCDIR)/*.f90) $(SCRIPTS) $(DOCS) \
 
 
 
-VERSION := 3.2
+VERSION := 3.3
 
 include depend.mk
 
@@ -54,6 +54,7 @@ clean:
 	$(FC) $(FFLAGS) $(MODDIR) -c $< -o $@
 
 install: $(PROG)
+	if [ ! -d "$(PREFIX)/bin" ]; then mkdir $(PREFIX)/bin; fi
 	cp $(PROG) $(PREFIX)/bin
 	cp $(SCRIPTS) $(PREFIX)/bin
 	if [ ! -d "$(PREFIX)/$(LIBDIR)" ]; then mkdir $(PREFIX)/$(LIBDIR); fi
