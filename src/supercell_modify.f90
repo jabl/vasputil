@@ -103,13 +103,30 @@ contains
   subroutine centercell (infile, point, outfile)
     character(len=*), intent(in) :: infile, outfile, point
     type(supercell) :: cell
-    real(wp) :: pcoord(3)
+    real(wp) :: pcoord(3), dist, tcoord(3)
+    integer :: ii, jj
+
     call read_POSCAR (cell, infile)
+    call cartesian2Direct (cell)
     if (point == "c") then
        pcoord = (/ 0.5_wp, 0.5_wp, 0.5_wp /)
     else
        pcoord = (/ 0.0_wp, 0.0_wp, 0.0_wp /)
     end if
+    do ii = 1, size (cell%atoms)
+       tcoord = cell%atomCoords(:,ii) - pcoord
+       dist = sqrt (dot_product (tcoord, tcoord))
+       do jj = 1, 3
+          if (cell%atomCoords(jj,ii) > 0.5_wp) then
+             tcoord = cell%atomCoords(:,ii)
+             tcoord(jj) = tcoord(jj) - 1.0_wp
+             if (sqrt (dot_product (tcoord, tcoord)) < dist) then
+                cell%atomCoords(:,ii) = tcoord
+             end if
+          end if
+       end do
+    end do
+    call write_POSCAR (cell, outfile)
   end subroutine centercell
 
 

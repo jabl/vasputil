@@ -39,13 +39,14 @@ DISTFILES := $(wildcard $(SRCDIR)/*.f90) $(SCRIPTS) $(DOCS) \
 
 
 
-VERSION := 3.3
+VERSION := 3.3.1
 
 include depend.mk
 
 
 clean:
-	-rm -rf $(PROG) $(SRCDIR)/*.o *.mod $(SRCDIR)/*.mod $(SRCDIR)/*.lst
+	-rm -rf $(PROG) $(SRCDIR)/*.o *.mod $(SRCDIR)/*.mod $(SRCDIR)/*.lst \
+	$(SRCDIR)/*~
 
 #%.mod: %.o
 #	$(MAKE) $*.o #recursive make
@@ -57,8 +58,7 @@ install: $(PROG)
 	if [ ! -d "$(PREFIX)/bin" ]; then mkdir $(PREFIX)/bin; fi
 	cp $(PROG) $(PREFIX)/bin
 	cp $(SCRIPTS) $(PREFIX)/bin
-	if [ ! -d "$(PREFIX)/$(LIBDIR)" ]; then mkdir $(PREFIX)/$(LIBDIR); fi
-	if [ ! -d "$(PREFIX)/$(LIBDIR)/m" ]; then mkdir $(PREFIX)/$(LIBDIR)/m; fi
+	if [ ! -d "$(PREFIX)/$(LIBDIR)/m" ]; then mkdir -p $(PREFIX)/$(LIBDIR)/m; fi
 	cp $(MLIBS) $(PREFIX)/lib/m/ 
 
 dist: doc depend

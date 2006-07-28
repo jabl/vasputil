@@ -263,6 +263,22 @@ program vasputil
         call normalize_POSCAR (arg(1), arg(2))
      end select
 
+  case ('centercell')
+     select case (i)
+        case default
+           print *, 'Usage: vasputil centercell POSCAR point [POSCAR.cnt]'
+           print *, ''
+           print *, 'Centers a cell around a point.'
+           print *, 'POSCAR: The input file.'
+           print *, 'point: The point to center around. Accepted values are c (center of cell) and 0.'
+           print *, 'POSCAR.cnt: The optional name of the output file.'
+        case (2, 3)
+           if (i == 2) then
+              write (arg(3), '(A)') trim (arg(1)) // '.cnt'
+           end if
+           call centercell (arg(1), arg(2), arg(3))
+        end select
+
   case ('removeatoms')
      select case (i)
      case (:2)
@@ -340,11 +356,12 @@ program vasputil
         print *, 'Usage: scgenerator POSCAR POSCAR2 POSCAR.out'
         print *, ''
         print *, 'Generate a supercell.'
-        print *, 'POSCAR: The name of the input file.'
+        print *, 'POSCAR: The name of the input file containing the basis, i.e. the atoms to be replicated.'
         print *, 'POSCAR2: The optional name of the input file containing the &
-             &supercell lattice vectors. If omitted, asks the user.'
+             &supercell lattice vectors of the new supercell. If omitted, asks the user.'
         print *, 'POSCAR.out: The name of the output file. If omitted, &
              &defaults to the input file plus the .out extension'
+        print *, ''
         print *, 'The input file should contain the coordinates of the &
              &atoms to be replicated in the supercell using a space-filling &
              &algorithm. Note that you cannot omit only one of the arguments; &
@@ -399,7 +416,7 @@ contains
   ! Print the version number of the program to the screen.
   !****
   subroutine print_version ()
-    print '(A, //, A, /, A, /, A)', ' vasputil release 3.3', &
+    print '(A, //, A, /, A, /, A)', ' vasputil release 3.3,1', &
          ' Copyright (C) 2004, 2005, 2006 Janne Blomqvist.', &
          ' This is free software; see the source for copying conditions.  &
          &There is NO', &
@@ -434,6 +451,7 @@ contains
          &two POSCAR files.'
     print *, 'normalize: Normalize the coordinates in a POSCAR file.'
     print *, 'unnormalize: Unnormalize coordinates in a POSCAR file.'
+    print *, 'centercell: Center a cell around a point.'
     print *, 'removeatoms: Remove atoms from a POSCAR file.'
     print *, 'kspace2xyz: Convert a POSCAR file to a xyz file with &
          &reciprocal coordinates.'

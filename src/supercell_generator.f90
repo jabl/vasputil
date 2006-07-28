@@ -98,7 +98,7 @@ contains
     ! Estimate for the number of atoms in the supercell
     natoms = ceiling (size (cell%atoms) * scell%lattice%omega / cell%lattice%omega)
     if (debug) then
-       print *, 'Estimated ', natoms, ' basis cells in the supercell.'
+       print *, 'Estimated ', natoms, ' atoms in the new supercell.'
     end if
 
     ! Allocate the ready queue
@@ -215,7 +215,7 @@ contains
       integer :: hash
       integer :: i, j, k, hkey
       ! Golden ratio of a signed 32-bit integer
-      integer, parameter :: gr = 2654435761/2
+      integer, parameter :: gr = 2654435761_i8b/2
       i = coords(1) * gr
       j = not (coords(2)) * gr
       k = ishftc (coords(3), 15) * gr
@@ -322,7 +322,7 @@ contains
       if (present (tol)) then
          tole = tol
       else
-         tole = 1000 * sqrt (epsilon (1.0_wp))
+         tole = 100 * sqrt (epsilon (1.0_wp))
       end if
       zert = 0.0_wp - tole
       onet = 1.0_wp - tole
@@ -439,6 +439,11 @@ contains
     ! Read the basis of the cell that is to be replicated in the 
     ! new supercell.
     call read_POSCAR (cell, infile)
+    ! Make all coords cartesian and actual
+    call direct2cartesian (cell)
+    call direct2cartesian (scell)
+    call rel2act (cell)
+    call rel2act (scell)
     ! Fill out the new supercell
     call generate_supercell (cell, scell, error_stop)
     ! Write the new supercell

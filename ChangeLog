@@ -8,6 +8,8 @@
 	* supercell_utils.f90: Likewise.
 	* supercell_io.f90: Removed.
 	* supercell_core.f90: Some procedures moved to new files.
+	* supercell_modify.f90 (centercell): New procedure.
+	* vasputil.f90: Add centercell utility.
 	
 2005-12-21	Janne Blomqvist  <job@fyslab.hut.fi>
 

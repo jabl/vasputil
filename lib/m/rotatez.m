@@ -1,3 +1,4 @@
+% rotatez (coords, rotp, angle)
 % Rotate molecule about z axis (it should be easy to generalize
 % this to the full euler angle rotations).
 % Inputs:

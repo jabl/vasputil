@@ -1,4 +1,14 @@
-vasputil 3.3, 2006-
+vasputil 3.3.1, 2006-??
+
+* Bugfix in scgenerator.
+
+-----------------------------------------------------------
+
+vasputil 3.3, 2006-03-29
+
+* New utility, centercell.
+
+* Source code reorganized.
 
 ------------------------------------------------------------
 

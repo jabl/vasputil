@@ -5,12 +5,12 @@
 module conf
 
   ! Working precision is IEEE double precision
-  use kind_params, only: wp => dp
+  use kind_params, only: wp => dp, i8b
 
   implicit none
 
   ! Change this to compile with(out) debug prints.
-  logical, parameter :: debug = .false.
+  logical, parameter :: debug = .true.
 
   contains
 

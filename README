@@ -1,5 +1,5 @@
 
-Vasputil release 3.3
+Vasputil release 3.3.1
 
 Vasputil is a command-line utility designed to make life with VASP
 easier. It provides a set of commands to manipulate POSCAR files.
@@ -13,6 +13,7 @@ atomsmoved: Check which atoms have moved from one POSCAR to another.
 interpolate: Interpolate the coordinates between two POSCAR files.
 normalize: Normalize the coordinates in a POSCAR file.
 unnormalize: Unnormalize coordinates in a POSCAR file.
+centercell: Center a cell around a point.
 removeatoms: Remove atoms from a POSCAR file.
 kspace2xyz: Convert a POSCAR file to a xyz file with reciprocal coordinates.
 check_nndist: Check nearest neighbor distances.
