@@ -1,5 +1,10 @@
 2006-03-29  Janne Blomqvist  <job@fyslab.hut.fi>
 
+	* supercell_generator.f90 (generate_supercell): Bugfix in
+	generating final coordinates.
+	
+2006-03-29  Janne Blomqvist  <job@fyslab.hut.fi>
+
 	* poscar_io.f90: New file.
 	* sc_file_convert.f90: Likewise.
 	* supercell_generator.f90: Likewise.

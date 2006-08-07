@@ -10,7 +10,7 @@ module conf
   implicit none
 
   ! Change this to compile with(out) debug prints.
-  logical, parameter :: debug = .true.
+  logical, parameter :: debug = .false.
 
   contains
 

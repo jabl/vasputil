@@ -96,9 +96,9 @@ contains
     !arel = scell%lattice%a / cell%lattice%a
     !print *, scell%lattice%omega, cell%lattice%omega
     ! Estimate for the number of atoms in the supercell
-    natoms = ceiling (size (cell%atoms) * scell%lattice%omega / cell%lattice%omega)
+    natoms = ceiling (scell%lattice%omega / cell%lattice%omega)
     if (debug) then
-       print *, 'Estimated ', natoms, ' atoms in the new supercell.'
+       print *, 'Estimated ', natoms, ' basis cells in the new supercell.'
     end if
 
     ! Allocate the ready queue
@@ -146,16 +146,17 @@ contains
                &total of ', &
                hitot, 'rehashing operations.'
        end if
-       print *, 'Explored ', j, ' atoms.'
+       print *, 'Explored ', j, ' basis cells.'
     end if
 
     ! Now all the primitive cells have been created in the graph. 
     ! Next we walk
     ! through the graph again and fill the supercell coordinate array.
+    natoms_tot = natoms_created * size (cell%atoms)
     if (debug) then
        print *, 'But really, we have ', natoms_created, ' basis cells in the supercell.'
+       print *, 'Total of ', natoms_tot, ' atoms will be created.'
     end if
-    natoms_tot = natoms_created * size (cell%atoms)
     call init_cell (scell, natoms_tot)
     !      scell%atoms%symbol = cell%atoms(1)%symbol
     scell%cartesian = .true.
@@ -169,7 +170,7 @@ contains
     j = 1 ! j is the 'first empty' index for scell%atomCoords.
     do k = 1, size(cell%atoms)
        scell%atomCoords(:, j) = cell%lattice%a * &
-            matmul (cell%lattice%t, av%acoords + cell%atomCoords(:,k))
+            matmul (cell%lattice%t, av%acoords) + cell%atomCoords(:,k)
        scell%atoms(j)%symbol = cell%atoms(k)%symbol
        j = j + 1
     end do
@@ -187,7 +188,7 @@ contains
                 do k = 1, size (cell%atoms)
                    scell%atomCoords(:, j) = cell%lattice%a * &
                         matmul (cell%lattice%t, &
-                        avnext%acoords + cell%atomCoords(:,k))
+                        avnext%acoords) + cell%atomCoords(:,k)
                    scell%atoms(j)%symbol = cell%atoms(k)%symbol
                    j = j + 1
                 end do
@@ -215,7 +216,7 @@ contains
       integer :: hash
       integer :: i, j, k, hkey
       ! Golden ratio of a signed 32-bit integer
-      integer, parameter :: gr = 2654435761_i8b/2
+      integer, parameter :: gr = 2654435761_i8b/2_i8b
       i = coords(1) * gr
       j = not (coords(2)) * gr
       k = ishftc (coords(3), 15) * gr
