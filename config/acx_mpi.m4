@@ -4,20 +4,20 @@ dnl This macro tries to find out how to compile programs that
 dnl use MPI (Message Passing Interface), a standard API for
 dnl parallel process communication (see http://www-unix.mcs.anl.gov/mpi/)
 dnl
-dnl On success, it sets the MPICC, MPICXX, or MPIF90 output variable to
+dnl On success, it sets the MPICC, MPICXX, or MPIFC output variable to
 dnl the name of the MPI compiler, depending upon the current language.
-dnl (This may just be $CC/$CXX/$F90, but is more often something like
-dnl mpicc/mpiCC/mpif90.)  It also sets MPILIBS to any libraries that are
-dnl needed for linking MPI (e.g. -lmpi, if a special MPICC/MPICXX/MPIF90
+dnl (This may just be $CC/$CXX/$FC, but is more often something like
+dnl mpicc/mpiCC/mpif77.)  It also sets MPILIBS to any libraries that are
+dnl needed for linking MPI (e.g. -lmpi, if a special MPICC/MPICXX/MPIFC
 dnl was not found).
 dnl
 dnl If you want to compile everything with MPI, you should set:
 dnl
-dnl     CC="$MPICC" #OR# CXX="$MPICXX" #OR# F90="$MPIF90"
+dnl     CC="$MPICC" #OR# CXX="$MPICXX" #OR# FC="$MPIFC"
 dnl     LIBS="$MPILIBS $LIBS"
 dnl
 dnl The user can force a particular library/compiler by setting the
-dnl MPICC/MPICXX/MPIF90 and/or MPILIBS environment variables.
+dnl MPICC/MPICXX/MPIFC and/or MPILIBS environment variables.
 dnl
 dnl ACTION-IF-FOUND is a list of shell commands to run if an MPI
 dnl library is found, and ACTION-IF-NOT-FOUND is a list of commands
@@ -28,7 +28,7 @@ dnl @version $Id$
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu>
 
 AC_DEFUN([ACX_MPI], [
-AC_PREREQ(2.57) dnl for AC_LANG_CASE
+AC_PREREQ(2.59) dnl for AC_LANG_CASE
 
 AC_LANG_CASE([C], [
 	AC_REQUIRE([AC_PROG_CC])
@@ -46,19 +46,19 @@ AC_LANG_CASE([C], [
 	CXX="$MPICXX"
 	AC_SUBST(MPICXX)
 ],
-[Fortran 90], [
-	AC_REQUIRE([AC_PROG_F90])
-	AC_ARG_VAR(MPIF90,[MPI Fortran compiler command])
-	AC_CHECK_PROGS(MPIF90, mpif77 mpif90 hf77 mpxlf mpf77 mpf90 mpxlf90 mpxlf95 mpxlf_r, $F90)
-	acx_mpi_save_F90="$F90"
-	F90="$MPIF90"
-	AC_SUBST(MPIF90)
+[Fortran], [
+	AC_REQUIRE([AC_PROG_FC])
+	AC_ARG_VAR(MPIFC,[MPI Fortran compiler command])
+	AC_CHECK_PROGS(MPIFC, mpif77 mpif90 hf77 mpxlf mpf77 mpf90 mpxlf90 mpxlf95 mpxlf_r, $FC)
+	acx_mpi_save_FC="$FC"
+	FC="$MPIFC"
+	AC_SUBST(MPIFC)
 ])
 
 if test x = x"$MPILIBS"; then
 	AC_LANG_CASE([C], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
 		[C++], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
-		[Fortran 90], [AC_MSG_CHECKING([for MPI_Init])
+		[Fortran], [AC_MSG_CHECKING([for MPI_Init])
 			AC_LINK_IFELSE([AC_LANG_PROGRAM([], [[      call MPI_Init]])],[MPILIBS=" "
 				AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])])
 fi
@@ -84,7 +84,7 @@ fi],
 	[AC_MSG_RESULT(yes)],[MPILIBS=""
 		AC_MSG_RESULT(no)])
 fi],
-[Fortran 90], [if test x != x"$MPILIBS"; then
+[Fortran], [if test x != x"$MPILIBS"; then
 	AC_MSG_CHECKING([for mpif.h])
 	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[      include 'mpif.h']])],
 	[AC_MSG_RESULT(yes)],[MPILIBS=""
@@ -93,7 +93,7 @@ fi])
 
 AC_LANG_CASE([C], [CC="$acx_mpi_save_CC"],
 	[C++], [CXX="$acx_mpi_save_CXX"],
-	[Fortran 90], [F90="$acx_mpi_save_F90"])
+	[Fortran], [FC="$acx_mpi_save_FC"])
 
 AC_SUBST(MPILIBS)
 

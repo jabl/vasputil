@@ -2,6 +2,7 @@
 
 # From the endpoints, make 4 evenly spaced
 # intermediate images.
+# @PACKAGE_STRING@
 
 vasputil interpolate POSCAR.00 POSCAR.05 0.2 POSCAR.01
 vasputil interpolate POSCAR.00 POSCAR.05 0.4 POSCAR.02

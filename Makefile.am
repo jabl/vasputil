@@ -1,18 +1,19 @@
-SYMLINKS = atomsdistance atomsmoved interpolate normalize unnormalize \
-	planetoatom planetolayer POSCAR2xyz removeatoms \
-	kspace2xyz check_nndist scgenerator lockatoms
+# Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = interpolate4 layers $(SYMLINKS)
+ACLOCAL_AMFLAGS = -I config
 
-bin_PROGRAMS = vasputil
-vasputil_SOURCES = vasputil.f90 supercell_io.f90 supercell_core.f90 \
-	geometry.f90 lattice.f90 mathconst.f90 kind_params.f90 conf.f90 \
-	f2kcli.f90
-	la_auxmod.f90 la_dgesdd.f90 la_dgesv.f90 \
-	f95_lapack.f90 la_erinfo.f90 f77_lapack.f90
+MYSRC = src
+SUBDIRS = $(MYSRC) bin
 
-$(SYMLINKS):
-	for syml in $(SYMLINKS); do\
-		ln -sf vasputil $$syml;
-	done
+matlabdir = $(libdir)/m/
+dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotatez.m
 
+MYDOC = $(srcdir)/doc
+robodocdir = $(prefix)/doc
+dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
+
+doc: all
+	robodoc --src $(MYSRC) --doc $(MYDOC)/$(PACKAGE) --singledoc --html --sections --toc --nodesc
+
+depend:
+	cd $(MYSRC) && $(MAKE) $(AM_MAKEFLAGS) depend;

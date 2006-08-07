@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Example driver script for planetolayer.
+# @PACKAGE_STRING@
 
 a=1.815
 
