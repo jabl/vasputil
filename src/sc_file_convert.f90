@@ -124,6 +124,55 @@ contains
   end subroutine importcoords
 
 
+  !****f* sc_file_convert/dumpatomsase
+  ! PURPOSE
+  ! Dump cartesian coordinates and atom types to stdout
+  ! in a format that can be understood by Campos ASE
+  ! (i.e. as python code).
+  !****
+  subroutine dumpatomsase (infile)
+    character(len=*), intent(in) :: infile
+    type(supercell) :: cell
+    integer :: i, j
+    logical :: writecomma
+    call read_POSCAR (cell, infile)
+    call direct2Cartesian (cell)
+    call rel2Act (cell)
+    write (*,'(A)') 'from ASE import Atom, ListOfAtoms'
+    write (*,'(A)') 'atoms = ListOfAtoms(['
+    writecomma = .false.
+    do i = 1, size (cell%atoms)
+       if (writecomma) then
+          write (*,*) ','
+       end if
+       write (*,'(A,A,A,3(F13.8,A),A)', advance="no") 'Atom("', &
+            trim (cell%atoms(i)%symbol), '", (', &
+            cell%atomcoords(1,i), ', ', cell%atomcoords(2,i), ', ', &
+            cell%atomcoords(3,i), '))'
+       writecomma = .true.
+    end do
+    write (*,*) '], cell=('
+    writecomma = .false.
+    do i = 1, 3
+       if (writecomma) then
+          write (*,*) ','
+       end if
+       write (*,'(A)', advance="no") '('
+       writecomma = .false.
+       do j = 1, 3
+          if (writecomma) then
+             write (*,'(A)', advance="no") ', '
+          end if
+          write (*,'(F13.8)', advance="no") cell%lattice%t(j,i)*cell%lattice%a
+          writecomma = .true.
+       end do
+       write (*,*) ') '
+       writecomma = .true.
+    end do
+    write (*,*) '), periodic=1)'
+  end subroutine dumpatoms
+
+
   !****f* sc_file_convert/read_xyz
   ! PURPOSE
   ! Read a .xyz file.

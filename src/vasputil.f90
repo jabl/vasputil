@@ -397,6 +397,16 @@ program vasputil
         call importcoords (arg(1))
      end select
 
+  case ('dumpatomsase')
+     select case (i)
+     case default
+        write (*,*) 'Usage: vasputil dumpatomsase POSCAR'
+        write (*,*) ''
+        write (*,*) 'Dump cartesian coordinates as python code, with atom type and some parenthesis, for importing into Campos ASE.'
+     case (1)
+        call dumpatomsase (arg(1))
+     end select
+
   case ('test')
      call runtest ()
 
@@ -416,7 +426,7 @@ contains
   ! Print the version number of the program to the screen.
   !****
   subroutine print_version ()
-    print '(A, //, A, /, A, /, A)', ' vasputil release 3.3,1', &
+    print '(A, //, A, /, A, /, A)', ' vasputil release 4.0', &
          ' Copyright (C) 2004, 2005, 2006 Janne Blomqvist.', &
          ' This is free software; see the source for copying conditions.  &
          &There is NO', &
@@ -463,6 +473,7 @@ contains
          &coordinates.'
     print *, 'dumpcoords: Dump cartesian coordinates to stdout.'
     print *, 'importcoords: Import cartesian coordinates from stdout.'
+    print *, 'dumpatomsase: Dump cartesian coordinates with atom type info as python code to stdout.'
     print *, 'test: Print some diagnostic information.'
     print *, ''
     print *, 'Run the utilities without arguments to get usage &

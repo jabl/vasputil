@@ -1,5 +1,5 @@
 
-Vasputil release 3.3.1
+Vasputil release 4.0
 
 Vasputil is a command-line utility designed to make life with VASP
 easier. It provides a set of commands to manipulate POSCAR files.
@@ -22,6 +22,7 @@ lockatoms: Lock atom coordinates in a supercell.
 xyz2poscar: Convert a XYZ file to a POSCAR file.
 dumpcoords: Dump cartesian coordinates to stdout.
 importcoords: Read cartesian coordinates from stdin.
+dumpatomsase: Dump atom types and coordinates suitable for importing to Campos ASE.
 test: Run self-tests.
 
 Documentation for each utility is available by running it without any
@@ -49,13 +50,26 @@ QUICK INSTALLATION INSTRUCTIONS
 
 $ tar xvzf vasputil-$(VERSION).tar.gz
 
-2) Edit Makefile and set the appropriate installation prefix (default
-is $(HOME)) and include the makefile fragment for your compiler. See
-the instructions in the Makefile.
+2) Run configure, if necessary with extra flags to specify
+e.g. location of libraries not in the default search path
 
-3) Compile and install. In case the default make does not support
-immediate evaluation, you can use GNU make instead, on proprietary
-systems this is sometimes installed as 'gmake'.
+Eg. to use dynamically linked ACML:
+
+$ ./configure LDFLAGS=-L/opt/acml/pathscale64/lib/
+
+Statically linked ACML
+
+$ ./configure --with-blas=/opt/acml/pathscale64/lib/libacml.a
+
+Install somewhere not in the default location ($HOME)
+
+$ ./configure --prefix=/usr/local
+
+For help, see
+
+$ ./configure --help
+
+3) Compile and install.
 
 $ make && make install
 

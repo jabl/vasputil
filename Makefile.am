@@ -6,7 +6,8 @@ MYSRC = src
 SUBDIRS = $(MYSRC) bin
 
 matlabdir = $(libdir)/m/
-dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotatez.m
+dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotatez.m $(srcdir)/lib/m/rotate.m \
+                   $(srcdir)/lib/m/translate.m
 
 MYDOC = $(srcdir)/doc
 robodocdir = $(prefix)/doc
