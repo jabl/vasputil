@@ -33,7 +33,7 @@ AC_PROG_LN_S
 AC_CACHE_SAVE
 
 AC_PROG_CC
-AC_PROG_FC(gfortran pathf95 pathf90 pgf95 pgf90 ifort ifc lf95 xlf95 xlf90 f95 f90 fort)
+AC_PROG_FC(pathf95 pathf90 pgf95 pgf90 ifort ifc lf95 xlf95 xlf90 gfortran f95 f90 fort)
 
 AC_ARG_ENABLE(debug-flags,
 [AC_HELP_STRING([--enable-debug-flags@<:@=ARG@:>@],[compile with debugging flags (default is on)])

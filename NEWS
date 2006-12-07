@@ -4,6 +4,8 @@ vasputil 4.0, 2006-12-05
 
 * New utility, dumpatomsase.
 
+* New Octave/Matlab scripts: rotate and translate.
+
 ----------------------------------------------------------
 
 vasputil 3.3.1, 2006-07-28
