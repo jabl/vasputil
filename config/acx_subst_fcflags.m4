@@ -10,7 +10,7 @@ gfortran)
 	fstd="-std=f95 -Wall -pedantic"
 	fldflags=""
 	;;
-path90|pathf95)
+pathf90|pathf95)
 	fopt="-Ofast"
 	fprof="-pg"
 	fdebug="-O0 -g -fno-unsafe-math-optimizations"
