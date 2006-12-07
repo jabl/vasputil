@@ -33,7 +33,20 @@ AC_PROG_LN_S
 AC_CACHE_SAVE
 
 AC_PROG_CC
+
+# Trick from http://sources.redhat.com/ml/automake/2004-12/msg00070.html
+#user_FCFLAGS = $FCFLAGS
 AC_PROG_FC(pathf95 pathf90 pgf95 pgf90 ifort ifc lf95 xlf95 xlf90 gfortran f95 f90 fort)
+#if test "x$user_FCFLAGS" = x; then
+  # If the user didn't specify FCFLAGS, then FCFLAGS contains
+  # a subset of -g -O2 selected by AC_PROG_FC.  This is not
+  # a user setting, and we want to be able to override this
+  # locally in our rules, so put these flags in a separate
+  # variable and empty CFLAGS.
+#  AC_SUBST([DEFAULTFLAGS], [$FCFLAGS])
+#  FCFLAGS=
+#fi
+
 
 AC_ARG_ENABLE(debug-flags,
 [AC_HELP_STRING([--enable-debug-flags@<:@=ARG@:>@],[compile with debugging flags (default is on)])
