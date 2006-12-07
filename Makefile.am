@@ -13,7 +13,9 @@ MYDOC = $(srcdir)/doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
-doc: all
+doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
+
+$(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
 	robodoc --src $(MYSRC) --doc $(MYDOC)/$(PACKAGE) --singledoc --html --sections --toc --nodesc
 
 depend:

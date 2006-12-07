@@ -170,7 +170,7 @@ contains
        writecomma = .true.
     end do
     write (*,*) '), periodic=1)'
-  end subroutine dumpatoms
+  end subroutine dumpatomsase
 
 
   !****f* sc_file_convert/read_xyz
