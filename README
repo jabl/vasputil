@@ -79,3 +79,6 @@ Makefile is $(HOME), for octave add the following line to ~/.octaverc:
 
 LOADPATH = ['~/lib/m/', LOADPATH];
 
+For matlab, add the following to startup.m (in your matlab directory):
+path(path, '~/lib/m')
+

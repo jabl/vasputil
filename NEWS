@@ -1,10 +1,12 @@
 vasputil 4.0.1, 2007-07-21
 
-* Format string fix in write_poscar
-
-* Break up long write into multiple lines in vasputil.f90
+* Remove rotatez.m, as rotate_molecule does the same thing more generally.
 
 * Rename matlab scripts to avoid conflicting with matlab provided ones.
+
+* Small bugfixes, see ChangeLog for details.
+
+* Switch from CVS to Subversion. 
 
 -------------------------------------------------------------
 

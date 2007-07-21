@@ -2,21 +2,22 @@
 
 ACLOCAL_AMFLAGS = -I config
 
-MYSRC = src
-SUBDIRS = $(MYSRC) bin
+MYSRC = $(srcdir)/src
+SUBDIRS = src bin
 
 matlabdir = $(libdir)/m/
-dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotatez.m $(srcdir)/lib/m/rotate.m \
-                   $(srcdir)/lib/m/translate.m
+dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotate_molecule.m \
+                   $(srcdir)/lib/m/translate_molecule.m
 
-MYDOC = $(srcdir)/doc
+MYDOC = doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
 doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
 $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
+	mkdir doc
 	robodoc --src $(MYSRC) --doc $(MYDOC)/$(PACKAGE) --singledoc --html --sections --toc --nodesc
 
 depend:
-	cd $(MYSRC) && $(MAKE) $(AM_MAKEFLAGS) depend;
+	cd src && $(MAKE) $(AM_MAKEFLAGS) depend;

@@ -1,4 +1,4 @@
-% rotate (coords, rotp, phi, theta, psi)
+% rotate_molecule (coords, rotp, phi, theta, psi)
 % Rotate molecule 
 % See http://mathworld.wolfram.com/EulerAngles.html for definition
 % of angles.
@@ -9,7 +9,7 @@
 % phi: The 1st rotation angle around z axis.
 % theta: Rotation around x axis.
 % psi: 2nd rotation around z axis.
-function rcoords = rotate (coords, rotp, phi, theta, psi)
+function rcoords = rotate_molecule (coords, rotp, phi, theta, psi)
 
 % rotation point appropriately dimensioned:
 dr = kron (ones (1, size (coords', 2)), rotp');

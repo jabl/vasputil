@@ -3366,6 +3366,9 @@ else
 fi
 
 
+
+# Trick from http://sources.redhat.com/ml/automake/2004-12/msg00070.html
+#user_FCFLAGS = $FCFLAGS
 ac_ext=${FC_SRCEXT-f}
 ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext $LIBS >&5'
@@ -3458,7 +3461,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:3461:" \
+echo "$as_me:3464:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -3600,6 +3603,16 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+#if test "x$user_FCFLAGS" = x; then
+  # If the user didn't specify FCFLAGS, then FCFLAGS contains
+  # a subset of -g -O2 selected by AC_PROG_FC.  This is not
+  # a user setting, and we want to be able to override this
+  # locally in our rules, so put these flags in a separate
+  # variable and empty CFLAGS.
+#  AC_SUBST([DEFAULTFLAGS], [$FCFLAGS])
+#  FCFLAGS=
+#fi
 
 
 # Check whether --enable-debug-flags or --disable-debug-flags was given.
@@ -3840,7 +3853,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_verb"
-(eval echo $as_me:3843: \"$ac_link\") >&5
+(eval echo $as_me:3856: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -3918,7 +3931,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_cv_prog_fc_v"
-(eval echo $as_me:3921: \"$ac_link\") >&5
+(eval echo $as_me:3934: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
