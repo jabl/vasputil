@@ -402,7 +402,8 @@ program vasputil
      case default
         write (*,*) 'Usage: vasputil dumpatomsase POSCAR'
         write (*,*) ''
-        write (*,*) 'Dump cartesian coordinates as python code, with atom type and some parenthesis, for importing into Campos ASE.'
+        write (*,*) 'Dump cartesian coordinates as python code, with atom type &
+             &and some parenthesis, for importing into Campos ASE.'
      case (1)
         call dumpatomsase (arg(1))
      end select

@@ -1,3 +1,13 @@
+vasputil 4.0.1, 2007-07-21
+
+* Format string fix in write_poscar
+
+* Break up long write into multiple lines in vasputil.f90
+
+* Rename matlab scripts to avoid conflicting with matlab provided ones.
+
+-------------------------------------------------------------
+
 vasputil 4.0, 2006-12-05
 
 * New build system using GNU autotools.

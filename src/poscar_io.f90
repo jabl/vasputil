@@ -320,7 +320,7 @@ contains
          access='sequential', action='write', status='replace')
     write(pos_iu, '(100(A, 1X))') symbols
     write(pos_iu, *) cell%lattice%a
-    write(pos_iu, '(3(4X, F18.16))') cell%lattice%t
+    write(pos_iu, '(3(4X, F18.15))') cell%lattice%t
     write(pos_iu, *) species
     if (cell%selective) then
        write(pos_iu, '(A)') 'Selective dynamics'
@@ -332,12 +332,12 @@ contains
     end if
     if (cell%selective) then
        do i = 1, size(cell%atoms)
-          write(pos_iu, '(3(2X, F18.16), 3(2X, L2))') &
+          write(pos_iu, '(3(2X, F18.15), 3(2X, L2))') &
                cell%atomCoords(:,i), &
                cell%atoms(i)%selective
        end do
     else
-       write(pos_iu, '(3(2X, F18.16))') (cell%atomCoords(:, i), i=1, size(cell%atoms))
+       write(pos_iu, '(3(2X, F18.15))') (cell%atomCoords(:, i), i=1, size(cell%atoms))
     end if
     close(pos_iu)
     print *, trim(outfile), ' written successfully.'

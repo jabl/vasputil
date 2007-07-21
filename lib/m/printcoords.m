@@ -13,14 +13,14 @@
 % % vasputil importcoords POSCAR < mcoords
 function printcoords (coords)
 
-[fd,msg] = fopen ("mcoords", "w");
+[fd,msg] = fopen ('mcoords', 'w');
 
 if fd == -1,
-  printf (msg);
+  fprintf (msg);
 end;
 
 for i=1:size (coords, 1),
-  fprintf(fd, "    %18.14f    %18.14f    %18.14f\n", coords(i,:));
+  fprintf(fd, '    %18.14f    %18.14f    %18.14f\n', coords(i,:));
 end;
 
 fclose (fd);
