@@ -211,7 +211,7 @@ contains
     !   coords    - Input coordinates to hash.
     !   tsize     - Size of the hash table.
     !****
-    pure function hash (coords, tsize)
+    function hash (coords, tsize)
       integer, intent(in) :: coords(3), tsize
       integer :: hash
       integer :: i, j, k, hkey
