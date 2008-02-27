@@ -1,6 +1,6 @@
 !****h* /vasputil
 ! COPYRIGHT
-!  Copyright (c) 2004, 2005, 2006, 2007 Janne Blomqvist
+!  Copyright (c) 2004, 2005, 2006, 2007, 2008 Janne Blomqvist
 
 !  This program is free software; you can redistribute it and/or modify
 !  it under the terms of the GNU General Public License as published by
@@ -427,8 +427,8 @@ contains
   ! Print the version number of the program to the screen.
   !****
   subroutine print_version ()
-    print '(A, //, A, /, A, /, A)', ' vasputil release 4.0.1', &
-         ' Copyright (C) 2004, 2005, 2006, 2007 Janne Blomqvist.', &
+    print '(A, //, A, /, A, /, A)', ' vasputil release 4.0.2', &
+         ' Copyright (C) 2004, 2005, 2006, 2007, 2008 Janne Blomqvist.', &
          ' This is free software; see the source for copying conditions.  &
          &There is NO', &
          ' warranty; not even for MERCHANTABILITY or FITNESS FOR &

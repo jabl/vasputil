@@ -2,7 +2,7 @@
 ! NAME
 !   supercell_generator
 ! COPYRIGHT
-!  Copyright (c) 2004, 2005, 2006 Janne Blomqvist
+!  Copyright (c) 2004, 2005, 2006, 2008 Janne Blomqvist
 
 !  This program is free software; you can redistribute it and/or modify
 !  it under the terms of the GNU General Public License as published by
