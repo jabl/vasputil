@@ -1,3 +1,9 @@
+vasputil 4.0.2, 2008-02-27
+
+* Bugfix in scgenerator, thanks to Sebastien Lebegue for reporting.
+
+------------------------------------------------------------------
+
 vasputil 4.0.1, 2007-07-21
 
 * Remove rotatez.m, as rotate_molecule does the same thing more generally.

@@ -1,3 +1,8 @@
+2008-02-27  Janne Blomqvist  <job@fyslab.hut.fi>
+
+	* src/supercell_generator.f90 (init_queue): Make queue indexing 0:qsize-1
+	instead of default in order for modulo to work correctly.
+
 2007-10-10  Janne Blomqvist  <job@fyslab.hut.fi>
 
 	* src/supercell_generator.f90 (hash): Remove pure attribute as a

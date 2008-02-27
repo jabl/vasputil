@@ -4,7 +4,7 @@
 # Id: configure.ac 1.7 05/05/05 22:13:58+02:00 jonas@radon 
 # $Id$
 
-AC_INIT(vasputil, 4.0.1, job@fyslab.hut.fi)
+AC_INIT(vasputil, 4.0.2, job@fyslab.hut.fi)
 AC_CONFIG_SRCDIR(src/vasputil.f90)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE
