@@ -1,6 +1,7 @@
 vasputil 4.0.2, 2008-02-27
 
-* Bugfix in scgenerator, thanks to Sebastien Lebegue for reporting.
+* Bugfix in scgenerator, thanks to Chinnappan Ravi and Sebastien Lebegue for
+  reporting.
 
 ------------------------------------------------------------------
 
