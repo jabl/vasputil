@@ -2,7 +2,7 @@ AC_DEFUN([ACX_SUBST_FCFLAGS],[
 
 # Fortran flags
 case $FC in
-gfortran)
+gfortran*)
 	fopt="-O3 -funroll-loops"
 	fprof="-pg"
 	fdebug="-O0 -g"

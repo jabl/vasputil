@@ -1,7 +1,7 @@
 2008-08-07  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* config/acx_subst_fcflags.m4: More checking for ifort, use f2003 mode
-	for gfortran.
+	for gfortran, allow gfortran to be called gfortran*.
 	* config/acx_fc_command_line.m4: New file, autoconf macro for checking
 	command line support. Copied from octopus (tddft.org).
 	* configure.ac: Run ACX_FC_COMMAND_LINE_ARGUMENTS macro, new contact
