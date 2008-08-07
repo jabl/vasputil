@@ -103,7 +103,7 @@ program vasputil
         print *, 'Convert a POSCAR file to xyz format.'
         print *, 'POSCAR is the POSCAR file you want to convert.'
         print *, 'POSCAR.xyz is the filename of the .xyz file to be &
-             &created. If omitted, it defaults to the name of the &
+             &created. If omitted, ', ' it defaults to the name of the &
              &POSCAR file, plus the xyz extension.'
      case (1, 2)
         if ( i == 1) then
@@ -120,7 +120,7 @@ program vasputil
         print *, 'Convert a POSCAR file in direct coordinates to cartesian.'
         print *, 'POSCAR: The POSCAR file with the direct coordinates.'
         print *, 'POSCAR.cart: The name of the output file. If omitted, &
-             &defaults to the name of the POSCAR file plus the .cart extension.'
+             &defaults to the name of', ' the POSCAR file plus the .cart extension.'
      case (1, 2)
         if (i == 1) then
            write (arg(2), '(A)') trim (arg(1)) // '.cart'
@@ -385,13 +385,13 @@ program vasputil
         print *, 'Generate a supercell.'
         print *, 'POSCAR: The name of the input file containing the basis, i.e. the atoms to be replicated.'
         print *, 'POSCAR2: The optional name of the input file containing the &
-             &supercell lattice vectors of the new supercell. If omitted, asks the user.'
+             &supercell lattice', ' vectors of the new supercell. If omitted, asks the user.'
         print *, 'POSCAR.out: The name of the output file. If omitted, &
              &defaults to the input file plus the .out extension'
         print *, ''
         print *, 'The input file should contain the coordinates of the &
-             &atoms to be replicated in the supercell using a space-filling &
-             &algorithm. Note that you cannot omit only one of the arguments; &
+             &atoms to be replicated in', ' the supercell using a space-filling &
+             &algorithm. Note that you cannot omit only', ' one of the arguments; &
              &the allowed forms are thus with 1 or 3 arguments.'
      case (1)
         write (arg(3), '(A)') trim (arg(1)) // '.out'
@@ -430,7 +430,7 @@ program vasputil
         write (*,*) 'Usage: vasputil dumpatomsase POSCAR'
         write (*,*) ''
         write (*,*) 'Dump cartesian coordinates as python code, with atom type &
-             &and some parenthesis, for importing into Campos ASE.'
+             &and some parenthesis,', ' for importing into Campos ASE.'
      case (1)
         call dumpatomsase (arg(1))
      end select
