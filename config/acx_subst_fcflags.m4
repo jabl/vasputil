@@ -38,7 +38,7 @@ ifort)
 	fprof="-qp"
 	fdebug="-g"
 	frange="-C -gen-interface -warn interface -traceback"
-	fstd="-warn all -std95"
+	fstd="-warn all -std03"
 	fldflags=""
 	;;
 lf95)
