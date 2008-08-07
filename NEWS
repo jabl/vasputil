@@ -1,7 +1,8 @@
-vasputil 4.0.3, 2008-08-07
+vasputil 4.1, 2008-08-07
 
 * Fix compilation with gfortran and other compilers that have built-in support
   for F2003 command line arguments.
+* Upgrade to GPL 3 license.
 
 -----------------------------------------------------------------------------
 
