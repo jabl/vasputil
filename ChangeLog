@@ -1,6 +1,23 @@
 2008-08-07  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
-	* config/acx_subst_fcflags.m4: More checking for ifort.
+	* config/acx_subst_fcflags.m4: More checking for ifort, use f2003 mode
+	for gfortran.
+	* config/acx_fc_command_line.m4: New file, autoconf macro for checking
+	command line support. Copied from octopus (tddft.org).
+	* configure.ac: Run ACX_FC_COMMAND_LINE_ARGUMENTS macro, new contact
+	info.
+	* src/f2kcli.f90: Delete.
+	* src/vasputil.f90: Rename to vasputil.F90.
+	* src/vasputil.F90: Use results of acx_fc_command_line_arguments macro
+	to call correct procedures for getting command line arguments.
+	* src/Makefile.am: Remove f2kcli.f90, change to vasputil.F90.
+	* src/config.h.in: Regenerate.
+	* src/Makefile.in: Regenerate.
+	* bin/Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+	* src/depend.mk: Regenerate.
 
 2008-02-27  Janne Blomqvist  <job@fyslab.hut.fi>
 

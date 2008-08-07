@@ -1,5 +1,20 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* compiler supports command line arguments */
+#undef FC_COMMAND_LINE_ARGUMENTS
+
+/* iargc and getarg are implicit, we have to declare them */
+#undef FC_COMMAND_LINE_IMPLICIT
+
+/* iargc and getarg are defined in a include file */
+#undef FC_COMMAND_LINE_INCLUDE
+
+/* iargc and getarg are intrinsic */
+#undef FC_COMMAND_LINE_INTRINSIC
+
+/* iargc and getar are defined in a module */
+#undef FC_COMMAND_LINE_MODULE
+
 /* Define to dummy `main' function (if any) required to link to the Fortran
    libraries. */
 #undef FC_DUMMY_MAIN

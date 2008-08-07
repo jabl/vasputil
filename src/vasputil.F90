@@ -23,7 +23,8 @@
 !****
 program vasputil
   use conf
-  use f2kcli
+#include "config.inc"
+
   use supercell_measure
   use supercell_modify
   use sc_file_convert
@@ -38,7 +39,25 @@ program vasputil
   real(wp) :: fraction, lheight, tol, bulk
   integer, dimension(:), allocatable :: atoms
 
+
+#if FC_COMMAND_LINE_ARGUMENTS == 2003
   iarg = command_argument_count ()
+#elif FC_COMMAND_LINE_ARGUMENTS == 77
+#if FC_COMMAND_LINE_IMPLICIT
+  interface iargc
+    integer function iargc ()
+    end function iargc
+  end interface
+
+  interface getarg
+    subroutine getarg (c, a)
+      integer :: c
+      character(len=*) :: a
+    end subroutine getarg
+  end interface
+#endif
+  iarg = iargc ()
+#endif
   
   if (iarg == 0) then
      call print_usage ()
@@ -46,23 +65,31 @@ program vasputil
   end if
 
   ! Get the command name     
+#if FC_COMMAND_LINE_ARGUMENTS == 2003
   call get_command_argument (number=1,  value=command, status=status)
   if ( status /= 0) then
      print *, 'Could not retrieve name of command, status: ', status
      stop
   end if
+#else
+  call getarg (1, command)
+#endif
 
   ! Allocate space for the arguments. We need two extra spaces for non-present
   ! optional args.
   allocate(arg(iarg+1))
 
   do j = 2, iarg
+#if FC_COMMAND_LINE_ARGUMENTS == 2003
      call get_command_argument (j, arg(j-1), status=status)
      if (status /= 0) then
         print *, 'Could not retrieve value of command argument ', j, &
              ', status: ', status
         stop
      end if
+#else
+     call getarg (j, arg(j-1))
+#endif
   end do
 
   i = iarg - 1

@@ -1,19 +1,14 @@
 AC_DEFUN([ACX_SUBST_FCFLAGS],[
 
-# Does the compiler support the F2003 command line intrinsics
-# command_argument_count() and get_command_argument()
-fcppflags=""
-
 # Fortran flags
 case $FC in
 gfortran)
 	fopt="-O3 -funroll-loops"
 	fprof="-pg"
 	fdebug="-O0 -g"
-	frange="-C"
-	fstd="-std=f95 -Wall -pedantic"
+	frange="-frange-check"
+	fstd="-std=f2003 -Wall -pedantic"
 	fldflags=""
-	fcppflags="-DHAVE_F2003CLI"
 	;;
 pathf90|pathf95)
 	fopt="-Ofast"
@@ -45,7 +40,6 @@ ifort)
 	frange="-C -gen-interface -warn interface -traceback"
 	fstd="-warn all -std95"
 	fldflags=""
-	fcppflags="-DHAVE_F2003CLI"
 	;;
 lf95)
 	fopt="--o2 --ntrace --nap --nchk --ng --nsav --prefetch 2 --tpp"
@@ -83,10 +77,10 @@ esac
 
 case "${USE_DEBUG_FLAGS}" in
 yes)
-	fcflags="${fcppflags} ${fdebug} ${frange} ${fstd}"
+	fcflags="${fdebug} ${frange} ${fstd}"
 	;;
 no)
-	fcflags="${fcppflags} ${fopt}"
+	fcflags="${fopt}"
 	;;
 *)
 	fcflags="${fdebug} ${frange} ${fstd}"

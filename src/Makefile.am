@@ -1,7 +1,6 @@
 bin_PROGRAMS = vasputil
 vasputil_SOURCES = \
 conf.f90 \
-f2kcli.f90 \
 f77_lapack.f90 \
 f95_lapack.f90 \
 geometry.f90 \
@@ -20,7 +19,7 @@ supercell_generator.f90 \
 supercell_measure.f90 \
 supercell_modify.f90 \
 supercell_utils.f90 \
-vasputil.f90
+vasputil.F90
 
 LIBS = $(LAPACK_LIBS) $(BLAS_LIBS)
 

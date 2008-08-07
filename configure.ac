@@ -4,8 +4,8 @@
 # Id: configure.ac 1.7 05/05/05 22:13:58+02:00 jonas@radon 
 # $Id$
 
-AC_INIT(vasputil, 4.0.2, job@fyslab.hut.fi)
-AC_CONFIG_SRCDIR(src/vasputil.f90)
+AC_INIT(vasputil, 4.0.3, Janne.Blomqvist@tkk.fi)
+AC_CONFIG_SRCDIR(src/vasputil.F90)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE
 
@@ -71,13 +71,10 @@ dnl ACX_GETKW([], AC_MSG_ERROR([libgetkw.a not found!]))
 AC_LANG_PUSH([Fortran])
 ACX_BLAS(,AC_MSG_ERROR([No working blas library found!]))
 ACX_LAPACK(,AC_MSG_ERROR([No working lapack library found!]))
-AC_LANG_POP([Fortran])
 
-AC_LANG_PUSH([Fortran])
 AC_FC_SRCEXT([f90])
 AC_FC_SRCEXT([F90])
 #AC_FC_FREEFORM
-AC_LANG_POP([Fortran])
 
 #set -x -v
 AX_F90_MODULE_EXTENSION
@@ -89,6 +86,11 @@ fi
 AC_SUBST(AX_F90_MODEXT, $ax_f90_modext)
 
 #AX_F90_MODULE_FLAG
+
+# Check whether F2003 command line intrinsics are available
+ACX_FC_COMMAND_LINE_ARGUMENTS
+
+AC_LANG_POP([Fortran])
 
 AC_CACHE_SAVE
 #AC_MSG_NOTICE([Checking if MPI is available])

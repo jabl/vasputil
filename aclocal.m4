@@ -862,6 +862,7 @@ AC_SUBST([am__untar])
 
 m4_include([config/acx_blas.m4])
 m4_include([config/acx_f90_config_header.m4])
+m4_include([config/acx_fc_command_line.m4])
 m4_include([config/acx_lapack.m4])
 m4_include([config/acx_subst_fcflags.m4])
 m4_include([config/ax_f90_module_extension.m4])

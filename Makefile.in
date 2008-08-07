@@ -47,6 +47,7 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/acx_blas.m4 \
 	$(top_srcdir)/config/acx_f90_config_header.m4 \
+	$(top_srcdir)/config/acx_fc_command_line.m4 \
 	$(top_srcdir)/config/acx_lapack.m4 \
 	$(top_srcdir)/config/acx_subst_fcflags.m4 \
 	$(top_srcdir)/config/ax_f90_module_extension.m4 \
