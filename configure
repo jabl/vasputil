@@ -3642,7 +3642,7 @@ pathf90|pathf95)
 	fprof="-pg"
 	fdebug="-O0 -g -fno-unsafe-math-optimizations"
 	frange="-C"
-	fstd="-ansi -fullwarn -Wall"
+	fstd="-ansi -Wall"
 	fldflags=""
 	;;
 pgf90|pgf95)
