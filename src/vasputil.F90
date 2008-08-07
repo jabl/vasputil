@@ -454,7 +454,8 @@ contains
   ! Print the version number of the program to the screen.
   !****
   subroutine print_version ()
-    print '(A, //, A, /, A, /, A)', ' vasputil release 4.0.2', &
+    character(len=10), parameter :: version = PACKAGE_VERSION
+    print '(A, A, //, A, /, A, /, A)', ' vasputil release ', version, &
          ' Copyright (C) 2004, 2005, 2006, 2007, 2008 Janne Blomqvist.', &
          ' This is free software; see the source for copying conditions.  &
          &There is NO', &

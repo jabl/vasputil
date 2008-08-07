@@ -1,5 +1,5 @@
 
-Vasputil release 4.0.2
+Vasputil release 4.0.3
 
 Vasputil is a command-line utility designed to make life with VASP
 easier. It provides a set of commands to manipulate POSCAR files.
@@ -28,10 +28,11 @@ test: Run self-tests.
 Documentation for each utility is available by running it without any
 arguments, e.g. "vasputil poscar2xyz".
 
-Vasputil is written in the Fortran 95 programming language, and should
-be compilable by any compiler that conforms to said
-standard. Makefiles for IBM xlf95, Lahey lf95, Pathscale pathf90,
-Intel ifort and Portland pgf90 are provided.
+Vasputil is written in the Fortran 95 programming language with a few optional
+Fortran 2003 features such as command line argument handling, and should be
+compilable by any compiler that conforms to said standard. Makefiles for IBM
+xlf95, Lahey lf95, Pathscale pathf90, Intel ifort and Portland pgf90 are
+provided.
 
 Vasputil depends on the LAPACK and BLAS libraries. The provided
 Makefiles use different platform-specific optimized versions of the
