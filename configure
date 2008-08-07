@@ -3664,7 +3664,7 @@ ifort)
 	fopt="-O2 -cm -w95 -fpp"
 	fprof="-qp"
 	fdebug="-g"
-	frange="-CB"
+	frange="-C -gen-interface -warn interface -traceback"
 	fstd="-warn all -std95"
 	fldflags=""
 	;;
