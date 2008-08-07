@@ -51,8 +51,9 @@ QUICK INSTALLATION INSTRUCTIONS
 
 $ tar xvzf vasputil-$(VERSION).tar.gz
 
-2) Run configure, if necessary with extra flags to specify
-e.g. location of libraries not in the default search path
+2) Run configure, if necessary with extra flags to specify location of
+libraries not in the default search path, if you want to use some specific
+compiler etc.
 
 Eg. to use dynamically linked ACML:
 
@@ -61,6 +62,10 @@ $ ./configure LDFLAGS=-L/opt/acml/pathscale64/lib/
 Statically linked ACML
 
 $ ./configure --with-blas=/opt/acml/pathscale64/lib/libacml.a
+
+Use Intel Fortran
+
+$ ./configure FC=ifort
 
 Install somewhere not in the default location ($HOME)
 
@@ -75,11 +80,20 @@ $ ./configure --help
 $ make && make install
 
 To use the Octave/Matlab scripts it is recommended to add the path
-where the scripts are found to the search path. E.g. if the PREFIX in
-Makefile is $(HOME), for octave add the following line to ~/.octaverc:
+where the scripts are found to the search path. 
+
+E.g. if the PREFIX in Makefile is $(HOME), for octave 2.x add the following
+line to ~/.octaverc:
 
 LOADPATH = ['~/lib/m/', LOADPATH];
 
-For matlab, add the following to startup.m (in your matlab directory):
+For octave 3.x, the initialization has become more matlab-like, so add the
+following to ~/.octaverc:
+
+path(path, '~/lib/m')
+
+For MATLAB, add the following to startup.m (in the directory where you run
+MATLAB): 
+
 path(path, '~/lib/m')
 
