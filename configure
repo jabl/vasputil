@@ -3627,6 +3627,10 @@ echo $ECHO_N "checking for debugging flags to use... $ECHO_C" >&6
 
 
 
+# Does the compiler support the F2003 command line intrinsics
+# command_argument_count() and get_command_argument()
+fcppflags=""
+
 # Fortran flags
 case $FC in
 gfortran)
@@ -3636,6 +3640,7 @@ gfortran)
 	frange="-C"
 	fstd="-std=f95 -Wall -pedantic"
 	fldflags=""
+	fcppflags="-DHAVE_F2KCLI"
 	;;
 pathf90|pathf95)
 	fopt="-Ofast"
@@ -3667,6 +3672,7 @@ ifort)
 	frange="-C -gen-interface -warn interface -traceback"
 	fstd="-warn all -std95"
 	fldflags=""
+	fcppflags="-DHAVE_F2KCLI"
 	;;
 lf95)
 	fopt="--o2 --ntrace --nap --nchk --ng --nsav --prefetch 2 --tpp"
@@ -3704,10 +3710,10 @@ esac
 
 case "${USE_DEBUG_FLAGS}" in
 yes)
-	fcflags="${fdebug} ${frange} ${fstd}"
+	fcflags="${fcppflags} ${fdebug} ${frange} ${fstd}"
 	;;
 no)
-	fcflags="${fopt}"
+	fcflags="${fcppflags} ${fopt}"
 	;;
 *)
 	fcflags="${fdebug} ${frange} ${fstd}"
@@ -3853,7 +3859,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_verb"
-(eval echo $as_me:3856: \"$ac_link\") >&5
+(eval echo $as_me:3862: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -3931,7 +3937,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_cv_prog_fc_v"
-(eval echo $as_me:3934: \"$ac_link\") >&5
+(eval echo $as_me:3940: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
