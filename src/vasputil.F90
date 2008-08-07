@@ -43,6 +43,9 @@ program vasputil
 #if FC_COMMAND_LINE_ARGUMENTS == 2003
   iarg = command_argument_count ()
 #elif FC_COMMAND_LINE_ARGUMENTS == 77
+#ifdef FC_COMMAND_LINE_INCLUDE
+  include FC_COMMAND_LINE_INCLUDE
+#endif
 #if FC_COMMAND_LINE_IMPLICIT
   interface iargc
     integer function iargc ()
