@@ -3629,7 +3629,7 @@ echo $ECHO_N "checking for debugging flags to use... $ECHO_C" >&6
 
 # Fortran flags
 case $FC in
-gfortran)
+gfortran*)
 	fopt="-O3 -funroll-loops"
 	fprof="-pg"
 	fdebug="-O0 -g"
