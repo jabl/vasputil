@@ -361,14 +361,14 @@ contains
       type(queue_t), intent(inout) :: queue
       type(atom_vertex), intent(in), target :: element
 
-	  if (queue%tail < 0) then
-		write (*,*) 'Error, queue%tail < 0 when inserting, now queue%head = ', queue%head
-	  end if
+        if (queue%tail < 0) then
+            write (*,*) 'Error, queue%tail < 0 when inserting, now queue%head = ', queue%head
+        end if
       queue%elems(queue%tail)%v => element
       queue%tail = modulo (queue%tail + 1, size (queue%elems))
-	  if (queue%tail < 0) then
-		write (*,*) 'Error, queue%tail < 0 after inserting now queue%head = ', queue%head
-	  end if
+        if (queue%tail < 0) then
+            write (*,*) 'Error, queue%tail < 0 after inserting now queue%head = ', queue%head
+        end if
     end subroutine insert
 
 
@@ -380,15 +380,15 @@ contains
       type(queue_t), intent(inout) :: queue
       type(atom_vertex), pointer :: element
 
-	  if (queue%head < 0) then
-		  write (*,*) 'Error, queue%head = ', queue%head, ' when removing'
-	  end if
+        if (queue%head < 0) then
+            write (*,*) 'Error, queue%head = ', queue%head, ' when removing'
+        end if
       element => queue%elems(queue%head)%v
       queue%elems(queue%head)%v => NULL()
       queue%head = modulo (queue%head + 1, size (queue%elems))
-	  if (queue%head < 0) then
-		  write (*,*) 'Error, queue%head = ', queue%head, ' after removing'
-	  end if
+          if (queue%head < 0) then
+                  write (*,*) 'Error, queue%head = ', queue%head, ' after removing'
+          end if
     end subroutine remove
 
 
