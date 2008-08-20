@@ -75,6 +75,7 @@ contains
     integer, intent(in) :: dir, atoms(:)
     integer, intent(out), optional :: status
     integer :: i
+    real(wp) :: cc
 
     if (dir < 1 .or. dir > 3) then
        call error_msg (1, "Direction to unnormalize in must be 1, 2 or 3.", status)
@@ -87,7 +88,12 @@ contains
        call act2Rel(cell)
     end if
     do i = 1, size(atoms)
-       cell%atomCoords(dir, atoms(i)) = cell%atomCoords(dir, atoms(i)) - 1.0_wp
+        cc = cell%atomCoords(dir, atoms(i))
+        if (cc < 0.5_wp) then
+            cell%atomCoords(dir, atoms(i)) = cc + 1.0_wp
+        else
+            cell%atomCoords(dir, atoms(i)) = cc - 1.0_wp
+        end if
     end do
   end subroutine unnormalize
 

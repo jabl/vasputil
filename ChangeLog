@@ -1,3 +1,8 @@
+2008-08-20  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* src/supercell_modify.f90 (unnormalize): Fix unnormalization when
+	coordinate is < 0.5.
+
 2008-08-07  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* config/acx_subst_fcflags.m4: More checking for ifort, use f2003 mode
