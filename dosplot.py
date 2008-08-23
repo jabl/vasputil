@@ -49,18 +49,18 @@ def makedosplot(dos, s=True, p=True, d=True):
     show()
 
 
-def showdp():
-    xlabel("E-E$_\mathrm{f}$ (eV)", size=16)
+def showdp(fsz=16):
+    xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
     #ylabel("LDOS", size=16)
     #f = figure(0)
     #text(0., 0.4, "LDOS", rotation='vertical', transform = f.axes.transAxes)
     #figtext(0., 0.4, "LDOS", rotation='vertical', figure=f)
-    figtext(0.03, 0.45, "LDOS", rotation='vertical', size=16)
+    figtext(0.03, 0.45, "LDOS", rotation='vertical', size=fsz)
     loc, lab = xticks()
 #    set(l, size = 16)
-    lab.set_size = 16
+    lab.set_size = fsz
     loc, lab = yticks()
-    lab.set_size=16
+    lab.set_size = fsz
     legend()
     subplots_adjust(hspace=0.0)
     show()
