@@ -4,7 +4,6 @@
 # First use split_dos to create DOSx files.
 
 from pylab import *
-#from matplotlib.numerix import sin, cos, exp, pi, arange
 
 def makedosplot(dos, s=True, p=True, d=True):
     t = arange(0.0, 2.0, 0.01)
@@ -49,8 +48,6 @@ def makedosplot(dos, s=True, p=True, d=True):
     
     show()
 
-def readdos(fname):
-    dos = load(fname)
 
 def showdp():
     xlabel("E-E$_\mathrm{f}$ (eV)", size=16)
