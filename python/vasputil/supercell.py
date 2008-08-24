@@ -1,5 +1,5 @@
 # vim: set fileencoding=latin-1
-#Copyright (c) 2003, 2008 Janne Blomqvist
+# Copyright (c) 2003, 2008 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
