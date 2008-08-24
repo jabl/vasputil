@@ -53,9 +53,9 @@ class Cell:
         # Coordinates of the atoms
         self.atoms = zeros((0, 3))
         if (poscar != None):
-            read_poscar(poscar)
+            self.read_poscar(poscar)
         elif (xyz != None):
-            read_xyz(xyz)
+            self.read_xyz(xyz)
 
     def read_poscar(self, filename):
         """Parses a POSCAR file"""
@@ -155,16 +155,16 @@ class Cell:
         xyz = f.readlines()
         f.close()
         # first line contains number of atoms
-        atomnum = xyz[0]
-        self.atoms = array((atomnum, 3))
+        self.nAtoms = int(xyz[0])
+        self.atoms = zeros((self.nAtoms, 3))
         self.cartesian = True
         self.relative = False
         skey = lambda x: x.split()[0]
         xyz[2:].sort(key=skey)
-        for atom in xyz[2:]:
-            s = atom.split()
-            floatvect = float(s[1]), float(s[2]), float(s[3])
-            self.atoms.append(floatvect)
+        for ii in range(2, self.nAtoms):
+            s = xyz[ii].split()
+            floatvect = array([float(s[1]), float(s[2]), float(s[3])])
+            self.atoms[(ii-1),:] = floatvect
         return self.atoms
 
 
