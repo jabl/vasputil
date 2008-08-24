@@ -1,7 +1,9 @@
 #!/usr/bin/pythoon
 
-# Plot DOS from vasp
-# First use split_dos to create DOSx files.
+"""Utility function to set some default plot parameters for plotting DOS
+figures.
+
+"""
 
 from pylab import *
 
