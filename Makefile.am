@@ -13,9 +13,11 @@ MYDOC = doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
-mypydir = $(srcdir)/lib/python/vasputil
-dist_python_DATA = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
-		   $(mypydir)/supercell.py
+#mypydir = $(srcdir)/lib/python/vasputil
+#python_PYTHON = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
+#		   $(mypydir)/supercell.py
+
+EXTRA_DIST = $(srcdir)/lib/python
 
 doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 

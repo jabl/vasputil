@@ -39,7 +39,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(dist_matlab_DATA) \
-	$(dist_python_DATA) $(dist_robodoc_DATA) $(srcdir)/Makefile.am \
+	$(dist_robodoc_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
 	ChangeLog INSTALL NEWS config/config.guess config/config.sub \
 	config/install-sh config/missing config/mkinstalldirs
@@ -74,12 +74,10 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(matlabdir)" "$(DESTDIR)$(pythondir)" \
-	"$(DESTDIR)$(robodocdir)"
+am__installdirs = "$(DESTDIR)$(matlabdir)" "$(DESTDIR)$(robodocdir)"
 dist_matlabDATA_INSTALL = $(INSTALL_DATA)
-dist_pythonDATA_INSTALL = $(INSTALL_DATA)
 dist_robodocDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(dist_matlab_DATA) $(dist_python_DATA) $(dist_robodoc_DATA)
+DATA = $(dist_matlab_DATA) $(dist_robodoc_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -206,10 +204,11 @@ dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotate_molecule
 MYDOC = doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
-mypydir = $(srcdir)/lib/python/vasputil
-dist_python_DATA = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
-		   $(mypydir)/supercell.py
 
+#mypydir = $(srcdir)/lib/python/vasputil
+#python_PYTHON = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
+#		   $(mypydir)/supercell.py
+EXTRA_DIST = $(srcdir)/lib/python
 all: all-recursive
 
 .SUFFIXES:
@@ -263,23 +262,6 @@ uninstall-dist_matlabDATA:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(matlabdir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(matlabdir)/$$f"; \
-	done
-install-dist_pythonDATA: $(dist_python_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(pythondir)" || $(mkdir_p) "$(DESTDIR)$(pythondir)"
-	@list='$(dist_python_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(dist_pythonDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pythondir)/$$f'"; \
-	  $(dist_pythonDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pythondir)/$$f"; \
-	done
-
-uninstall-dist_pythonDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_python_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(pythondir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(pythondir)/$$f"; \
 	done
 install-dist_robodocDATA: $(dist_robodoc_DATA)
 	@$(NORMAL_INSTALL)
@@ -434,7 +416,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/$(MYDOC) $(distdir)/$(mypydir) $(distdir)/config $(distdir)/lib/m
+	$(mkdir_p) $(distdir)/$(MYDOC) $(distdir)/$(srcdir)/lib $(distdir)/config $(distdir)/lib/m
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -578,7 +560,7 @@ check: check-recursive
 all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(matlabdir)" "$(DESTDIR)$(pythondir)" "$(DESTDIR)$(robodocdir)"; do \
+	for dir in "$(DESTDIR)$(matlabdir)" "$(DESTDIR)$(robodocdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -625,7 +607,7 @@ info: info-recursive
 info-am:
 
 install-data-am: install-data-local install-dist_matlabDATA \
-	install-dist_pythonDATA install-dist_robodocDATA
+	install-dist_robodocDATA
 
 install-exec-am:
 
@@ -653,8 +635,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dist_matlabDATA uninstall-dist_pythonDATA \
-	uninstall-dist_robodocDATA uninstall-info-am
+uninstall-am: uninstall-dist_matlabDATA uninstall-dist_robodocDATA \
+	uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -666,15 +648,14 @@ uninstall-info: uninstall-info-recursive
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am \
 	install-data-local install-dist_matlabDATA \
-	install-dist_pythonDATA install-dist_robodocDATA install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
+	install-dist_robodocDATA install-exec install-exec-am \
+	install-info install-info-am install-man install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic \
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am uninstall-dist_matlabDATA \
-	uninstall-dist_pythonDATA uninstall-dist_robodocDATA \
-	uninstall-info-am
+	uninstall-dist_robodocDATA uninstall-info-am
 
 
 doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
