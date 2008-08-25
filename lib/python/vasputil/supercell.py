@@ -30,38 +30,39 @@ class Cell:
     
     def __init__(self, poscar=None, xyz=None):
         """Initialize the data members of this class"""
-        # List of the chemical symbols of the atoms
-        self.atomNames = []
-        # Lattice constant, in Ångströms
-        self.latticeConstant = 1.
-        # 3x3 matrix containing the basis vectors of the supercell
-        # in row major format
-        self.basisVectors = eye(3)
-        # Array containing the numbers of each element in the
-        # system, i.e. the length of this array is the same as the
-        # length of the self.atomNames list
-        self.nAtomsType = array(0)
-        # Total number of atoms
-        self.nAtoms = 0
-        # Are the ions allowed to move?
-        self.selectiveDynamics = True
-        # Flags for each atom describing in which cartesian coordinate
-        # direction the atom is allowed to move. It is thus a 3xnAtoms
-        # size list
-        self.selectiveFlags = []
-        # Are the atomic coordinates cartesian or in direct coordinates
-        # If direct, cartesian coordinates can be calculated by
-        # multiplying each coordinate with the basis vector matrix
-        self.cartesian = True
-        # Are the atomic coordinates relative or absolute, i.e. should
-        # they be multiplies by the lattice constant.
-        self.relative = False
-        # Coordinates of the atoms
-        self.atoms = zeros((0, 3))
         if (poscar != None):
             self.read_poscar(poscar)
         elif (xyz != None):
             self.read_xyz(xyz)
+        else: # Some default values for instance variables.
+            # List of the chemical symbols of the atoms
+            self.atomNames = []
+            # Lattice constant, in Ångströms
+            self.latticeConstant = 1.
+            # 3x3 matrix containing the basis vectors of the supercell
+            # in row major format
+            self.basisVectors = eye(3)
+            # Array containing the numbers of each element in the
+            # system, i.e. the length of this array is the same as the
+            # length of the self.atomNames list
+            self.nAtomsType = array(0)
+            # Total number of atoms
+            self.nAtoms = 0
+            # Are the ions allowed to move?
+            self.selectiveDynamics = True
+            # Flags for each atom describing in which cartesian coordinate
+            # direction the atom is allowed to move. It is thus a 3xnAtoms
+            # size list
+            self.selectiveFlags = []
+            # Are the atomic coordinates cartesian or in direct coordinates
+            # If direct, cartesian coordinates can be calculated by
+            # multiplying each coordinate with the basis vector matrix
+            self.cartesian = True
+            # Are the atomic coordinates relative or absolute, i.e. should
+            # they be multiplies by the lattice constant.
+            self.relative = False
+            # Coordinates of the atoms
+            self.atoms = zeros((0, 3))
 
     def read_poscar(self, filename):
         """Parses a POSCAR file"""
