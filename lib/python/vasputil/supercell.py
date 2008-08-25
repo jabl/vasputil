@@ -16,6 +16,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module defines a class that represents a supercell. It also
+    imports all of the pylab module into the namespace, to make it 
+    easy to create simple analysis scripts.
+    
+"""
+
 from pylab import *
 
 
