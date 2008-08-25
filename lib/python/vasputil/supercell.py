@@ -63,7 +63,7 @@ class Cell(object):
             self.atoms = zeros((0, 3))
 
     def getNAtoms(self):
-        return self.atoms.shape[0]
+        return self.atoms.shape[1]
 
     def setNAtoms(self, val):
         raise AttributeError, "can't set attribute"
@@ -82,14 +82,14 @@ class Cell(object):
         # First line should contain the atom names , eg. "Ag Ge" in
         # the same order
         # as later in the file (and POTCAR for the full vasp run)
-        self.atomNames = string.split(poscar[0])
+        self.atomNames = poscar[0].split()
             
         self.latticeConstant = float(poscar[1])
             
         # Now the lattice vectors
         a = []
         for vector in poscar[2:5]:
-            s = string.split(vector)
+            s = vector.split()
             floatvect = float(s[0]), float(s[1]), float(s[2])
             a.append( floatvect)
         
@@ -99,7 +99,7 @@ class Cell(object):
         # Number of atoms. Again this must be in the same order as
         # in the first line
         # and in the POTCAR file
-        numofatoms = string.split(poscar[5])
+        numofatoms = poscar[5].split()
         tot_numatoms = 0
         for i in xrange(len(numofatoms)):
             numofatoms[i] = int(numofatoms[i])
@@ -124,7 +124,7 @@ class Cell(object):
         self.selectiveFlags = []
         for natomType in numofatoms:
             for atype in xrange(natomType):
-                ac = string.split(poscar[atype+offset])
+                ac = poscar[atype+offset].split()
                 atomcoords.append((float(ac[0]), float(ac[1]), float(ac[2])))
                 if self.selectiveDynamics:
                     self.selectiveFlags.append((ac[3], ac[4], ac[5]))
@@ -133,7 +133,7 @@ class Cell(object):
         # Transpose to produce sensible linear algebra
         self.atoms = transpose(array(atomcoords))
 
-    def write_poscar(self, filename="POSCAR.out"):
+    def write_poscar(self, filename="POSCAR.out", fd=None):
         """Writes data into a POSCAR format file"""
         fc = "" # Contents of the file
         for a in self.atomNames:
@@ -160,9 +160,12 @@ class Cell(object):
                 for j in range(0,3):
                     fc += str(selflags[j]) + " "
             fc += "\n"
-        f = open(filename, "w")
-        f.write(fc)
-        f.close()
+        if (fd == None):
+            f = open(filename, "w")
+            f.write(fc)
+            f.close()
+        else:
+            fd.write(fc)
         
     def read_xyz(self, infile):
         "Parses an xyz file"
@@ -217,3 +220,17 @@ class Cell(object):
         self.atoms = dot(self.latticeConstant*self.basisVectors, self.atoms)
         self.cartesian = True
         
+    def showVmd(self):
+        """Show a supercell in VMD."""
+# This is a quick and dirty hack, as VMD has some builtin support 
+# as well.
+        import tempfile, os
+        f = tempfile.NamedTemporaryFile()
+        self.write_poscar(fd=f)
+        f.flush()
+        vmdstr = "vmd -nt -POSCAR " + f.name
+        print "now executing " + vmdstr
+        os.system(vmdstr)
+        raw_input("Press Enter when done to delete the temp file.")
+        f.close()
+
