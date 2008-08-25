@@ -25,7 +25,7 @@
 from pylab import *
 
 
-class Cell:
+class Cell(object):
     """Class for representing a supercell."""
     
     def __init__(self, poscar=None, xyz=None):
@@ -46,8 +46,6 @@ class Cell:
             # system, i.e. the length of this array is the same as the
             # length of the self.atomNames list
             self.nAtomsType = array(0)
-            # Total number of atoms
-            self.nAtoms = 0
             # Are the ions allowed to move?
             self.selectiveDynamics = True
             # Flags for each atom describing in which cartesian coordinate
@@ -63,6 +61,17 @@ class Cell:
             self.relative = False
             # Coordinates of the atoms
             self.atoms = zeros((0, 3))
+
+    def getNAtoms(self):
+        return self.atoms.shape[0]
+
+    def setNAtoms(self, val):
+        raise AttributeError, "can't set attribute"
+
+    def delNAtoms(self):
+        raise AttributeError, "can't delete attribute"
+
+    nAtoms = property(getNAtoms, setNAtoms, delNAtoms, "Total number of atoms.")
 
     def read_poscar(self, filename):
         """Parses a POSCAR file"""
@@ -95,7 +104,6 @@ class Cell:
         for i in xrange(len(numofatoms)):
             numofatoms[i] = int(numofatoms[i])
         self.nAtomsType = array(numofatoms)
-        self.nAtoms = sum(self.nAtomsType)
         
         # Check if Selective dynamics is switched on
         sdyn = poscar[6]
@@ -162,8 +170,7 @@ class Cell:
         xyz = f.readlines()
         f.close()
         # first line contains number of atoms
-        self.nAtoms = int(xyz[0])
-        self.atoms = zeros((self.nAtoms, 3))
+        self.atoms = zeros((int(xyz[0]), 3))
         self.cartesian = True
         self.relative = False
         skey = lambda x: x.split()[0]
