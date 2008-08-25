@@ -1,3 +1,13 @@
+vasputil 4.2, 2008-??-??
+
+* New python libraries, supercell.py and dosplot.py, intended to be used when
+  writing small scripts.
+
+* Switch from Subversion to Git (I suppose this makes me a version control
+  weenie, since I have gone from RCS->CVS->Subversion->Git).
+
+------------------------------------------------------------------------------
+
 vasputil 4.1, 2008-08-07
 
 * Fix compilation with gfortran and other compilers that have built-in support

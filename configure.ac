@@ -4,7 +4,7 @@
 # Id: configure.ac 1.7 05/05/05 22:13:58+02:00 jonas@radon 
 # $Id$
 
-AC_INIT(vasputil, 4.1, Janne.Blomqvist@tkk.fi)
+AC_INIT(vasputil, 4.2, Janne.Blomqvist@tkk.fi)
 AC_CONFIG_SRCDIR(src/vasputil.F90)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE
@@ -29,6 +29,8 @@ AC_CHECK_PROGS(STRIP,strip,true)
 AC_CHECK_PROGS(ETAGS,etags,true)
 AC_CHECK_PROGS(CTAGS,ctags,true)
 AC_PROG_LN_S
+
+AM_PATH_PYTHON
 
 AC_CACHE_SAVE
 

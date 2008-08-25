@@ -1,5 +1,5 @@
 
-Vasputil release 4.1
+Vasputil release 4.2
 
 Vasputil is a command-line utility designed to make life with VASP
 easier. It provides a set of commands to manipulate POSCAR files.
@@ -28,11 +28,12 @@ test: Run self-tests.
 Documentation for each utility is available by running it without any
 arguments, e.g. "vasputil poscar2xyz".
 
-Vasputil is written in the Fortran 95 programming language with a few optional
-Fortran 2003 features such as command line argument handling, and should be
-compilable by any compiler that conforms to said standard. Makefiles for IBM
-xlf95, Lahey lf95, Pathscale pathf90, Intel ifort and Portland pgf90 are
-provided.
+Vasputil is written mostly the Fortran 95 programming language with a few
+optional Fortran 2003 features such as command line argument handling, and
+should be compilable by any compiler that conforms to said standard. Makefiles
+for IBM xlf95, Lahey lf95, Pathscale pathf90, Intel ifort and Portland pgf90
+are provided. Parts of vasputil are also written in MATLAB and Python, see
+below for requirements.
 
 Vasputil depends on the LAPACK and BLAS libraries. The provided
 Makefiles use different platform-specific optimized versions of the
@@ -79,6 +80,9 @@ $ ./configure --help
 
 $ make && make install
 
+
+MATLAB SCRIPTS
+
 To use the Octave/Matlab scripts it is recommended to add the path
 where the scripts are found to the search path. 
 
@@ -97,3 +101,16 @@ MATLAB):
 
 path(path, '~/lib/m')
 
+
+PYTHON SCRIPTS
+
+To use the python scripts you should add the python library directory to the
+PYTHONPATH environment variable. E.g. if you ran configure with the prefix
+$HOME (default), then you should have something like 
+
+export PYTHONPATH=$HOME/lib/pythonX.Y/site-packages
+
+where X.Y is your python version, in your shell initialization file (e.g.
+~/.bash_profile). Also, the python scripts use of the matplotlib library, which
+you can find at http://matplotlib.sf.net, in case your system doesn't already
+have it.

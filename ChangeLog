@@ -1,3 +1,11 @@
+2008-08-25  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/vasputil/{__init__.py,dosplot.py,supercell.py}: New
+	files.
+	* setup.py: New file.
+	* Makefile.am: Install python scripts via distutils.
+	* configure.ac: Call AM_PATH_PYTHON.
+
 2008-08-20  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* src/supercell_modify.f90 (unnormalize): Fix unnormalization when
@@ -23,6 +31,8 @@
 	* Makefile.in: Regenerate.
 	* configure: Regenerate.
 	* src/depend.mk: Regenerate.
+	* src/{*.f90,*.F90}: Change licence to GPLv3
+	* COPYING: Change to GPLv3.
 
 2008-02-27  Janne Blomqvist  <job@fyslab.hut.fi>
 

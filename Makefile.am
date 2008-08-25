@@ -13,6 +13,10 @@ MYDOC = doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
+mypydir = $(srcdir)/lib/python/vasputil
+dist_python_DATA = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
+		   $(mypydir)/supercell.py
+
 doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
 $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
@@ -21,3 +25,6 @@ $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
 
 depend:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) depend;
+
+install-data-local:
+	@PYTHON@ ./setup.py install --install-purelib=$(pythondir) --install-scripts=$(bindir) 
