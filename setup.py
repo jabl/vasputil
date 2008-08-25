@@ -9,6 +9,7 @@ setup(name='vasputil',
       author_email='Janne.Blomqvist@tkk.fi',
       url='http://www.fyslab.hut.fi/~/job/',
       packages=['vasputil'],
-      package_dir = {'': 'lib/python'}
+      package_dir = {'': 'lib/python'},
+      scripts = ['bin/dosplot_example']
      )
 

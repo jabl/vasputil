@@ -1,0 +1,19 @@
+#!/usr/bin/python
+
+from vasputil.dosplot import *
+
+a1 = load("DOS3")
+a2 = load("DOS4")
+
+subplot(211)
+plot(a1[:,0], a1[:,1], "k-", label="Al s")
+plot(a1[:,0], a1[:,2], "k-.", label="Al p")
+legend()
+xlim(-15,5)
+xticks(arange(0))
+subplot(212)
+#a=axes([0.,0.5,0.,1.])
+plot(a2[:,0], a2[:,1], "k-", label="Al s")
+xlim(-15,5)
+ylim(0,.29)
+showdp()
