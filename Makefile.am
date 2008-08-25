@@ -17,7 +17,7 @@ dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 #python_PYTHON = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
 #		   $(mypydir)/supercell.py
 
-EXTRA_DIST = $(srcdir)/lib/python
+EXTRA_DIST = $(srcdir)/setup.py $(srcdir)/lib/python
 
 doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 

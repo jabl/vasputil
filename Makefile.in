@@ -208,7 +208,7 @@ dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 #mypydir = $(srcdir)/lib/python/vasputil
 #python_PYTHON = $(srcdir)/setup.py $(mypydir)/__init__.py $(mypydir)/dosplot.py \
 #		   $(mypydir)/supercell.py
-EXTRA_DIST = $(srcdir)/lib/python
+EXTRA_DIST = $(srcdir)/setup.py $(srcdir)/lib/python
 all: all-recursive
 
 .SUFFIXES:
@@ -416,7 +416,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/$(MYDOC) $(distdir)/$(srcdir)/lib $(distdir)/config $(distdir)/lib/m
+	$(mkdir_p) $(distdir)/$(MYDOC) $(distdir)/$(srcdir) $(distdir)/$(srcdir)/lib $(distdir)/config $(distdir)/lib/m
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
