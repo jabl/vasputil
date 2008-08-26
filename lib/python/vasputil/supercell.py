@@ -63,7 +63,7 @@ class Cell(object):
             self.atoms = zeros((0, 3))
 
     def getNAtoms(self):
-        return self.atoms.shape[1]
+        return self.atoms.shape[0]
 
     def setNAtoms(self, val):
         raise AttributeError, "can't set attribute"
@@ -131,7 +131,7 @@ class Cell(object):
             offset = offset + natomType
         
         # Transpose to produce sensible linear algebra
-        self.atoms = transpose(array(atomcoords))
+        self.atoms = array(atomcoords)
 
     def write_poscar(self, filename="POSCAR.out", fd=None):
         """Writes data into a POSCAR format file"""
@@ -154,7 +154,7 @@ class Cell(object):
             fc += "Direct\n"
         for i in arange(0,self.nAtoms):
             for j in range(0,3):
-                fc += str(self.atoms[j,i]) + " "
+                fc += str(self.atoms[i,j]) + " "
             if self.selectiveDynamics:
                 selflags = self.selectiveFlags[i]
                 for j in range(0,3):
@@ -197,7 +197,7 @@ class Cell(object):
             for nAtom in arange(nAtomType):
                 fc += self.atomNames[anameindex] + "\t"
                 for i in range(3):
-                    fc += str(self.atoms[i,aindex]) + "\t"
+                    fc += str(self.atoms[aindex,i]) + "\t"
                 fc += "\n"
                 aindex += 1
             anameindex += 1
@@ -210,14 +210,16 @@ class Cell(object):
         """Convert atom coordinates from cartesian to direct"""
         if not self.cartesian:
             return
-        self.atoms = linalg.solve(self.latticeConstant*self.basisVectors, self.atoms)
+        self.atoms = linalg.solve(self.latticeConstant*self.basisVectors, \
+                transpose(self.atoms))
         self.cartesian = False
 
     def direct2Cartesian(self):
         """Convert atom coordinates from direct to cartesian"""
         if self.cartesian:
             return
-        self.atoms = dot(self.latticeConstant*self.basisVectors, self.atoms)
+        self.atoms = dot(self.latticeConstant*self.basisVectors, \
+                transpose(self.atoms))
         self.cartesian = True
         
     def showVmd(self):
@@ -234,3 +236,36 @@ class Cell(object):
         raw_input("Press Enter when done to delete the temp file.")
         f.close()
 
+# End of class Cell
+
+def rotate_molecule(coords, rotp = array((0.,0.,0.)), phi = 0., \
+        theta = 0., psi = 0.):
+    """Rotate a molecule via Euler angles.
+    See http://mathworld.wolfram.com/EulerAngles.html for definition.
+    Input arguments:
+    coords: Atom coordinates, as Nx3 pylab array.
+    rotp: The point to rotate about, as a 3x1 pylab array
+    phi: The 1st rotation angle around z axis.
+    theta: Rotation around x axis.
+    psi: 2nd rotation around z axis.
+
+    """
+# First move the molecule to the origin
+# In contrast to MATLAB, numpy broadcasts the smaller array to the larger
+# so there is no need to play with the Kronecker product.
+    rcoords = coords - rotp
+# First Euler rotation about z in matrix form
+    D = array(((cos(phi), sin(phi), 0.), (-sin(phi), cos(phi), 0.), \
+            (0., 0., 1.)))
+# Second Euler rotation about x:
+    C = array(((1., 0., 0.), (0., cos(theta), sin(theta)), \
+            (0., -sin(theta), cos(theta))))
+# Third Euler rotation, 2nd rotation about z:
+    B = array(((cos(psi), sin(psi), 0.), (-sin(psi), cos(psi), 0.), \
+            (0., 0., 1.)))
+# Total Euler rotation
+    A = dot(B, dot(C, D))
+# Do the rotation
+    rcoords = dot(A, transpose(rcoords))
+# Move back to the rotation point
+    return transpose(rcoords) + rotp
