@@ -16,13 +16,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
 
-"""This module defines a class that represents a supercell. It also
-    imports all of the pylab module into the namespace, to make it 
-    easy to create simple analysis scripts.
-    
+"""This module defines a class that represents a supercell, as well as utility
+functions.
+
 """
 
-from pylab import *
+import pylab as m
 
 
 class Cell(object):
@@ -41,11 +40,11 @@ class Cell(object):
             self.latticeConstant = 1.
             # 3x3 matrix containing the basis vectors of the supercell
             # in row major format
-            self.basisVectors = eye(3)
+            self.basisVectors = m.eye(3)
             # Array containing the numbers of each element in the
             # system, i.e. the length of this array is the same as the
             # length of the self.atomNames list
-            self.nAtomsType = array(0)
+            self.nAtomsType = m.array(0)
             # Are the ions allowed to move?
             self.selectiveDynamics = True
             # Flags for each atom describing in which cartesian coordinate
@@ -60,7 +59,7 @@ class Cell(object):
             # they be multiplies by the lattice constant.
             self.relative = False
             # Coordinates of the atoms
-            self.atoms = zeros((0, 3))
+            self.atoms = m.zeros((0, 3))
 
     def getNAtoms(self):
         return self.atoms.shape[0]
@@ -94,7 +93,7 @@ class Cell(object):
             a.append( floatvect)
         
         # Transpose to make natural ordering for linear algebra
-        self.basisVectors = transpose(array(a))
+        self.basisVectors = m.transpose(m.array(a))
         
         # Number of atoms. Again this must be in the same order as
         # in the first line
@@ -103,7 +102,7 @@ class Cell(object):
         tot_numatoms = 0
         for i in xrange(len(numofatoms)):
             numofatoms[i] = int(numofatoms[i])
-        self.nAtomsType = array(numofatoms)
+        self.nAtomsType = m.array(numofatoms)
         
         # Check if Selective dynamics is switched on
         sdyn = poscar[6]
@@ -130,8 +129,7 @@ class Cell(object):
                     self.selectiveFlags.append((ac[3], ac[4], ac[5]))
             offset = offset + natomType
         
-        # Transpose to produce sensible linear algebra
-        self.atoms = array(atomcoords)
+        self.atoms = m.array(atomcoords)
 
     def write_poscar(self, filename="POSCAR.out", fd=None):
         """Writes data into a POSCAR format file"""
@@ -139,8 +137,8 @@ class Cell(object):
         for a in self.atomNames:
             fc += str(a) + " "
         fc += "\n" + str(self.latticeConstant) + "\n"
-        for i in range(0,3):
-            for j in range(0,3):
+        for i in xrange(3):
+            for j in xrange(3):
                 fc += str(self.basisVectors[i,j]) + " "
             fc += "\n"
         for at in self.nAtomsType:
@@ -152,12 +150,12 @@ class Cell(object):
             fc += "Cartesian\n"
         else:
             fc += "Direct\n"
-        for i in arange(0,self.nAtoms):
-            for j in range(0,3):
+        for i in xrange(self.nAtoms):
+            for j in xrange(3):
                 fc += str(self.atoms[i,j]) + " "
             if self.selectiveDynamics:
                 selflags = self.selectiveFlags[i]
-                for j in range(0,3):
+                for j in xrange(3):
                     fc += str(selflags[j]) + " "
             fc += "\n"
         if (fd == None):
@@ -173,14 +171,14 @@ class Cell(object):
         xyz = f.readlines()
         f.close()
         # first line contains number of atoms
-        self.atoms = zeros((int(xyz[0]), 3))
+        self.atoms = m.zeros((int(xyz[0]), 3))
         self.cartesian = True
         self.relative = False
         skey = lambda x: x.split()[0]
         xyz[2:].sort(key=skey)
-        for ii in range(2, self.nAtoms):
+        for ii in xrange(2, self.nAtoms):
             s = xyz[ii].split()
-            floatvect = array([float(s[1]), float(s[2]), float(s[3])])
+            floatvect = m.array([float(s[1]), float(s[2]), float(s[3])])
             self.atoms[(ii-1),:] = floatvect
         return self.atoms
 
@@ -194,9 +192,9 @@ class Cell(object):
         if not self.cartesian:
             self.direct2Cartesian()
         for nAtomType in self.nAtomsType:
-            for nAtom in arange(nAtomType):
+            for nAtom in xrange(nAtomType):
                 fc += self.atomNames[anameindex] + "\t"
-                for i in range(3):
+                for i in xrange(3):
                     fc += str(self.atoms[aindex,i]) + "\t"
                 fc += "\n"
                 aindex += 1
@@ -210,16 +208,16 @@ class Cell(object):
         """Convert atom coordinates from cartesian to direct"""
         if not self.cartesian:
             return
-        self.atoms = linalg.solve(self.latticeConstant*self.basisVectors, \
-                transpose(self.atoms))
+        self.atoms = m.linalg.solve(self.latticeConstant*self.basisVectors, \
+                m.transpose(self.atoms))
         self.cartesian = False
 
     def direct2Cartesian(self):
         """Convert atom coordinates from direct to cartesian"""
         if self.cartesian:
             return
-        self.atoms = dot(self.latticeConstant*self.basisVectors, \
-                transpose(self.atoms))
+        self.atoms = m.dot(self.latticeConstant*self.basisVectors, \
+                m.transpose(self.atoms))
         self.cartesian = True
         
     def showVmd(self):
@@ -238,7 +236,7 @@ class Cell(object):
 
 # End of class Cell
 
-def rotate_molecule(coords, rotp = array((0.,0.,0.)), phi = 0., \
+def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
         theta = 0., psi = 0.):
     """Rotate a molecule via Euler angles.
     See http://mathworld.wolfram.com/EulerAngles.html for definition.
@@ -255,17 +253,17 @@ def rotate_molecule(coords, rotp = array((0.,0.,0.)), phi = 0., \
 # row-wise, so there is no need to play with the Kronecker product.
     rcoords = coords - rotp
 # First Euler rotation about z in matrix form
-    D = array(((cos(phi), sin(phi), 0.), (-sin(phi), cos(phi), 0.), \
+    D = m.array(((m.cos(phi), m.sin(phi), 0.), (-m.sin(phi), m.cos(phi), 0.), \
             (0., 0., 1.)))
 # Second Euler rotation about x:
-    C = array(((1., 0., 0.), (0., cos(theta), sin(theta)), \
-            (0., -sin(theta), cos(theta))))
+    C = m.array(((1., 0., 0.), (0., m.cos(theta), m.sin(theta)), \
+            (0., -m.sin(theta), m.cos(theta))))
 # Third Euler rotation, 2nd rotation about z:
-    B = array(((cos(psi), sin(psi), 0.), (-sin(psi), cos(psi), 0.), \
+    B = m.array(((m.cos(psi), m.sin(psi), 0.), (-m.sin(psi), m.cos(psi), 0.), \
             (0., 0., 1.)))
 # Total Euler rotation
-    A = dot(B, dot(C, D))
+    A = m.dot(B, m.dot(C, D))
 # Do the rotation
-    rcoords = dot(A, transpose(rcoords))
+    rcoords = m.dot(A, m.transpose(rcoords))
 # Move back to the rotation point
-    return transpose(rcoords) + rotp
+    return m.transpose(rcoords) + rotp
