@@ -1,7 +1,15 @@
+2008-08-26  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* bin/vasputil_interpolate: New file.
+	* bin/interpolate4.in: Remove.
+	* bin/Makefile.am: Remove reference to interpolate4.in
+	* setup.py: Add bin/vasputil_interpolate to scripts.
+
 2008-08-25  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* lib/python/vasputil/{__init__.py,dosplot.py,supercell.py}: New
 	files.
+	* bin/dosplot_example: New file.
 	* setup.py: New file.
 	* Makefile.am: Install python scripts via distutils.
 	* configure.ac: Call AM_PATH_PYTHON.

@@ -28,6 +28,12 @@ test: Run self-tests.
 Documentation for each utility is available by running it without any
 arguments, e.g. "vasputil poscar2xyz".
 
+In addition to the above, vasputil contains some scripts, which can be used
+directly or as examples of what can be done with the provided python modules.
+These are dosplot_example (plot density-of-states) and vasputil_interpolate
+(wrapper around "vasputil interpolate" for creating many evenly spaced images
+at once).
+
 Vasputil is written mostly the Fortran 95 programming language with a few
 optional Fortran 2003 features such as command line argument handling, and
 should be compilable by any compiler that conforms to said standard. Makefiles
@@ -113,4 +119,8 @@ export PYTHONPATH=$HOME/lib/pythonX.Y/site-packages
 where X.Y is your python version, in your shell initialization file (e.g.
 ~/.bash_profile). Also, the python scripts use of the matplotlib library, which
 you can find at http://matplotlib.sf.net, in case your system doesn't already
-have it.
+have it.  As matplotlib requires some support libraries (e.g. NumPy), and if
+you don't have access to a package management system (e.g. on Linux) which
+includes matplotlib and its dependencies, you can get all at once by installing
+one of the python distributions targeted at science, such as SAGE, Enthought
+Python Distribution, or PythonXY.
