@@ -54,10 +54,8 @@ class Cell(object):
             # Are the atomic coordinates cartesian or in direct coordinates
             # If direct, cartesian coordinates can be calculated by
             # multiplying each coordinate with the basis vector matrix
+            # times the lattice constant
             self.cartesian = True
-            # Are the atomic coordinates relative or absolute, i.e. should
-            # they be multiplies by the lattice constant.
-            self.relative = False
             # Coordinates of the atoms
             self.atoms = m.zeros((0, 3))
 
@@ -173,7 +171,6 @@ class Cell(object):
         # first line contains number of atoms
         self.atoms = m.zeros((int(xyz[0]), 3))
         self.cartesian = True
-        self.relative = False
         skey = lambda x: x.split()[0]
         xyz[2:].sort(key=skey)
         for ii in xrange(2, self.nAtoms):
