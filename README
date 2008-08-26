@@ -123,4 +123,4 @@ have it.  As matplotlib requires some support libraries (e.g. NumPy), and if
 you don't have access to a package management system (e.g. on Linux) which
 includes matplotlib and its dependencies, you can get all at once by installing
 one of the python distributions targeted at science, such as SAGE, Enthought
-Python Distribution, or PythonXY.
+Python Distribution, or Python(x,y).
