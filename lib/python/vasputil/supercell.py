@@ -243,8 +243,8 @@ def rotate_molecule(coords, rotp = array((0.,0.,0.)), phi = 0., \
     """Rotate a molecule via Euler angles.
     See http://mathworld.wolfram.com/EulerAngles.html for definition.
     Input arguments:
-    coords: Atom coordinates, as Nx3 pylab array.
-    rotp: The point to rotate about, as a 3x1 pylab array
+    coords: Atom coordinates, as Nx3 2d pylab array.
+    rotp: The point to rotate about, as a 1d 3-element pylab array
     phi: The 1st rotation angle around z axis.
     theta: Rotation around x axis.
     psi: 2nd rotation around z axis.
@@ -252,7 +252,7 @@ def rotate_molecule(coords, rotp = array((0.,0.,0.)), phi = 0., \
     """
 # First move the molecule to the origin
 # In contrast to MATLAB, numpy broadcasts the smaller array to the larger
-# row-wise so there is no need to play with the Kronecker product.
+# row-wise, so there is no need to play with the Kronecker product.
     rcoords = coords - rotp
 # First Euler rotation about z in matrix form
     D = array(((cos(phi), sin(phi), 0.), (-sin(phi), cos(phi), 0.), \
