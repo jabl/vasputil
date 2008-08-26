@@ -5,7 +5,7 @@ import os, sys
 # Number of intermediate images
 if (len(sys.argv) != 4):
     print "Usage: interpolate POSCAR.start POSCAR.end N"
-    print "Result: you get N files called POSCAR.N which are linearly"
+    print "Result: you get N files called POSCAR.{1-N} which are linearly"
     print "interpolated between POSCAR.start and POSCAR.end"
     sys.exit(1)
 
