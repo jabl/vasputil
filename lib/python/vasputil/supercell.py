@@ -252,7 +252,7 @@ def rotate_molecule(coords, rotp = array((0.,0.,0.)), phi = 0., \
     """
 # First move the molecule to the origin
 # In contrast to MATLAB, numpy broadcasts the smaller array to the larger
-# so there is no need to play with the Kronecker product.
+# row-wise so there is no need to play with the Kronecker product.
     rcoords = coords - rotp
 # First Euler rotation about z in matrix form
     D = array(((cos(phi), sin(phi), 0.), (-sin(phi), cos(phi), 0.), \
