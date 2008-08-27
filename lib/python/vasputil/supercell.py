@@ -54,16 +54,16 @@ class Cell(object):
         elif (xyz != None):
             self.read_xyz(xyz)
 
-    def getNAtoms(self):
+    def __getNAtoms(self):
         return self.atoms.shape[0]
 
-    def setNAtoms(self, val):
+    def __setNAtoms(self, val):
         raise AttributeError, "can't set attribute"
 
-    def delNAtoms(self):
+    def __delNAtoms(self):
         raise AttributeError, "can't delete attribute"
 
-    nAtoms = property(getNAtoms, setNAtoms, delNAtoms, "Total number of atoms.")
+    nAtoms = property(__getNAtoms, __setNAtoms, __delNAtoms, "Total number of atoms.")
 
     def read_poscar(self, filename):
         """Parses a POSCAR file"""
@@ -203,6 +203,7 @@ class Cell(object):
 
     def getAtomSymbolCount(self):
         """Return a list of (atomic symbol, count) tuples.
+
         As a side effect, sorts the atoms by symbol.
 
         """
@@ -252,7 +253,9 @@ class Cell(object):
         f.close()
 
     def add(self, cell):
-        """Add another supercell to this one. The resulting cell will have
+        """Add another supercell to this one. 
+        
+        The resulting cell will have
         the basis vector and lattice constant of this cell.
         
         """
@@ -272,6 +275,7 @@ class Cell(object):
 def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
         theta = 0., psi = 0.):
     """Rotate a molecule via Euler angles.
+
     See http://mathworld.wolfram.com/EulerAngles.html for definition.
     Input arguments:
     coords: Atom coordinates, as Nx3 2d pylab array.
