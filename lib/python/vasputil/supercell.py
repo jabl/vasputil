@@ -131,13 +131,16 @@ class Cell(object):
         asc = self.getAtomSymbolCount()
         for a in asc:
             fc += str(a[0]) + " "
-        fc += "\n" + str(self.latticeConstant) + "\n"
+        fc += "\n" + "%19.16f" % self.latticeConstant + "\n"
+        basisfmt = "%22.16f"
         for i in xrange(3):
+            fc += " "
             for j in xrange(3):
-                fc += str(self.basisVectors[i,j]) + " "
+                fc += basisfmt % self.basisVectors[i,j] 
             fc += "\n"
+        atomnumfmt = "%4i"
         for at in asc:
-            fc += str(at[1]) + " "
+            fc += atomnumfmt % at[1]
         fc += "\n"
         if self.selectiveDynamics:
             fc += "Selective dynamics\n"
@@ -147,13 +150,15 @@ class Cell(object):
         else:
             fc += "Direct\n"
             atoms = self.atoms
+        atomfmt = "%20.16f"
+        logicalfmt = "%4s"
         for i in xrange(self.nAtoms):
             for j in xrange(3):
-                fc += str(atoms[i,j]) + " "
+                fc += atomfmt % atoms[i,j]
             if self.selectiveDynamics:
                 selflags = self.selectiveFlags[i]
                 for j in xrange(3):
-                    fc += str(selflags[j]) + " "
+                    fc += logicalfmt % selflags[j]
             fc += "\n"
         if (fd == None):
             f = open(filename, "w")
