@@ -6,6 +6,7 @@
 	(sortAtoms): New method.
 	(getAtomSymbolCount): New method.
 	(write_poscar): Make format match VASP.
+	(write_xyz): Make format match OpenBabel.
 
 2008-08-26  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
