@@ -162,9 +162,9 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-bin_SCRIPTS = interpolate4 layers
+bin_SCRIPTS = layers
 CLEANFILES = $(bin_SCRIPTS)
-EXTRA_DIST = interpolate4.in layers.in
+EXTRA_DIST = layers.in
 do_subst = sed -e 's,[@]PACKAGE_STRING[@],$(PACKAGE_STRING),g'
 all: all-am
 
@@ -340,10 +340,6 @@ uninstall-am: uninstall-binSCRIPTS uninstall-info-am
 	pdf-am ps ps-am uninstall uninstall-am uninstall-binSCRIPTS \
 	uninstall-info-am
 
-
-interpolate4: interpolate4.in Makefile
-	$(do_subst) < $(srcdir)/interpolate4.in > interpolate4
-	chmod +x interpolate4
 
 layers: layers.in Makefile
 	$(do_subst) < $(srcdir)/layers.in > layers
