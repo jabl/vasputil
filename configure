@@ -7227,7 +7227,7 @@ rm -f confcache
 #AC_SUBST(top_includedir,['$(topdir)/include'])
 #AC_SUBST(top_libdir,['$(topdir)/lib'])
 
-                              ac_config_files="$ac_config_files Makefile src/Makefile bin/Makefile"
+                    ac_config_files="$ac_config_files Makefile src/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7780,7 +7780,6 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-  "bin/Makefile" ) CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "src/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
