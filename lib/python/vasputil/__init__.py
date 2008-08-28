@@ -1,1 +1,1 @@
-__all__ = ["dosplot", "supercell"]
+__all__ = ["dos", "supercell"]
