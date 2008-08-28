@@ -23,21 +23,25 @@ import vasputil.dos as d
 from pylab import *
 import sys
 
-if len(sys.argv) != 4:
-    print "Usage: vasputil_dosplot DOSCAR atom orbital"
+if len(sys.argv) != 5:
+    print "Usage: vasputil_dosplot DOSCAR Efermi atom orbital"
     print "DOSCAR: VASP DOSCAR file from which to read data."
+    print "Efermi: Fermi energy."
     print "atom: atom number, starting from 1."
     print "orbital: orbital, s=1,p=2,d=3, if spin polarized s+=1,s-=2 etc."
     sys.exit(1)
 
 # By default tries to read a file called "DOSCAR".
 dc = d.LDOS(sys.argv[1])
-atom = int(sys.argv[2])
-orb = int(sys.argv[3])
+fermi = float(sys.argv[2])
+atom = int(sys.argv[3])
+orb = int(sys.argv[4])
 
+dc.eFermi = fermi
 en = dc.get_energygrid() # This is the x-axis in a typical DOS plot.
 
-plot(en, dc.get_dos(atom, orb))
+label = "Atom " + str(atom) + " orbital " + str(orb)
+plot(en, dc.get_dos(atom, orb), label=label)
 d.showdp()
 
 # For a more involved plot, create your own plot script or run interactively
