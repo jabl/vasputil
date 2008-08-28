@@ -4,10 +4,6 @@ ACLOCAL_AMFLAGS = -I config
 
 SUBDIRS = src
 
-matlabdir = $(libdir)/m/
-dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotate_molecule.m \
-                   $(srcdir)/lib/m/translate_molecule.m
-
 MYDOC = doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
