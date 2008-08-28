@@ -3,6 +3,8 @@ vasputil 4.2, 2008-??-??
 * New python libraries, supercell.py and dosplot.py, intended to be used when
   writing small scripts.
 
+* New utility, vasputil_zlayers.
+
 * Switch from Subversion to Git (I suppose this makes me a version control
   weenie, since I have gone from RCS->CVS->Subversion->Git).
 
