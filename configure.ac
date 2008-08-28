@@ -106,7 +106,7 @@ AC_CACHE_SAVE
 #AC_SUBST(top_includedir,['$(topdir)/include'])
 #AC_SUBST(top_libdir,['$(topdir)/lib'])
 
-AC_CONFIG_FILES([Makefile src/Makefile bin/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
 
 ACX_F90_CONFIG_HEADER([src/config.h], [src/config.inc])
