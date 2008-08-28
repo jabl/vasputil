@@ -21,21 +21,38 @@
 
 import vasputil.dos as d
 from pylab import *
+import sys
+
+if len(sys.argv) != 4:
+    print "Usage: vasputil_dosplot DOSCAR atom orbital"
+    print "DOSCAR: VASP DOSCAR file from which to read data."
+    print "atom: atom number, starting from 1."
+    print "orbital: orbital, s=1,p=2,d=3, if spin polarized s+=1,s-=2 etc."
+    sys.exit(1)
 
 # By default tries to read a file called "DOSCAR".
-dc = d.LDOS()
+dc = d.LDOS(sys.argv[1])
+atom = int(sys.argv[2])
+orb = int(sys.argv[3])
 
 en = dc.get_energygrid() # This is the x-axis in a typical DOS plot.
-subplot(211)
-# Get the s and p DOS of atom 1.
-plot(en, dc.get_dos(1, 1), "k-", label="Al s")
-plot(en, dc.get_dos(1, 2), "k-.", label="Al p")
-legend()
-xlim(-15,5)
-xticks(arange(0))
-subplot(212)
-# s-DOS of atom 2. 
-plot(en, dc.get_dos(2, 1), "k-", label="Al s")
-xlim(-15,5)
-ylim(0,.29)
+
+plot(en, dc.get_dos(atom, orb))
 d.showdp()
+
+# For a more involved plot, create your own plot script or run interactively
+# via 'ipython -pylab'
+# Below are some example pylab commands for plotting
+#subplot(211)
+# Get the s and p DOS of atom 1.
+#plot(en, dc.get_dos(1, 1), "k-", label="Al s")
+#plot(en, dc.get_dos(1, 2), "k-.", label="Al p")
+#legend()
+#xlim(-15,5)
+#xticks(arange(0))
+#subplot(212)
+# s-DOS of atom 2. 
+#plot(en, dc.get_dos(2, 1), "k-", label="Al s")
+#xlim(-15,5)
+#ylim(0,.29)
+#d.showdp()
