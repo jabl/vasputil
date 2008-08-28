@@ -1,0 +1,52 @@
+#!/usr/bin/python
+# vim: set fileencoding=latin-1
+
+# Find layers in z-coordinates, output distances between them
+
+import vasputil.supercell as s
+from pylab import *
+import sys
+
+if len(sys.argv) < 2:
+    print "Usage: vasputil_zlayers POSCAR [dbin] [tol]"
+    print "POSCAR: input file"
+    print "dbin: Size of histogram bin, default 0.1 Å"
+    print "tol: Tolerance, bin should contain > tol*maxbin in order to be " \
+            + "counted as layer, where maxbin is the population in the " \
+            + "largest bin. Default is 0.1."
+    sys.exit(1)
+
+if len(sys.argv) > 2:
+    dbin = float(sys.argv[2])
+else:
+    dbin = 0.1
+if len(sys.argv) > 3:
+    tol = float(sys.argv[3])
+else:
+    tol = 0.1
+
+c = s.Cell(sys.argv[1])
+c.direct2Cartesian()
+
+zc = c.atoms[:,2] # Atom Z coordinates
+bins = int(ceil((zc.max() - zc.min())/dbin))
+histdat, levels = npy.histogram(zc, bins)
+mask = histdat > tol * histdat.max()
+plev = levels[mask] + dbin/2
+alayer = histdat[mask]
+layerdist = plev[1:] - plev[:-1]
+print "Z layer    Distance to previous    Atoms in layer"
+print "-------------------------------------------------------"
+ffmt = "%8.4f"
+ifmt = "%3i"
+print ffmt % plev[0] + "                          " + ifmt % alayer[0]
+for ii in range(1, len(plev)):
+    print ffmt % plev[ii] + "          " + ffmt % layerdist[ii-1] + "        " + ifmt % alayer[ii]
+
+# Finally, make a picture:
+hist(zc,bins)
+xst = "Bin number (bin size " + str(dbin) + " A)"
+xlabel(xst)
+ylabel("Atoms in bin")
+show()
+
