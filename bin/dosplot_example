@@ -1,19 +1,41 @@
 #!/usr/bin/python
+# vim: set fileencoding=latin-1
+# Copyright (c) 2008 Janne Blomqvist
 
-from vasputil.dosplot import *
+#  This file is part of Vasputil.
 
-a1 = load("DOS3")
-a2 = load("DOS4")
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
 
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Example plotting script demonstrating how to use the vasputil.dos module."""
+
+import vasputil.dos as d
+from pylab import *
+
+# By default tries to read a file called "DOSCAR".
+dc = d.LDOS()
+
+en = dc.get_energygrid() # This is the x-axis in a typical DOS plot.
 subplot(211)
-plot(a1[:,0], a1[:,1], "k-", label="Al s")
-plot(a1[:,0], a1[:,2], "k-.", label="Al p")
+# Get the s and p DOS of atom 1.
+plot(en, dc.get_dos(1, 1), "k-", label="Al s")
+plot(en, dc.get_dos(1, 2), "k-.", label="Al p")
 legend()
 xlim(-15,5)
 xticks(arange(0))
 subplot(212)
-#a=axes([0.,0.5,0.,1.])
-plot(a2[:,0], a2[:,1], "k-", label="Al s")
+# s-DOS of atom 2. 
+plot(en, dc.get_dos(2, 1), "k-", label="Al s")
 xlim(-15,5)
 ylim(0,.29)
-showdp()
+d.showdp()

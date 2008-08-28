@@ -1,3 +1,9 @@
+2008-08-28  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/vasputil/dosplot.py: Rename to dos.py
+	* bin/vasputil_zlayers: New file.
+	* bin/dosplot_example: Use updated dos.py.
+
 2008-08-27  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* lib/python/vasputil/supercell.py: Change to use list of atomic

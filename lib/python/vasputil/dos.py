@@ -18,22 +18,108 @@
 #  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
 
 
+"""Module for doing stuff with density-of-states."""
 
-"""Utility function to set some default plot parameters for plotting DOS
-figures.
+import pylab as pl
+import sys
 
-"""
+class LDOS(object):
+    """Class for representing a set of local DOS.
+    
+    DOS data is stored in the instance variable self.dos, which is a 3D 
+    ndarray, as follows:
+    1st dim: Which atom.
+    2nd dim: Selects the DOS grid point.
+    3rd dim: 0 is the energy, 1-3 s, p, d DOS.
+        
+    """
 
-from pylab import *
+    def __init__(self, doscar="DOSCAR", efermi=0.0):
+        """Initialize LDOS."""
+        self.__efermi = 0.0
+        self.read_doscar(doscar)
+        self.eFermi = efermi
+
+    def read_doscar(self, fname="DOSCAR"):
+        """Read a VASP DOSCAR file."""
+        f = open(fname)
+        natoms = int(f.readline().split()[0])
+        [f.readline() for n in range(4)]  # Skip next 4 lines.
+        dos = []
+        for na in xrange(natoms + 1):
+            try:
+                line = f.readline()
+                if line == "":
+                    raise Exception
+            except Exception, e:
+                errstr = "Failed reading " + str(na) + ":th DOS block, probably " \
+                        + "this DOSCAR is from some old version of VASP that " \
+                        + "doesn't " \
+                        + "first produce a block with integrated DOS. Inserting " \
+                        + "empty 0:th block."
+                sys.stderr.write(errstr)
+                dos.insert(0, pl.zeros((ndos, dos[1].shape[1])))
+                continue
+            try:
+                ndos = int(line.split()[2])
+            except:
+                print "Error, line is: " + line + "ENDLINE"
+            line = f.readline().split()
+            cdos = pl.zeros((ndos, len(line)))
+            cdos[0] = pl.array(line)
+            for nd in xrange(1, ndos):
+                line = f.readline().split()
+                cdos[nd] = pl.array(line)
+            dos.append(cdos)
+        f.close()
+        if dos[0].shape != dos[1].shape:
+            dos0 = pl.zeros(dos[1].shape)
+            dos0[:,:dos[0].shape[1]] = dos[0]
+            dos[0] = dos0
+        self.dos = pl.array(dos)
+
+    def __set_efermi(self, efermi):
+        """Set the Fermi level."""
+        if self.__efermi != 0.0:
+            self.dos[:,:,0] = self.dos[:,:,0] + self.__efermi
+        self.__efermi = efermi
+        self.dos[:,:,0] = self.dos[:,:,0] - efermi
+
+    def __get_efermi(self):
+        return self.__efermi
+
+    def __del_efermi(self):
+        raise AttributeError, "Can't delete attribute."
+
+    eFermi = property(__get_efermi, __set_efermi, __del_efermi, "Fermi energy.")
+
+    def get_energygrid(self):
+        """Return the array with the energies."""
+        return self.dos[1, :, 0]
+
+    def get_dos(self, atom, orbital):
+        """Return an NDOSx1 array with dos for the chosen atom and orbital.
+        
+        If spin-unpolarized calculation, no phase factors:
+        s = 1, p = 2, d = 3
+        Spin-polarized, no phase factors:
+        s-up = 1, s-down = 2, p-up = 3, p-down = 4, d-up = 5, d-down = 6
+        If phase factors have been calculated, orbitals are
+        s, py, pz, px, dxy, dyz, dz2, dxz, dx2
+        double in the above fashion if spin polarized.
+        
+        """
+        return self.dos[atom, :, orbital]
 
 
 def showdp(fsz=16):
-    xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
-    figtext(0.03, 0.45, "LDOS", rotation='vertical', size=fsz)
-    loc, lab = xticks()
+    """Utility function to set default parameters for DOS plots."""
+    pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
+    pl.figtext(0.03, 0.45, "LDOS", rotation='vertical', size=fsz)
+    loc, lab = pl.xticks()
     lab.set_size = fsz
-    loc, lab = yticks()
+    loc, lab = pl.yticks()
     lab.set_size = fsz
-    legend()
-    subplots_adjust(hspace=0.0)
-    show()
+    pl.legend()
+    pl.subplots_adjust(hspace=0.0)
+    pl.show()
