@@ -105,15 +105,16 @@ where X.Y is your python version, in your shell initialization file (e.g.
 ~/.bash_profile). On the other hand, if you installed into the sytem default
 location, you probably don't need to do anything. 
 
-Also, the python scripts use of the matplotlib library, which you can find at
-http://matplotlib.sf.net, in case your system doesn't already have it.  As
-matplotlib requires some support libraries (e.g. NumPy), and if you don't have
-access to a package management system (e.g. on Linux) which includes matplotlib
-and its dependencies, you can get all at once by installing one of the python
-distributions targeted at science, such as SAGE, Enthought Python Distribution,
-or Python(x,y). Another solution if you already have python installed, is to
-install matplotlib and other libraries via easy_install from setuptools (a sort
-of package management system for python packages).
+Also, some of the python scripts and the library modules use the matplotlib
+library, which you can find at http://matplotlib.sf.net, in case your system
+doesn't already have it.  As matplotlib requires some other libraries (e.g.
+NumPy), and if you don't have access to a package management system (e.g. on
+Linux) which includes matplotlib and its dependencies, you can get all at once
+by installing one of the python distributions targeted at science, such as
+SAGE, Enthought Python Distribution, or Python(x,y). Another solution if you
+already have python installed, is to install matplotlib and other libraries via
+easy_install from setuptools (a sort of package management system for python
+packages).
 
 
 INTERACTIVE USAGE
