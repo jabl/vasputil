@@ -10,6 +10,6 @@ setup(name='vasputil',
       url='http://www.fyslab.hut.fi/~/job/',
       packages=['vasputil'],
       package_dir = {'': 'lib/python'},
-      scripts = ['bin/dosplot_example', 'bin/vasputil_interpolate', 'bin/vasputil_zlayers']
+      scripts = ['bin/vasputil_dosplot', 'bin/vasputil_interpolate', 'bin/vasputil_zlayers']
      )
 

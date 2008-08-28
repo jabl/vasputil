@@ -32,7 +32,7 @@ In addition to the above, vasputil contains some scripts, which can be used
 directly or as examples of what can be done with the provided python modules.
 These are 
 
-dosplot_example: plot density-of-states. 
+vasputil_dosplot: plot density-of-states. 
 
 vasputil_interpolate: wrapper around "vasputil interpolate" for creating many
 evenly spaced images at once.
