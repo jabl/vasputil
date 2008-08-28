@@ -30,9 +30,14 @@ arguments, e.g. "vasputil poscar2xyz".
 
 In addition to the above, vasputil contains some scripts, which can be used
 directly or as examples of what can be done with the provided python modules.
-These are dosplot_example (plot density-of-states) and vasputil_interpolate
-(wrapper around "vasputil interpolate" for creating many evenly spaced images
-at once).
+These are 
+
+dosplot_example: plot density-of-states. 
+
+vasputil_interpolate: wrapper around "vasputil interpolate" for creating many
+evenly spaced images at once.
+
+vasputil_zlayers: Find layers in z direction and print interlayer distances.
 
 Vasputil is written mostly the Fortran 95 programming language with a few
 optional Fortran 2003 features such as command line argument handling, and
