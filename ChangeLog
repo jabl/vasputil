@@ -3,6 +3,7 @@
 	* lib/python/vasputil/dosplot.py: Rename to dos.py
 	* bin/vasputil_zlayers: New file.
 	* bin/dosplot_example: Use updated dos.py, rename to vasputil_dosplot.
+	* lib/m: Remove all MATLAB scripts.
 
 2008-08-27  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 

@@ -1,9 +1,14 @@
-vasputil 4.2, 2008-??-??
+vasputil 4.2, 2008-08-28
 
-* New python libraries, supercell.py and dosplot.py, intended to be used when
+* New python libraries, supercell.py and dos.py, intended to be used when
   writing small scripts.
 
-* New utility, vasputil_zlayers.
+* New utilities, vasputil_zlayers, vasputil_dosplot, vasputil_interpolate,
+  implemented using the new python libraries.
+
+* Remove MATLAB scripts, as using python+matplotlib interactively provides
+  similar functionality, and the python libraries make it easier to work with
+  VASP rather than having to do extra steps to import/export data.
 
 * Switch from Subversion to Git (I suppose this makes me a version control
   weenie, since I have gone from RCS->CVS->Subversion->Git).

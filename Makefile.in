@@ -38,11 +38,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = README $(am__configure_deps) $(dist_matlab_DATA) \
-	$(dist_robodoc_DATA) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	ChangeLog INSTALL NEWS config/config.guess config/config.sub \
-	config/install-sh config/missing config/mkinstalldirs
+DIST_COMMON = README $(am__configure_deps) $(dist_robodoc_DATA) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
+	config/config.guess config/config.sub config/install-sh \
+	config/missing config/mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/acx_blas.m4 \
@@ -74,10 +74,9 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(matlabdir)" "$(DESTDIR)$(robodocdir)"
-dist_matlabDATA_INSTALL = $(INSTALL_DATA)
+am__installdirs = "$(DESTDIR)$(robodocdir)"
 dist_robodocDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(dist_matlab_DATA) $(dist_robodoc_DATA)
+DATA = $(dist_robodoc_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -196,10 +195,6 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I config
 SUBDIRS = src
-matlabdir = $(libdir)/m/
-dist_matlab_DATA = $(srcdir)/lib/m/printcoords.m $(srcdir)/lib/m/rotate_molecule.m \
-                   $(srcdir)/lib/m/translate_molecule.m
-
 MYDOC = doc
 robodocdir = $(prefix)/doc
 dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
@@ -241,23 +236,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 uninstall-info-am:
-install-dist_matlabDATA: $(dist_matlab_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(matlabdir)" || $(mkdir_p) "$(DESTDIR)$(matlabdir)"
-	@list='$(dist_matlab_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(dist_matlabDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(matlabdir)/$$f'"; \
-	  $(dist_matlabDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(matlabdir)/$$f"; \
-	done
-
-uninstall-dist_matlabDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_matlab_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(matlabdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(matlabdir)/$$f"; \
-	done
 install-dist_robodocDATA: $(dist_robodoc_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(robodocdir)" || $(mkdir_p) "$(DESTDIR)$(robodocdir)"
@@ -411,7 +389,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/$(MYDOC) $(distdir)/$(srcdir) $(distdir)/$(srcdir)/lib $(distdir)/config $(distdir)/lib/m
+	$(mkdir_p) $(distdir)/$(MYDOC) $(distdir)/$(srcdir) $(distdir)/$(srcdir)/lib $(distdir)/config
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -555,7 +533,7 @@ check: check-recursive
 all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(matlabdir)" "$(DESTDIR)$(robodocdir)"; do \
+	for dir in "$(DESTDIR)$(robodocdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -601,8 +579,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-data-local install-dist_matlabDATA \
-	install-dist_robodocDATA
+install-data-am: install-data-local install-dist_robodocDATA
 
 install-exec-am:
 
@@ -630,8 +607,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dist_matlabDATA uninstall-dist_robodocDATA \
-	uninstall-info-am
+uninstall-am: uninstall-dist_robodocDATA uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -642,15 +618,14 @@ uninstall-info: uninstall-info-recursive
 	distclean-recursive distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am \
-	install-data-local install-dist_matlabDATA \
-	install-dist_robodocDATA install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic \
+	install-data-local install-dist_robodocDATA install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-dist_matlabDATA \
-	uninstall-dist_robodocDATA uninstall-info-am
+	uninstall uninstall-am uninstall-dist_robodocDATA \
+	uninstall-info-am
 
 
 doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css

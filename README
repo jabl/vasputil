@@ -1,10 +1,11 @@
 
 Vasputil release 4.2
 
-Vasputil is a command-line utility designed to make life with VASP
-easier. It provides a set of commands to manipulate POSCAR files.
+Vasputil is a set of command-line utilities and python libraries designed to
+make life with VASP easier. It provides a set of commands to manipulate POSCAR
+files.
 
-Available commands are:
+Available commands via the 'vasputil' binary are:
 poscar2xyz: Convert a POSCAR file to a xyz format file.
 plane2atom: Calculate the average distance from a plane to a set of atoms.
 plane2layer: Calculate the average distance from a plane to a layer.
@@ -28,9 +29,9 @@ test: Run self-tests.
 Documentation for each utility is available by running it without any
 arguments, e.g. "vasputil poscar2xyz".
 
-In addition to the above, vasputil contains some scripts, which can be used
-directly or as examples of what can be done with the provided python modules.
-These are 
+In addition to the above, vasputil contains some Python scripts, which can be
+used directly or as examples of what can be done with the provided python
+modules.  These are 
 
 vasputil_dosplot: plot density-of-states. 
 
@@ -43,8 +44,8 @@ Vasputil is written mostly the Fortran 95 programming language with a few
 optional Fortran 2003 features such as command line argument handling, and
 should be compilable by any compiler that conforms to said standard. Makefiles
 for IBM xlf95, Lahey lf95, Pathscale pathf90, Intel ifort and Portland pgf90
-are provided. Parts of vasputil are also written in MATLAB and Python, see
-below for requirements.
+are provided. Parts of vasputil are also written in Python, see below for
+requirements.
 
 Vasputil depends on the LAPACK and BLAS libraries. The provided
 Makefiles use different platform-specific optimized versions of the
@@ -92,27 +93,6 @@ $ ./configure --help
 $ make && make install
 
 
-MATLAB SCRIPTS
-
-To use the Octave/Matlab scripts it is recommended to add the path
-where the scripts are found to the search path. 
-
-E.g. if the PREFIX in Makefile is $(HOME), for octave 2.x add the following
-line to ~/.octaverc:
-
-LOADPATH = ['~/lib/m/', LOADPATH];
-
-For octave 3.x, the initialization has become more matlab-like, so add the
-following to ~/.octaverc:
-
-path(path, '~/lib/m')
-
-For MATLAB, add the following to startup.m (in the directory where you run
-MATLAB): 
-
-path(path, '~/lib/m')
-
-
 PYTHON SCRIPTS
 
 To use the python scripts you should add the python library directory to the
@@ -122,10 +102,28 @@ $HOME (default), then you should have something like
 export PYTHONPATH=$HOME/lib/pythonX.Y/site-packages
 
 where X.Y is your python version, in your shell initialization file (e.g.
-~/.bash_profile). Also, the python scripts use of the matplotlib library, which
-you can find at http://matplotlib.sf.net, in case your system doesn't already
-have it.  As matplotlib requires some support libraries (e.g. NumPy), and if
-you don't have access to a package management system (e.g. on Linux) which
-includes matplotlib and its dependencies, you can get all at once by installing
-one of the python distributions targeted at science, such as SAGE, Enthought
-Python Distribution, or Python(x,y).
+~/.bash_profile). On the other hand, if you installed into the sytem default
+location, you probably don't need to do anything. 
+
+Also, the python scripts use of the matplotlib library, which you can find at
+http://matplotlib.sf.net, in case your system doesn't already have it.  As
+matplotlib requires some support libraries (e.g. NumPy), and if you don't have
+access to a package management system (e.g. on Linux) which includes matplotlib
+and its dependencies, you can get all at once by installing one of the python
+distributions targeted at science, such as SAGE, Enthought Python Distribution,
+or Python(x,y). Another solution if you already have python installed, is to
+install matplotlib and other libraries via easy_install from setuptools (a sort
+of package management system for python packages).
+
+
+INTERACTIVE USAGE
+
+The python modules can be used interactively as well, to provide a sort of
+MATLAB-like interactive environment where you can manipulate coordinates stored
+in arrays, or plot data etc. For this, the 'ipython' enhanced interactive
+environment is recommended. Start with the matplotlib stuff preloaded with
+'ipython -pylab'. For those familiar with MATLAB, see
+http://www.scipy.org/NumPy_for_Matlab_Users . After that, just import what you
+need from the vasputil module and get going! See the python scripts for
+reference, or 'pydoc vasputil', 'pydoc vasputil.supercell' etc. to read
+documentation, or the ? operator in ipython.
