@@ -42,16 +42,16 @@ vasputil_zlayers: Find layers in z direction and print interlayer distances.
 
 Vasputil is written mostly the Fortran 95 programming language with a few
 optional Fortran 2003 features such as command line argument handling, and
-should be compilable by any compiler that conforms to said standard. Makefiles
-for IBM xlf95, Lahey lf95, Pathscale pathf90, Intel ifort and Portland pgf90
-are provided. Parts of vasputil are also written in Python, see below for
+should be compilable by any compiler that conforms to said standard.  Vasputil
+uses the common GNU autotools based build system, and has been tested with IBM
+xlf95, Lahey lf95, Pathscale pathf90, Intel ifort, GNU Fortran (Gfortran), and
+Portland pgf90. Parts of vasputil are also written in Python, see below for
 requirements.
 
-Vasputil depends on the LAPACK and BLAS libraries. The provided
-Makefiles use different platform-specific optimized versions of the
-BLAS library; the xlf Makefile uses ESSL, the Lahey Makefile uses the
-BLAS that is provided with the Lahey compiler, and the Portland and
-Pathscale Makefiles use the AMD ACML library.
+Vasputil depends on the LAPACK and BLAS libraries. The provided autotools build
+system tries to use different platform-specific optimized versions of the BLAS
+library; ESSL on IBM, the BLAS that is provided with the Lahey compiler, and
+the Portland and Pathscale Makefiles use the AMD ACML library.
 
 To regenerate the source code documentation (file doc/vasputil.html),
 the robodoc utility is needed. To regenerate the dependency list, the
@@ -118,12 +118,12 @@ of package management system for python packages).
 
 INTERACTIVE USAGE
 
-The python modules can be used interactively as well, to provide a sort of
-MATLAB-like interactive environment where you can manipulate coordinates stored
-in arrays, or plot data etc. For this, the 'ipython' enhanced interactive
-environment is recommended. Start with the matplotlib stuff preloaded with
-'ipython -pylab'. For those familiar with MATLAB, see
-http://www.scipy.org/NumPy_for_Matlab_Users . After that, just import what you
-need from the vasputil module and get going! See the python scripts for
-reference, or 'pydoc vasputil', 'pydoc vasputil.supercell' etc. to read
-documentation, or the ? operator in ipython.
+The python modules are designed to be used from the interactive python prompt
+as well, to provide a sort of MATLAB-like interactive environment where you can
+manipulate coordinates stored in arrays, or plot data etc. For this, the
+'ipython' enhanced interactive environment is recommended. Start with the
+matplotlib stuff preloaded with 'ipython -pylab'. For those familiar with
+MATLAB, see http://www.scipy.org/NumPy_for_Matlab_Users . After that, just
+import what you need from the vasputil module and get going! See the python
+scripts for reference, or 'pydoc vasputil', 'pydoc vasputil.supercell' etc. to
+read documentation, or the ? operator in ipython.
