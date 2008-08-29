@@ -36,9 +36,9 @@ class LDOS(object):
 
     def __init__(self, doscar="DOSCAR", efermi=0.0):
         """Initialize LDOS."""
-        self.__efermi = 0.0
+        self._efermi = 0.0
         self.read_doscar(doscar)
-        self.eFermi = efermi
+        self.efermi = efermi
 
     def read_doscar(self, fname="DOSCAR"):
         """Read a VASP DOSCAR file."""
@@ -78,20 +78,20 @@ class LDOS(object):
             dos[0] = dos0
         self.dos = pl.array(dos)
 
-    def __set_efermi(self, efermi):
+    def _set_efermi(self, efermi):
         """Set the Fermi level."""
-        if self.__efermi != 0.0:
-            self.dos[:,:,0] = self.dos[:,:,0] + self.__efermi
-        self.__efermi = efermi
+        if self._efermi != 0.0:
+            self.dos[:,:,0] = self.dos[:,:,0] + self._efermi
+        self._efermi = efermi
         self.dos[:,:,0] = self.dos[:,:,0] - efermi
 
-    def __get_efermi(self):
-        return self.__efermi
+    def _get_efermi(self):
+        return self._efermi
 
-    def __del_efermi(self):
+    def _del_efermi(self):
         raise AttributeError, "Can't delete attribute."
 
-    eFermi = property(__get_efermi, __set_efermi, __del_efermi, "Fermi energy.")
+    efermi = property(_get_efermi, _set_efermi, _del_efermi, "Fermi energy.")
 
     def get_energygrid(self):
         """Return the array with the energies."""

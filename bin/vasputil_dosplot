@@ -37,7 +37,7 @@ fermi = float(sys.argv[2])
 atom = int(sys.argv[3])
 orb = int(sys.argv[4])
 
-dc.eFermi = fermi
+dc.efermi = fermi
 en = dc.get_energygrid() # This is the x-axis in a typical DOS plot.
 
 label = "Atom " + str(atom) + " orbital " + str(orb)
