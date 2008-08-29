@@ -249,7 +249,7 @@ class Cell(object):
                 m.transpose(self.atoms)))
         self.cartesian = True
         
-    def showVmd(self):
+    def show_vmd(self):
         """Show a supercell in VMD."""
 # This is a quick and dirty hack, as VMD has some builtin support 
 # as well.
