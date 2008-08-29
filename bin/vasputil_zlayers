@@ -42,7 +42,7 @@ else:
     tol = 0.1
 
 c = s.Cell(sys.argv[1])
-c.direct2Cartesian()
+c.direct2cartesian()
 
 zc = c.atoms[:,2] # Atom Z coordinates
 bins = int(ceil((zc.max() - zc.min())/dbin))

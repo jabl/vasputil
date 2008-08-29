@@ -30,18 +30,18 @@ class Cell(object):
     def __init__(self, poscar=None, xyz=None):
         """Initialize the data members of this class"""
         # List of the chemical symbols of the atoms
-        self.atomSymbols = []
+        self.atom_symbols = []
         # Lattice constant, in Ångströms
-        self.latticeConstant = 1.
+        self.lattice_constant = 1.
         # 3x3 matrix containing the basis vectors of the supercell
         # in row major format
-        self.basisVectors = m.eye(3)
+        self.basis_vectors = m.eye(3)
         # Are the ions allowed to move?
-        self.selectiveDynamics = False
+        self.selective_dynamics = False
         # Flags for each atom describing in which cartesian coordinate
-        # direction the atom is allowed to move. It is thus a nAtomsx3
+        # direction the atom is allowed to move. It is thus a natomsx3
         # size list
-        self.selectiveFlags = []
+        self.selective_flags = []
         # Are the atomic coordinates cartesian or in direct coordinates
         # If direct, cartesian coordinates can be calculated by
         # multiplying each coordinate with the basis vector matrix
@@ -54,16 +54,17 @@ class Cell(object):
         elif (xyz != None):
             self.read_xyz(xyz)
 
-    def __getNAtoms(self):
+    def __get_natoms(self):
         return self.atoms.shape[0]
 
-    def __setNAtoms(self, val):
+    def __set_natoms(self, val):
         raise AttributeError, "can't set attribute"
 
-    def __delNAtoms(self):
+    def __del_natoms(self):
         raise AttributeError, "can't delete attribute"
 
-    nAtoms = property(__getNAtoms, __setNAtoms, __delNAtoms, "Total number of atoms.")
+    natoms = property(__get_natoms, __set_natoms, __del_natoms, \
+            "Total number of atoms.")
 
     def read_poscar(self, filename):
         """Parses a POSCAR file"""
@@ -76,7 +77,7 @@ class Cell(object):
         # as later in the file (and POTCAR for the full vasp run)
         atomNames = poscar[0].split()
             
-        self.latticeConstant = float(poscar[1])
+        self.lattice_constant = float(poscar[1])
             
         # Now the lattice vectors
         a = []
@@ -86,7 +87,7 @@ class Cell(object):
             a.append( floatvect)
         
         # Transpose to make natural ordering for linear algebra
-        self.basisVectors = m.transpose(m.array(a))
+        self.basis_vectors = m.transpose(m.array(a))
         
         # Number of atoms. Again this must be in the same order as
         # in the first line
@@ -96,14 +97,14 @@ class Cell(object):
             numofatoms[i] = int(numofatoms[i])
             if (len(atomNames) < i + 1):
                 atomNames.append("Unknown")
-            [self.atomSymbols.append(atomNames[i]) for n in xrange(numofatoms[i])]
+            [self.atom_symbols.append(atomNames[i]) for n in xrange(numofatoms[i])]
         
         # Check if Selective dynamics is switched on
         sdyn = poscar[6]
         add = 0
         if sdyn[0] == "S" or sdyn[0] == "s":
             add = 1
-            self.selectiveDynamics = True
+            self.selective_dynamics = True
         
         # Check if atom coordinates are cartesian or direct
         acType = poscar[6+add]
@@ -115,48 +116,48 @@ class Cell(object):
         offset = add+7
         tot_natoms = sum(numofatoms)
         self.atoms = m.zeros((tot_natoms, 3))
-        self.selectiveFlags = []
+        self.selective_flags = []
         for atom in xrange(tot_natoms):
             ac = poscar[atom+offset].split()
             self.atoms[atom] = (float(ac[0]), float(ac[1]), float(ac[2]))
-            if self.selectiveDynamics:
-                self.selectiveFlags.append((ac[3], ac[4], ac[5]))
+            if self.selective_dynamics:
+                self.selective_flags.append((ac[3], ac[4], ac[5]))
         if self.cartesian:
-            self.atoms *= self.latticeConstant
+            self.atoms *= self.lattice_constant
         
 
     def write_poscar(self, filename="POSCAR.out", fd=None):
         """Writes data into a POSCAR format file"""
         fc = "" # Contents of the file
-        asc = self.getAtomSymbolCount()
+        asc = self.get_atom_symbol_count()
         for a in asc:
             fc += str(a[0]) + " "
-        fc += "\n" + "%19.16f" % self.latticeConstant + "\n"
+        fc += "\n" + "%19.16f" % self.lattice_constant + "\n"
         basisfmt = "%22.16f"
         for i in xrange(3):
             fc += " "
             for j in xrange(3):
-                fc += basisfmt % self.basisVectors[i,j] 
+                fc += basisfmt % self.basis_vectors[i,j] 
             fc += "\n"
         atomnumfmt = "%4i"
         for at in asc:
             fc += atomnumfmt % at[1]
         fc += "\n"
-        if self.selectiveDynamics:
+        if self.selective_dynamics:
             fc += "Selective dynamics\n"
         if self.cartesian:
             fc += "Cartesian\n"
-            atoms = self.atoms / self.latticeConstant
+            atoms = self.atoms / self.lattice_constant
         else:
             fc += "Direct\n"
             atoms = self.atoms
         atomfmt = "%20.16f"
         logicalfmt = "%4s"
-        for i in xrange(self.nAtoms):
+        for i in xrange(self.natoms):
             for j in xrange(3):
                 fc += atomfmt % atoms[i,j]
-            if self.selectiveDynamics:
-                selflags = self.selectiveFlags[i]
+            if self.selective_dynamics:
+                selflags = self.selective_flags[i]
                 for j in xrange(3):
                     fc += logicalfmt % selflags[j]
             fc += "\n"
@@ -175,12 +176,12 @@ class Cell(object):
         # first line contains number of atoms
         self.atoms = m.zeros((int(xyz[0]), 3))
         self.cartesian = True
-        self.atomSymbols = []
-        for ii in xrange(2, self.nAtoms):
+        self.atom_symbols = []
+        for ii in xrange(2, self.natoms):
             s = xyz[ii].split()
             floatvect = m.array([float(s[1]), float(s[2]), float(s[3])])
             self.atoms[(ii-1),:] = floatvect
-            self.atomSymbols.append(s[0])
+            self.atom_symbols.append(s[0])
         return self.atoms
 
 
@@ -192,11 +193,11 @@ class Cell(object):
         
         """
         fc = "" # Contents of the file
-        fc += str(self.nAtoms) + "\n" + comment + "\n"
+        fc += str(self.natoms) + "\n" + comment + "\n"
         if not self.cartesian:
             self.direct2Cartesian()
-        for nn in xrange(self.nAtoms):
-            fc += "%3s" % self.atomSymbols[nn]
+        for nn in xrange(self.natoms):
+            fc += "%3s" % self.atom_symbols[nn]
             for i in xrange(3):
                 fc += "%10.5f" % self.atoms[nn,i]
             fc += "\n"
@@ -204,24 +205,24 @@ class Cell(object):
         f.write(fc)
         f.close()
 
-    def sortAtoms(self):
+    def sort_atoms(self):
         """Sort the atoms in the cell according to atomic symbol."""
-        ind = m.argsort(self.atomSymbols)
-        self.atomSymbols = m.array(self.atomSymbols)[ind]
+        ind = m.argsort(self.atom_symbols)
+        self.atom_symbols = m.array(self.atom_symbols)[ind]
         self.atoms = self.atoms[ind]
-        self.selectiveFlags = m.array(self.selectiveFlags)[ind]
+        self.selective_flags = m.array(self.selective_flags)[ind]
 
-    def getAtomSymbolCount(self):
+    def get_atom_symbol_count(self):
         """Return a list of (atomic symbol, count) tuples.
 
         As a side effect, sorts the atoms by symbol.
 
         """
-        self.sortAtoms()
+        self.sort_atoms()
         sc = []
-        psym = self.atomSymbols[0]
+        psym = self.atom_symbols[0]
         count = 0
-        for sym in self.atomSymbols:
+        for sym in self.atom_symbols:
             if (sym != psym):
                 sc.append((psym, count))
                 psym = sym
@@ -231,20 +232,20 @@ class Cell(object):
         sc.append((psym, count))
         return sc
 
-    def cartesian2Direct(self):
+    def cartesian2direct(self):
         """Convert atom coordinates from cartesian to direct"""
         if not self.cartesian:
             return
-        self.atoms = m.transpose(m.linalg.solve(self.latticeConstant * \
-                self.basisVectors, \
+        self.atoms = m.transpose(m.linalg.solve(self.lattice_constant * \
+                self.basis_vectors, \
                 m.transpose(self.atoms)))
         self.cartesian = False
 
-    def direct2Cartesian(self):
+    def direct2cartesian(self):
         """Convert atom coordinates from direct to cartesian"""
         if self.cartesian:
             return
-        self.atoms = m.transpose(m.dot(self.latticeConstant*self.basisVectors, \
+        self.atoms = m.transpose(m.dot(self.lattice_constant*self.basis_vectors, \
                 m.transpose(self.atoms)))
         self.cartesian = True
         
@@ -269,12 +270,12 @@ class Cell(object):
         the basis vector and lattice constant of this cell.
         
         """
-        self.direct2Cartesian()
-        cell.direct2Cartesian()
-        oldsz = self.nAtoms
-        atoms = m.zeros((self.nAtoms + cell.nAtoms, 3))
-        self.atomSymbols = m.array(self.atomSymbols + cell.atomSymbols)
-        self.selectiveFlags = m.array(self.selectiveFlags + cell.selectiveFlags)
+        self.direct2cartesian()
+        cell.direct2cartesian()
+        oldsz = self.natoms
+        atoms = m.zeros((self.natoms + cell.natoms, 3))
+        self.atom_symbols = m.array(self.atom_symbols + cell.atom_symbols)
+        self.selective_flags = m.array(self.selective_flags + cell.selective_flags)
         atoms[:oldsz] = self.atoms
         atoms[oldsz:] = cell.atoms
         self.atoms = atoms
