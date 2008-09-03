@@ -112,7 +112,7 @@ class LDOS(object):
         return self.dos[atom, :, orbital]
 
 
-def showdp(fsz=16):
+def showdp(fsz=16, show_legend=True):
     """Utility function to set default parameters for DOS plots."""
     pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
     pl.figtext(0.03, 0.45, "LDOS", rotation='vertical', size=fsz)
@@ -120,6 +120,7 @@ def showdp(fsz=16):
     lab.set_size = fsz
     loc, lab = pl.yticks()
     lab.set_size = fsz
-    pl.legend()
+    if show_legend:
+        pl.legend()
     pl.subplots_adjust(hspace=0.0)
     pl.show()
