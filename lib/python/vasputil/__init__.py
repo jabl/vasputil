@@ -1,1 +1,1 @@
-__all__ = ["dos", "supercell"]
+__all__ = ["dos", "supercell", "geometry"]
