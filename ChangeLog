@@ -1,3 +1,14 @@
+2008-09-05  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* README: Convert to reStructured Text format.
+	* doc/README.html: Automatically generated from README.
+	* Makefile.am: Add target to generate README.html.
+
+2008-09-03  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/vasputil/geometry.py: New file.
+	* lib/python/vasputil/__init__.py: add geometry.
+
 2008-08-28  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* lib/python/vasputil/dosplot.py: Rename to dos.py

@@ -10,11 +10,15 @@ dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
 
 EXTRA_DIST = $(srcdir)/setup.py $(srcdir)/lib/python  $(srcdir)/bin
 
-doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
+doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css $(MYDOC)/README.html
 
 $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
-	mkdir doc
+	mkdir -p doc
 	robodoc --src $(srcdir)/src --doc $(MYDOC)/$(PACKAGE) --singledoc --html --sections --toc --nodesc
+
+$(MYDOC)/README.html:
+	mkdir -p doc
+	rst2html $(srcdir)/README $(MYDOC)/README.html
 
 depend:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) depend;

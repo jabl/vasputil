@@ -1,44 +1,67 @@
-
+====================
 Vasputil release 4.2
+====================
 
 Vasputil is a set of command-line utilities and python libraries designed to
 make life with VASP easier. It provides a set of commands to manipulate POSCAR
 files.
 
-Available commands via the 'vasputil' binary are:
-poscar2xyz: Convert a POSCAR file to a xyz format file.
-plane2atom: Calculate the average distance from a plane to a set of atoms.
-plane2layer: Calculate the average distance from a plane to a layer.
-atomsdistance: Calculate the distance between two atoms.
-atomsmoved: Check which atoms have moved from one POSCAR to another.
-interpolate: Interpolate the coordinates between two POSCAR files.
-normalize: Normalize the coordinates in a POSCAR file.
-unnormalize: Unnormalize coordinates in a POSCAR file.
-centercell: Center a cell around a point.
-removeatoms: Remove atoms from a POSCAR file.
-kspace2xyz: Convert a POSCAR file to a xyz file with reciprocal coordinates.
-check_nndist: Check nearest neighbor distances.
-scgenerator: Generate a supercell.
-lockatoms: Lock atom coordinates in a supercell.
-xyz2poscar: Convert a XYZ file to a POSCAR file.
-dumpcoords: Dump cartesian coordinates to stdout.
-importcoords: Read cartesian coordinates from stdin.
-dumpatomsase: Dump atom types and coordinates suitable for importing to Campos ASE.
-test: Run self-tests.
+Available commands via the ``vasputil`` binary are:
+
+poscar2xyz
+    Convert a POSCAR file to a xyz format file.
+plane2atom 
+    Calculate the average distance from a plane to a set of atoms.
+plane2layer 
+    Calculate the average distance from a plane to a layer.
+atomsdistance 
+    Calculate the distance between two atoms.
+atomsmoved
+    Check which atoms have moved from one POSCAR to another.
+interpolate
+    Interpolate the coordinates between two POSCAR files.
+normalize
+    Normalize the coordinates in a POSCAR file.
+unnormalize
+    Unnormalize coordinates in a POSCAR file.
+centercell
+    Center a cell around a point.
+removeatoms
+    Remove atoms from a POSCAR file.
+kspace2xyz
+    Convert a POSCAR file to a xyz file with reciprocal coordinates.
+check_nndist
+    Check nearest neighbor distances.
+scgenerator
+    Generate a supercell.
+lockatoms
+    Lock atom coordinates in a supercell.
+xyz2poscar
+    Convert a XYZ file to a POSCAR file.
+dumpcoords
+    Dump cartesian coordinates to stdout.
+importcoords
+    Read cartesian coordinates from stdin.
+dumpatomsase
+    Dump atom types and coordinates suitable for importing to Campos ASE.
+test
+    Run self-tests.
 
 Documentation for each utility is available by running it without any
-arguments, e.g. "vasputil poscar2xyz".
+arguments, e.g. ``vasputil poscar2xyz``.
 
 In addition to the above, vasputil contains some Python scripts, which can be
 used directly or as examples of what can be done with the provided python
 modules.  These are 
 
-vasputil_dosplot: plot density-of-states. 
+``vasputil_dosplot``
+    Plot density-of-states. 
 
-vasputil_interpolate: wrapper around "vasputil interpolate" for creating many
-evenly spaced images at once.
+``vasputil_interpolate``
+    Wrapper around "vasputil interpolate" for creating many evenly spaced images at once.
 
-vasputil_zlayers: Find layers in z direction and print interlayer distances.
+``vasputil_zlayers``
+    Find layers in z direction and print interlayer distances.
 
 Vasputil is written mostly the Fortran 95 programming language with a few
 optional Fortran 2003 features such as command line argument handling, and
@@ -53,78 +76,84 @@ system tries to use different platform-specific optimized versions of the BLAS
 library; ESSL on IBM, the BLAS that is provided with the Lahey compiler, and
 the Portland and Pathscale Makefiles use the AMD ACML library.
 
-To regenerate the source code documentation (file doc/vasputil.html),
-the robodoc utility is needed. To regenerate the dependency list, the
-makedepf90 utility is needed.
+To regenerate the Fortran source code documentation (file doc/vasputil.html),
+the `robodoc <http://www.xs4all.nl/~rfsber/Robo/>`_ utility is needed. To
+regenerate the README.html file, the `rst2html
+<http://docutils.sourceforge.net/docs/user/tools.html>`_ utility is needed.
+Finally, to regenerate the dependency list, the `makedepf90
+<http://personal.inet.fi/private/erikedelmann/makedepf90/>`_ utility is needed.
 
 
-QUICK INSTALLATION INSTRUCTIONS
+Quick Installation Instructions
+===============================
 
-1) Unpack the source code.
+1)  Unpack the source code.
 
-$ tar xvzf vasputil-$(VERSION).tar.gz
+    ``tar xvzf vasputil-$(VERSION).tar.gz``
 
-2) Run configure, if necessary with extra flags to specify location of
-libraries not in the default search path, if you want to use some specific
-compiler etc.
+2)  Run configure, if necessary with extra flags to specify location of
+    libraries not in the default search path, if you want to use some specific
+    compiler etc.
 
-Eg. to use dynamically linked ACML:
+    Eg. to use dynamically linked ACML:
 
-$ ./configure LDFLAGS=-L/opt/acml/pathscale64/lib/
+    ``./configure LDFLAGS=-L/opt/acml/pathscale64/lib/``
 
-Statically linked ACML
+    Statically linked ACML
 
-$ ./configure --with-blas=/opt/acml/pathscale64/lib/libacml.a
+    ``./configure --with-blas=/opt/acml/pathscale64/lib/libacml.a``
 
-Use Intel Fortran
+    Use Intel Fortran
 
-$ ./configure FC=ifort
+    ``./configure FC=ifort``
 
-Install somewhere not in the default location ($HOME)
+    Install somewhere not in the default location ($HOME)
 
-$ ./configure --prefix=/usr/local
+    ``./configure --prefix=/usr/local``
 
-For help, see
+    For help, see
 
-$ ./configure --help
+    ``./configure --help``
 
-3) Compile and install.
+3)  Compile and install.
 
-$ make && make install
+    ``make && make install``
 
 
-PYTHON SCRIPTS
+Python Scripts
+==============
 
 To use the python scripts you should add the python library directory to the
 PYTHONPATH environment variable. E.g. if you ran configure with the prefix
 $HOME (default), then you should have something like 
 
-export PYTHONPATH=$HOME/lib/pythonX.Y/site-packages
+``export PYTHONPATH=$HOME/lib/pythonX.Y/site-packages``
 
 where X.Y is your python version, in your shell initialization file (e.g.
-~/.bash_profile). On the other hand, if you installed into the sytem default
+~/.bash_profile). On the other hand, if you installed into the system default
 location, you probably don't need to do anything. 
 
-Also, some of the python scripts and the library modules use the matplotlib
-library, which you can find at http://matplotlib.sf.net, in case your system
-doesn't already have it.  As matplotlib requires some other libraries (e.g.
-NumPy), and if you don't have access to a package management system (e.g. on
-Linux) which includes matplotlib and its dependencies, you can get all at once
-by installing one of the python distributions targeted at science, such as
-SAGE, Enthought Python Distribution, or Python(x,y). Another solution if you
-already have python installed, is to install matplotlib and other libraries via
-easy_install from setuptools (a sort of package management system for python
-packages).
+Also, some of the python scripts and the library modules use the `matplotlib
+<http://matplotlib.sf.net>`_ library.  Matplotlib requires some other libraries
+(e.g.  `NumPy <http://numpy.scipy.org>`_), and if you don't have access to a
+package management system (e.g. on Linux) which includes matplotlib and its
+dependencies, you can get all at once by installing one of the python
+distributions targeted at science, such as SAGE, Enthought Python Distribution,
+or Python(x,y). Another solution if you already have python installed, is to
+install matplotlib and other libraries via *easy_install* from setuptools (a
+sort of package management system for python packages).
 
 
-INTERACTIVE USAGE
+Interactive Usage
+-----------------
 
 The python modules are designed to be used from the interactive python prompt
 as well, to provide a sort of MATLAB-like interactive environment where you can
 manipulate coordinates stored in arrays, or plot data etc. For this, the
-'ipython' enhanced interactive environment is recommended. Start with the
-matplotlib stuff preloaded with 'ipython -pylab'. For those familiar with
-MATLAB, see http://www.scipy.org/NumPy_for_Matlab_Users . After that, just
-import what you need from the vasputil module and get going! See the python
-scripts for reference, or 'pydoc vasputil', 'pydoc vasputil.supercell' etc. to
-read documentation, or the ? operator in ipython.
+`IPython <http://ipython.scipy.org/moin/>`_ enhanced interactive environment is
+recommended. Start with the matplotlib stuff preloaded with ``ipython -pylab``.
+For those familiar with MATLAB, see `NumPy for MATLAB Users
+<http://www.scipy.org/NumPy_for_Matlab_Users>`_ . After that, just import what
+you need from the vasputil module and get going! See the python scripts for
+reference, or ``pydoc vasputil``, ``pydoc vasputil.supercell`` etc. to read
+documentation, or the ``?`` operator in IPython.
