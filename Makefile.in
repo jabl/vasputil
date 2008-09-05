@@ -38,7 +38,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = README $(am__configure_deps) $(dist_robodoc_DATA) \
+DIST_COMMON = README $(am__configure_deps) $(dist_doc_DATA) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	config/config.guess config/config.sub config/install-sh \
@@ -74,9 +74,9 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(robodocdir)"
-dist_robodocDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(dist_robodoc_DATA)
+am__installdirs = "$(DESTDIR)$(docdir)"
+dist_docDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(dist_doc_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -196,8 +196,9 @@ target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I config
 SUBDIRS = src
 MYDOC = doc
-robodocdir = $(prefix)/doc
-dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
+apidoc = fortrandoc
+docdir = ${datadir}/doc/${PACKAGE}
+dist_doc_DATA = $(MYDOC)/$(apidoc).html $(MYDOC)/$(apidoc).css $(MYDOC)/README.html
 EXTRA_DIST = $(srcdir)/setup.py $(srcdir)/lib/python  $(srcdir)/bin
 all: all-recursive
 
@@ -236,22 +237,22 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 uninstall-info-am:
-install-dist_robodocDATA: $(dist_robodoc_DATA)
+install-dist_docDATA: $(dist_doc_DATA)
 	@$(NORMAL_INSTALL)
-	test -z "$(robodocdir)" || $(mkdir_p) "$(DESTDIR)$(robodocdir)"
-	@list='$(dist_robodoc_DATA)'; for p in $$list; do \
+	test -z "$(docdir)" || $(mkdir_p) "$(DESTDIR)$(docdir)"
+	@list='$(dist_doc_DATA)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f=$(am__strip_dir) \
-	  echo " $(dist_robodocDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(robodocdir)/$$f'"; \
-	  $(dist_robodocDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(robodocdir)/$$f"; \
+	  echo " $(dist_docDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(docdir)/$$f'"; \
+	  $(dist_docDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(docdir)/$$f"; \
 	done
 
-uninstall-dist_robodocDATA:
+uninstall-dist_docDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(dist_robodoc_DATA)'; for p in $$list; do \
+	@list='$(dist_doc_DATA)'; for p in $$list; do \
 	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(robodocdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(robodocdir)/$$f"; \
+	  echo " rm -f '$(DESTDIR)$(docdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(docdir)/$$f"; \
 	done
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -533,7 +534,7 @@ check: check-recursive
 all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(robodocdir)"; do \
+	for dir in "$(DESTDIR)$(docdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -579,7 +580,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-data-local install-dist_robodocDATA
+install-data-am: install-data-local install-dist_docDATA
 
 install-exec-am:
 
@@ -607,7 +608,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dist_robodocDATA uninstall-info-am
+uninstall-am: uninstall-dist_docDATA uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -618,23 +619,23 @@ uninstall-info: uninstall-info-recursive
 	distclean-recursive distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am \
-	install-data-local install-dist_robodocDATA install-exec \
+	install-data-local install-dist_docDATA install-exec \
 	install-exec-am install-info install-info-am install-man \
 	install-strip installcheck installcheck-am installdirs \
 	installdirs-am maintainer-clean maintainer-clean-generic \
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-dist_robodocDATA \
+	uninstall uninstall-am uninstall-dist_docDATA \
 	uninstall-info-am
 
 
-doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css $(MYDOC)/README.html
+doc: $(MYDOC)/$(apidoc).html $(MYDOC)/$(apidoc).css $(MYDOC)/README.html
 
-$(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
+$(MYDOC)/$(apidoc).html $(MYDOC)/$(apidoc).css:
 	mkdir -p doc
-	robodoc --src $(srcdir)/src --doc $(MYDOC)/$(PACKAGE) --singledoc --html --sections --toc --nodesc
+	robodoc --src $(srcdir)/src --doc $(MYDOC)/$(apidoc) --singledoc --html --sections --toc --nodesc
 
-$(MYDOC)/README.html:
+$(MYDOC)/README.html: $(srcdir)/README
 	mkdir -p doc
 	rst2html $(srcdir)/README $(MYDOC)/README.html
 

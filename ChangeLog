@@ -2,7 +2,8 @@
 
 	* README: Convert to reStructured Text format.
 	* doc/README.html: Automatically generated from README.
-	* Makefile.am: Add target to generate README.html.
+	* Makefile.am: Add target to generate README.html. Install doc to
+	standard doc dir. Rename vasputil.{html,css} to fortrandoc.{html,css}.
 
 2008-09-03  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 

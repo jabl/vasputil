@@ -5,18 +5,20 @@ ACLOCAL_AMFLAGS = -I config
 SUBDIRS = src
 
 MYDOC = doc
-robodocdir = $(prefix)/doc
-dist_robodoc_DATA = $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css
+apidoc = fortrandoc
+docdir = ${datadir}/doc/${PACKAGE}
+
+dist_doc_DATA = $(MYDOC)/$(apidoc).html $(MYDOC)/$(apidoc).css $(MYDOC)/README.html
 
 EXTRA_DIST = $(srcdir)/setup.py $(srcdir)/lib/python  $(srcdir)/bin
 
-doc: $(MYDOC)/vasputil.html $(MYDOC)/vasputil.css $(MYDOC)/README.html
+doc: $(MYDOC)/$(apidoc).html $(MYDOC)/$(apidoc).css $(MYDOC)/README.html
 
-$(MYDOC)/vasputil.html $(MYDOC)/vasputil.css:
+$(MYDOC)/$(apidoc).html $(MYDOC)/$(apidoc).css:
 	mkdir -p doc
-	robodoc --src $(srcdir)/src --doc $(MYDOC)/$(PACKAGE) --singledoc --html --sections --toc --nodesc
+	robodoc --src $(srcdir)/src --doc $(MYDOC)/$(apidoc) --singledoc --html --sections --toc --nodesc
 
-$(MYDOC)/README.html:
+$(MYDOC)/README.html: $(srcdir)/README
 	mkdir -p doc
 	rst2html $(srcdir)/README $(MYDOC)/README.html
 

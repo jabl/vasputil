@@ -76,7 +76,7 @@ system tries to use different platform-specific optimized versions of the BLAS
 library; ESSL on IBM, the BLAS that is provided with the Lahey compiler, and
 the Portland and Pathscale Makefiles use the AMD ACML library.
 
-To regenerate the Fortran source code documentation (file doc/vasputil.html),
+To regenerate the Fortran source code documentation (file doc/fortrandoc.html),
 the `robodoc <http://www.xs4all.nl/~rfsber/Robo/>`_ utility is needed. To
 regenerate the README.html file, the `rst2html
 <http://docutils.sourceforge.net/docs/user/tools.html>`_ utility is needed.
