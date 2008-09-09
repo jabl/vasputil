@@ -1,4 +1,3 @@
-#!/usr/bin/pythoon
 # vim: set fileencoding=latin-1
 # Copyright (c) 2008 Janne Blomqvist
 
@@ -20,7 +19,11 @@
 
 """Module for doing stuff with density-of-states."""
 
-import pylab as pl
+try:
+    import numpy as n
+except:
+    import pylab as n
+
 import sys
 
 class LDOS(object):
@@ -58,25 +61,25 @@ class LDOS(object):
                         + "first produce a block with integrated DOS. Inserting " \
                         + "empty 0:th block."
                 sys.stderr.write(errstr)
-                dos.insert(0, pl.zeros((ndos, dos[1].shape[1])))
+                dos.insert(0, n.zeros((ndos, dos[1].shape[1])))
                 continue
             try:
                 ndos = int(line.split()[2])
             except:
                 print "Error, line is: " + line + "ENDLINE"
             line = f.readline().split()
-            cdos = pl.zeros((ndos, len(line)))
-            cdos[0] = pl.array(line)
+            cdos = n.zeros((ndos, len(line)))
+            cdos[0] = n.array(line)
             for nd in xrange(1, ndos):
                 line = f.readline().split()
-                cdos[nd] = pl.array(line)
+                cdos[nd] = n.array(line)
             dos.append(cdos)
         f.close()
         if dos[0].shape != dos[1].shape:
-            dos0 = pl.zeros(dos[1].shape)
+            dos0 = n.zeros(dos[1].shape)
             dos0[:,:dos[0].shape[1]] = dos[0]
             dos[0] = dos0
-        self.dos = pl.array(dos)
+        self.dos = n.array(dos)
 
     def _set_efermi(self, efermi):
         """Set the Fermi level."""
@@ -114,6 +117,7 @@ class LDOS(object):
 
 def showdp(fsz=16, show_legend=True):
     """Utility function to set default parameters for DOS plots."""
+    import pylab as pl
     pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
     pl.figtext(0.03, 0.45, "LDOS", rotation='vertical', size=fsz)
     loc, lab = pl.xticks()

@@ -21,7 +21,10 @@ functions.
 
 """
 
-import pylab as m
+try:
+    import numpy as m
+except ImportError:
+    import pylab as m
 
 
 class Cell(object):

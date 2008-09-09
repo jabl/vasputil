@@ -18,7 +18,10 @@
 
 """This module defines a class that represents a plane in 3d space."""
 
-import pylab as pl
+try:
+    import numpy as n
+except:
+    import pylab as n
 
 
 class Plane(object):
@@ -38,15 +41,15 @@ class Plane(object):
 
         """
         if normal == None:
-            if type(points) == pl.ndarray and points.shape != (3,3):
+            if type(points) == n.ndarray and points.shape != (3,3):
                 raise TypeError("Shape of points array must be (3,3).")
             elif len(points) != 3:
                 raise TypeError("Points sequence must have 3 elemnents.")
             v1 = points[1] - points[0]
             v2 = points[2] - points[1]
-            self.normal = pl.cross(v1, v2)
-            self.normal /= pl.norm(self.normal)
-            self.d_origo = pl.dot(self.normal, points[1])
+            self.normal = n.cross(v1, v2)
+            self.normal /= n.linalg.norm(self.normal)
+            self.d_origo = n.dot(self.normal, points[1])
         else:
-            self.normal = normal / pl.norm(normal)
-            self.d_origo = pl.dot(self.normal, point)
+            self.normal = normal / n.linalg.norm(normal)
+            self.d_origo = n.dot(self.normal, points)
