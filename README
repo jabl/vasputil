@@ -119,6 +119,11 @@ Quick Installation Instructions
 
     ``make && make install``
 
+4)  Optionally, run the testsuite (requires that the python stuff is installed
+    correctly).
+
+    ``make test``
+
 
 Python Scripts
 ==============
