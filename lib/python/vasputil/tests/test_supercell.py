@@ -23,15 +23,32 @@ import vasputil.supercell as s
 import numpy.testing.numpytest as nt
 import numpy.testing.utils as ntu
 import math
+import os
 
 class CellTestCase(unittest.TestCase):
     """Testcase for vasputil.supercell.Cell class."""
 
     def setUp(self):
-        self.cell = s.Cell()
+        # WARNING: Ugly ugly ugly!
+        # find the path where this file is
+        path = os.path.split(__file__)[0]
+        # The test POSCAR file is in the same directory.
+        path = os.path.join(path, "POSCAR")
+        self.cell = s.Cell(poscar=path)
 
     def test_lc(self):
+        """Check that the lattice constant is imported correctly."""
         self.assertEqual(self.cell.lattice_constant, 1.)
+
+    def test_atoms_distance(self):
+        """Test the atoms_distance method."""
+        dist = self.cell.atoms_distance(9, 24)
+        ntu.assert_almost_equal(dist, 1.90823040889809)
+
+    def test_atoms_distance_proj(self):
+        """Test the atoms_distance method with a projection."""
+        dist = self.cell.atoms_distance(9, 24, "xy")
+        ntu.assert_almost_equal(dist, 1.51230705052) 
 
 class RotateMolTestCase(nt.NumpyTestCase):
     """Test the rotate_molecule function."""

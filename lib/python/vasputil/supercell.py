@@ -283,6 +283,18 @@ class Cell(object):
         atoms[oldsz:] = cell.atoms
         self.atoms = atoms
 
+    def atoms_distance(self, atom1, atom2):
+        """Measure the distance between two atoms.
+        
+        Atoms are indexed starting from 0, following the usual Python
+        convention. Note that this is different from VASP itself, which starts
+        indexing from 1.
+        
+        """
+        self.direct2cartesian()
+        dvec = self.atoms[atom1, :] - self.atoms[atom2, :]
+        return m.linalg.norm(dvec)
+
 
 # End of class Cell
 
@@ -292,8 +304,8 @@ def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
 
     See http://mathworld.wolfram.com/EulerAngles.html for definition.
     Input arguments:
-    coords: Atom coordinates, as Nx3 2d pylab array.
-    rotp: The point to rotate about, as a 1d 3-element pylab array
+    coords: Atom coordinates, as Nx3 2d numpy array.
+    rotp: The point to rotate about, as a 1d 3-element numpy array
     phi: The 1st rotation angle around z axis.
     theta: Rotation around x axis.
     psi: 2nd rotation around z axis.
