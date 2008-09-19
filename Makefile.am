@@ -25,5 +25,8 @@ $(MYDOC)/README.html: $(srcdir)/README
 depend:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) depend;
 
+test:
+	@PYTHON@ $(srcdir)/lib/python/runtests.py
+
 install-data-local:
 	@PYTHON@ ./setup.py install --install-purelib=$(pythondir) --install-scripts=$(bindir) 

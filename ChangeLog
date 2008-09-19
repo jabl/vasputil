@@ -1,3 +1,9 @@
+2008-09-09  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/runtests.py: New file.
+	* lib/python/vasputil/tests/{__init__.py, test_dos.py,
+	test_geometry.py, test_supercell.py}: New files.
+
 2008-09-05  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* README: Convert to reStructured Text format.
