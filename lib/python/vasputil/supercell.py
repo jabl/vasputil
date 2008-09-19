@@ -254,8 +254,8 @@ class Cell(object):
         
     def show_vmd(self):
         """Show a supercell in VMD."""
-# This is a quick and dirty hack, as VMD has some builtin support 
-# as well.
+        # This is a quick and dirty hack, as VMD has some builtin support 
+        # as well.
         import tempfile, os
         f = tempfile.NamedTemporaryFile()
         self.write_poscar(fd=f)
@@ -283,17 +283,42 @@ class Cell(object):
         atoms[oldsz:] = cell.atoms
         self.atoms = atoms
 
-    def atoms_distance(self, atom1, atom2):
+    def atoms_distance(self, atom1, atom2, proj=None):
         """Measure the distance between two atoms.
         
         Atoms are indexed starting from 0, following the usual Python
         convention. Note that this is different from VASP itself, which starts
         indexing from 1.
+
+        Arguments:
+        atom1 -- The index of one of the atoms, starting from 0.
+        atom2 -- The index of the other atom, starting from 0.
+        proj  -- Projection along a vector or plane. If a string, it can
+                 contain x, y, z and the method then measures the distance
+                 in the plane defined by the string. If it's a sequence
+                 of three numbers, the method measures the distance
+                 projected along the vector.
         
         """
         self.direct2cartesian()
         dvec = self.atoms[atom1, :] - self.atoms[atom2, :]
-        return m.linalg.norm(dvec)
+        if proj == None:
+            return m.linalg.norm(dvec)
+        elif type(proj) == str:
+            if len(proj) != 2:
+                raise TypeError("Length of string specifying plane must be 2.")
+            pvec = dvec
+            if proj.find("x") == -1:
+                pvec[0] = 0.
+            if proj.find("y") == -1:
+                pvec[1] = 0.
+            if proj.find("z") == -1:
+                pvec[2] = 0.
+            print pvec
+            return m.sqrt(m.dot(dvec, pvec) / m.linalg.norm(pvec))
+        else:
+            print 'projection type is: ' + str(type(proj))
+            raise TypeError("Not handled yet!")
 
 
 # End of class Cell
@@ -311,22 +336,22 @@ def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
     psi: 2nd rotation around z axis.
 
     """
-# First move the molecule to the origin
-# In contrast to MATLAB, numpy broadcasts the smaller array to the larger
-# row-wise, so there is no need to play with the Kronecker product.
+    # First move the molecule to the origin
+    # In contrast to MATLAB, numpy broadcasts the smaller array to the larger
+    # row-wise, so there is no need to play with the Kronecker product.
     rcoords = coords - rotp
-# First Euler rotation about z in matrix form
+    # First Euler rotation about z in matrix form
     D = m.array(((m.cos(phi), m.sin(phi), 0.), (-m.sin(phi), m.cos(phi), 0.), \
             (0., 0., 1.)))
-# Second Euler rotation about x:
+    # Second Euler rotation about x:
     C = m.array(((1., 0., 0.), (0., m.cos(theta), m.sin(theta)), \
             (0., -m.sin(theta), m.cos(theta))))
-# Third Euler rotation, 2nd rotation about z:
+    # Third Euler rotation, 2nd rotation about z:
     B = m.array(((m.cos(psi), m.sin(psi), 0.), (-m.sin(psi), m.cos(psi), 0.), \
             (0., 0., 1.)))
-# Total Euler rotation
+    # Total Euler rotation
     A = m.dot(B, m.dot(C, D))
-# Do the rotation
+    # Do the rotation
     rcoords = m.dot(A, m.transpose(rcoords))
-# Move back to the rotation point
+    # Move back to the rotation point
     return m.transpose(rcoords) + rotp
