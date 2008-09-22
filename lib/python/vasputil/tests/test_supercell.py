@@ -47,8 +47,13 @@ class CellTestCase(unittest.TestCase):
 
     def test_atoms_distance_proj(self):
         """Test the atoms_distance method with a projection."""
-        dist = self.cell.atoms_distance(9, 24, "xy")
+        dist = self.cell.atoms_distance(24, 9, "xy")
         ntu.assert_almost_equal(dist, 1.51230705052) 
+
+    def test_atoms_distance_proj2(self):
+        """Test the atoms_distance method with a projection defined by vector."""
+        dist = self.cell.atoms_distance(9, 24, (0,0,10))
+        ntu.assert_almost_equal(dist, 1.16373136) 
 
 class RotateMolTestCase(nt.NumpyTestCase):
     """Test the rotate_molecule function."""

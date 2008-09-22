@@ -314,10 +314,9 @@ class Cell(object):
                 pvec[1] = 0.
             if proj.find("z") == -1:
                 pvec[2] = 0.
-            return m.dot(dvec, pvec) / m.linalg.norm(pvec)
+            return abs(m.dot(dvec, pvec) / m.linalg.norm(pvec))
         else:
-            print 'projection type is: ' + str(type(proj))
-            raise TypeError("Not handled yet!")
+            return abs(m.dot(dvec, proj) / m.linalg.norm(proj))
 
 
 # End of class Cell
