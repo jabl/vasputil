@@ -24,17 +24,20 @@ and end images.
 
 """
 
-import os, sys
+import os
+from optparse import OptionParser
 
-if (len(sys.argv) != 4):
-    print "Usage: vasputil_interpolate POSCAR.start POSCAR.end N"
-    print "Result: you get N files called POSCAR.{1-N} which are linearly"
-    print "interpolated between POSCAR.start and POSCAR.end"
-    sys.exit(1)
+usage = """%prog POSCAR.start POSCAR.end N
 
-ps = sys.argv[1]
-pe = sys.argv[2]
-ni = int(sys.argv[3]) + 1
+The result is N files called POSCAR.{1-N} which are linearly interpolated
+between POSCAR.start and POSCAR.end.
+"""
+parser = OptionParser(usage)
+(options, args) = parser.parse_args()
+
+ps = args[0]
+pe = args[1]
+ni = int(args[2]) + 1
 
 for i in range(1, ni):
     s = "vasputil interpolate " + ps + " " + pe + " " + str(float(i)/ni) + \

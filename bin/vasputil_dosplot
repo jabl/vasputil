@@ -21,23 +21,29 @@
 
 import vasputil.dos as d
 from pylab import *
-import sys
+from optparse import OptionParser
 
-if len(sys.argv) != 5:
-    print "Usage: vasputil_dosplot DOSCAR Efermi atom orbital"
-    print "DOSCAR: VASP DOSCAR file from which to read data."
-    print "Efermi: Fermi energy."
-    print "atom: atom number, starting from 1."
-    print "orbital: orbital, s=1,p=2,d=3, if spin polarized s+=1,s-=2 etc."
-    sys.exit(1)
+usage = """%prog [options] DOSCAR atom
 
-# By default tries to read a file called "DOSCAR".
-dc = d.LDOS(sys.argv[1])
-fermi = float(sys.argv[2])
-atom = int(sys.argv[3])
-orb = int(sys.argv[4])
+atom 0 is the total dos, atom 1-N are LDOS.
+"""
+parser = OptionParser(usage)
+parser.add_option("-f", "--fermi", dest="fermi", help="Fermi energy")
+parser.add_option("-o", "--orbital", dest="orb", help="Orbital, s=1, p=2, \
+d=3, if spin polarized s+ = 1, s- = 2 etc.")
+(options, args) = parser.parse_args()
 
-dc.efermi = fermi
+# By default LDOS constructor tries to read a file called "DOSCAR".
+dc = d.LDOS(args[0])
+atom = int(args[1])
+if options.fermi:
+    fermi = float(options.fermi)
+    dc.efermi = fermi
+if options.orb:
+    orb = int(options.orb)
+else:
+    orb = 1
+
 en = dc.get_energygrid() # This is the x-axis in a typical DOS plot.
 
 label = "Atom " + str(atom) + " orbital " + str(orb)

@@ -21,27 +21,27 @@
 
 import vasputil.supercell as s
 from pylab import *
-import sys
+from optparse import OptionParser
 
-if len(sys.argv) < 2:
-    print "Usage: vasputil_zlayers POSCAR [dbin] [tol]"
-    print "POSCAR: input file"
-    print "dbin: Size of histogram bin, default 0.1 Å"
-    print "tol: Tolerance, bin should contain > tol*maxbin in order to be " \
-            + "counted as layer, where maxbin is the population in the " \
-            + "largest bin. Default is 0.1."
-    sys.exit(1)
+usage = "%prog [options] POSCAR"
+parser= OptionParser(usage)
+parser.add_option("-b", "--binsize", dest="dbin", help=\
+        "Size of histogram bin, default 0.1 Å")
+parser.add_option("-t", "--tol", dest="tol", help=\
+        "Tolerance, bin should contain > tol*maxbin in order to be counted \
+as a layer, where maxbin is the population in the largest bin. Default is 0.1.")
+(options, args) = parser.parse_args()
 
-if len(sys.argv) > 2:
-    dbin = float(sys.argv[2])
+if options.dbin:
+    dbin = float(options.dbin)
 else:
     dbin = 0.1
-if len(sys.argv) > 3:
-    tol = float(sys.argv[3])
+if options.tol:
+    tol = float(options.tol)
 else:
     tol = 0.1
 
-c = s.Cell(sys.argv[1])
+c = s.Cell(args[0])
 c.direct2cartesian()
 
 zc = c.atoms[:,2] # Atom Z coordinates
