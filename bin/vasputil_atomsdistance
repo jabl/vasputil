@@ -20,7 +20,6 @@
 """Find distance between two atoms."""
 
 import vasputil.supercell as s
-from pylab import *
 from optparse import OptionParser
 
 usage = """%prog [options] POSCAR atom1 atom2

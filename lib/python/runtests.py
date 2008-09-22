@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # vim: set fileencoding=latin-1
 # Copyright (c) 2008 Janne Blomqvist
 
