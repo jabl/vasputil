@@ -1,5 +1,5 @@
 ====================
-Vasputil release 4.2
+Vasputil release 4.3
 ====================
 
 Vasputil is a set of command-line utilities and python libraries designed to
@@ -54,6 +54,9 @@ In addition to the above, vasputil contains some Python scripts, which can be
 used directly or as examples of what can be done with the provided python
 modules.  These are 
 
+``vasputil_atomsdistance``
+    Improved version of 'vasputil atomsdistance', can also measure projected distances.
+
 ``vasputil_dosplot``
     Plot density-of-states. 
 
@@ -62,6 +65,9 @@ modules.  These are
 
 ``vasputil_zlayers``
     Find layers in z direction and print interlayer distances.
+
+For the Python scripts, documentation is provided via the ``-h`` command line
+option.
 
 Vasputil is written mostly the Fortran 95 programming language with a few
 optional Fortran 2003 features such as command line argument handling, and

@@ -1,3 +1,9 @@
+2008-09-22  Janne Blomqvist <Janne.Blomqvist@tkk.fi>
+
+	* bin/vasputil_atomsdistance: New file.
+	* bin/vasputil_*: Switch to optparse.
+	* lib/python/vasputil/supercell.py (atoms_distance): New method.
+
 2008-09-09  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* lib/python/runtests.py: New file.
