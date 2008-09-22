@@ -55,6 +55,10 @@ class CellTestCase(unittest.TestCase):
         dist = self.cell.atoms_distance(9, 24, (0,0,10))
         ntu.assert_almost_equal(dist, 1.16373136) 
 
+    def test_atoms_distance_pbc(self):
+        dist = self.cell.atoms_distance(2, 18)
+        ntu.assert_almost_equal(dist, 1.867066, decimal=5)
+
 class RotateMolTestCase(nt.NumpyTestCase):
     """Test the rotate_molecule function."""
 
