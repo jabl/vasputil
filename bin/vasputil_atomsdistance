@@ -23,7 +23,10 @@ import vasputil.supercell as s
 from pylab import *
 from optparse import OptionParser
 
-usage = "%prog [options] POSCAR atom1 atom2"
+usage = """%prog [options] POSCAR atom1 atom2
+
+Note that atom numbering starts from 0.  The optional projection vector or 
+plane, if supplied, should be in cartesian coordinates."""
 parser = OptionParser(usage)
 parser.add_option("-p", "--projvec", dest="pvec", \
         help="Projection vector, e.g. '0 0 1'. Note that the vector must be \

@@ -287,8 +287,9 @@ class Cell(object):
         """Measure the distance between two atoms.
         
         Atoms are indexed starting from 0, following the usual Python
-        convention. Note that this is different from VASP itself, which starts
-        indexing from 1.
+        convention.  Note that this is different from VASP itself, which starts
+        indexing from 1.  This method takes into account periodic boundary
+        conditions.
 
         Arguments:
         atom1 -- The index of one of the atoms, starting from 0.
@@ -300,8 +301,15 @@ class Cell(object):
                  projected along the vector.
         
         """
-        self.direct2cartesian()
+        self.cartesian2direct()
         dvec = self.atoms[atom1, :] - self.atoms[atom2, :]
+        for ii in range(3):
+            if dvec[ii] > 0.5:
+                dvec[ii] -= 1.0
+            elif dvec[ii] < -0.5:
+                dvec[ii] += 1.0
+        dvec = m.dot(self.lattice_constant*self.basis_vectors, \
+                dvec)
         if proj == None:
             return m.linalg.norm(dvec)
         elif type(proj) == str:
