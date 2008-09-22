@@ -25,8 +25,7 @@ from optparse import OptionParser
 
 usage = """%prog [options] DOSCAR atom
 
-atom 0 is the total dos, atom 1-N are LDOS.
-"""
+atom 0 is the total dos, atom 1-N are LDOS."""
 parser = OptionParser(usage)
 parser.add_option("-f", "--fermi", dest="fermi", help="Fermi energy")
 parser.add_option("-o", "--orbital", dest="orb", help="Orbital, s=1, p=2, \

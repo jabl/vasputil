@@ -30,8 +30,7 @@ from optparse import OptionParser
 usage = """%prog POSCAR.start POSCAR.end N
 
 The result is N files called POSCAR.{1-N} which are linearly interpolated
-between POSCAR.start and POSCAR.end.
-"""
+between POSCAR.start and POSCAR.end."""
 parser = OptionParser(usage)
 (options, args) = parser.parse_args()
 
