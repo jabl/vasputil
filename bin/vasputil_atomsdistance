@@ -1,0 +1,44 @@
+#!/usr/bin/python
+# vim: set fileencoding=latin-1
+# Copyright (c) 2008 Janne Blomqvist
+
+#  This file is part of Vasputil.
+
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Find distance between two atoms."""
+
+import vasputil.supercell as s
+from pylab import *
+from optparse import OptionParser
+
+usage = "%prog [options] POSCAR atom1 atom2"
+parser = OptionParser(usage)
+parser.add_option("-p", "--projvec", dest="pvec", \
+        help="Projection vector, e.g. '0 0 1'. Note that the vector must be \
+enclosed in quotation marks")
+parser.add_option("-s", "--plane", dest="plane", \
+        help="Projection plane, e.g. 'xy'")
+(options, args) = parser.parse_args()
+c = s.Cell(args[0])
+atom1 = int(args[1])
+atom2 = int(args[2])
+if options.pvec:
+    pvec = []
+    [pvec.append(float(x)) for x in options.pvec.split()]
+    print c.atoms_distance(atom1, atom2, pvec)
+elif options.plane:
+    print c.atoms_distance(atom1, atom2, options.plane)
+else:
+    print c.atoms_distance(atom1, atom2)
