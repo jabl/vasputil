@@ -307,15 +307,14 @@ class Cell(object):
         elif type(proj) == str:
             if len(proj) != 2:
                 raise TypeError("Length of string specifying plane must be 2.")
-            pvec = dvec
+            pvec = dvec.copy()
             if proj.find("x") == -1:
                 pvec[0] = 0.
             if proj.find("y") == -1:
                 pvec[1] = 0.
             if proj.find("z") == -1:
                 pvec[2] = 0.
-            print pvec
-            return m.sqrt(m.dot(dvec, pvec) / m.linalg.norm(pvec))
+            return m.dot(dvec, pvec) / m.linalg.norm(pvec)
         else:
             print 'projection type is: ' + str(type(proj))
             raise TypeError("Not handled yet!")
