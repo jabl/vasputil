@@ -13,6 +13,7 @@ setup(name='vasputil',
       scripts = ['bin/vasputil_atomsdistance', \
               'bin/vasputil_dosplot', \
               'bin/vasputil_interpolate', \
+              'bin/vasputil_poscar2xyz', \
               'bin/vasputil_zlayers']
      )
 

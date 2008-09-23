@@ -63,6 +63,9 @@ modules.  These are
 ``vasputil_interpolate``
     Wrapper around "vasputil interpolate" for creating many evenly spaced images at once.
 
+``vasputil_poscar2xyz``
+    Convert a POSCAR format file to XYZ format.
+
 ``vasputil_zlayers``
     Find layers in z direction and print interlayer distances.
 
