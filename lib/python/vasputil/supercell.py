@@ -198,7 +198,7 @@ class Cell(object):
         fc = "" # Contents of the file
         fc += str(self.natoms) + "\n" + comment + "\n"
         if not self.cartesian:
-            self.direct2Cartesian()
+            self.direct2cartesian()
         for nn in xrange(self.natoms):
             fc += "%3s" % self.atom_symbols[nn]
             for i in xrange(3):

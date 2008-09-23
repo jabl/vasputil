@@ -1,3 +1,8 @@
+2008-09-23  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* bin/vasputil_poscar2xyz: New file.
+	* lib/python/vasputil/supercell.py (write_xyz): Bugfix.
+
 2008-09-22  Janne Blomqvist <Janne.Blomqvist@tkk.fi>
 
 	* bin/vasputil_atomsdistance: New file.
