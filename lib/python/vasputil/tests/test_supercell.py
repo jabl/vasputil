@@ -25,15 +25,18 @@ import numpy.testing.utils as ntu
 import math
 import os
 
+def testdir():
+    """The directory where the tests and data files reside."""
+    # WARNING: Ugly ugly ugly!
+    # find the path where this file is
+    return os.path.split(__file__)[0]
+
 class CellTestCase(unittest.TestCase):
     """Testcase for vasputil.supercell.Cell class."""
 
     def setUp(self):
-        # WARNING: Ugly ugly ugly!
-        # find the path where this file is
-        path = os.path.split(__file__)[0]
         # The test POSCAR file is in the same directory.
-        path = os.path.join(path, "POSCAR")
+        path = os.path.join(testdir(), "POSCAR")
         self.cell = s.Cell(poscar=path)
 
     def test_lc(self):
@@ -68,10 +71,48 @@ class RotateMolTestCase(nt.NumpyTestCase):
                 psi=math.pi)
         ntu.assert_array_almost_equal(coords, rcoords)
 
+class AtomsMovedTestCase(unittest.TestCase):
+    """Test the atoms_moved function."""
+
+    def setUp(self):
+        p1 = os.path.join(testdir(), "POSCAR")
+        self.c1 = s.Cell(poscar=p1)
+        p2 = os.path.join(testdir(), "POSCAR2")
+        self.c2 = s.Cell(poscar=p2)
+
+    def test_moved(self):
+        atoms = []
+        for atom in s.atoms_moved(self.c1, self.c2):
+            atoms.append(atom[0])
+        self.failUnless(29 in atoms)
+
+    def test_moved_tol(self):
+        atoms = s.atoms_moved(self.c1, self.c2, 3)
+        self.failUnless(len(atoms) == 0)
+
+class CheckCellsTestCase(unittest.TestCase):
+    """Test the check_cells function."""
+
+    def setUp(self):
+        p1 = os.path.join(testdir(), "POSCAR")
+        self.c1 = s.Cell(poscar=p1)
+        p2 = os.path.join(testdir(), "POSCAR2")
+        self.c2 = s.Cell(poscar=p2)
+
+    def test_check_cells(self):
+        (latt, natoms) = s.check_cells(self.c1, self.c2)
+        self.assertEqual(latt, True)
+        self.assertEqual(natoms, True)
+
 def suite():
     cell_suite = unittest.TestLoader().loadTestsFromTestCase(CellTestCase)
     rot_suite = unittest.TestLoader().loadTestsFromTestCase(RotateMolTestCase)
-    return unittest.TestSuite([cell_suite, rot_suite])
+    move_suite = unittest.TestLoader().loadTestsFromTestCase(\
+            AtomsMovedTestCase)
+    check_suite = unittest.TestLoader().loadTestsFromTestCase(\
+            CheckCellsTestCase)
+    return unittest.TestSuite([cell_suite, rot_suite, move_suite, \
+            check_suite])
 
 
 if __name__ == "__main__":

@@ -57,6 +57,11 @@ modules.  These are
 ``vasputil_atomsdistance``
     Improved version of 'vasputil atomsdistance', can also measure projected distances.
 
+``vasputil_atomsmoved`` 
+    See which atoms have moved between two POSCAR files.  If lattices are
+    compatible, takes into account periodic boundary conditions.  Optionally
+    print out moved distances.
+
 ``vasputil_dosplot``
     Plot density-of-states. 
 

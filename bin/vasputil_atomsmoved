@@ -1,0 +1,46 @@
+#!/usr/bin/python
+# vim: set fileencoding=latin-1
+# Copyright (c) 2008 Janne Blomqvist
+
+#  This file is part of Vasputil.
+
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Compare to POSCAR files and print out atoms that have moved."""
+
+import vasputil.supercell as s
+from optparse import OptionParser
+
+usage = """%prog [options] POSCAR1 POSCAR2"""
+
+parser = OptionParser(usage)
+parser.add_option("-t", "--tolerance", dest="tol", \
+        help="Tolerance, default 0.1 Å")
+parser.add_option("-v", "--verbose", dest="verb", action="store_true", \
+        help="Print out the distance moved as well.")
+(options, args) = parser.parse_args()
+if options.tol:
+    tol = float(options.tol)
+else:
+    tol = 0.1
+c1 = s.Cell(args[0])
+c2 = s.Cell(args[1])
+if options.verb:
+    print 'Atom    Moved (Å)'
+    print '================='
+for at in s.atoms_moved(c1, c2, tol):
+    if options.verb:
+        print "%4i  %11.2f" % at
+    else:
+        print at[0],

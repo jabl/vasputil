@@ -329,6 +329,57 @@ class Cell(object):
 
 # End of class Cell
 
+def atoms_moved(cell1, cell2, tol=0.1):
+    """Return a list of atoms that have moved between the two cells.
+
+    If lattices are compatible, take periodic boundary conditions into account.
+    
+    Arguments:
+    cell1,2 -- The supercells to compare
+    tol -- The tolerance in Å
+
+    Return value -- A list of (atom index, distance moved) tuples.
+
+    """
+    (latt, natoms) = check_cells(cell1, cell2)
+    if latt:
+        cell1.cartesian2direct()
+        cell2.cartesian2direct()
+    else:
+        cell1.direct2cartesian()
+        cell2.direct2cartesian()
+    nmax = min(cell1.natoms, cell2.natoms)
+    am = []
+    for nn in range(nmax):
+        dvec = cell1.atoms[nn, :] - cell2.atoms[nn, :]
+        if latt:
+            for ii in range(3):
+                if dvec[ii] < -0.5:
+                    dvec[ii] += 1.0
+                elif dvec[ii] > 0.5:
+                    dvec[ii] -= 1.0
+            dvec = m.dot(cell1.lattice_constant * cell1.basis_vectors, dvec)
+        dist = m.linalg.norm(dvec)
+        if dist > tol:
+            am.append((nn, dist))
+    return am
+
+def check_cells(cell1, cell2):
+    """Check to which extent two cells are compatible.
+    
+    Return value -- a tuple where the first element is a boolean specifying
+    whether the lattices are compatible, that is, comparing the basis vectors *
+    lattice constants. The second element is a boolean specifying whether the
+    cells contain an equal amount of atoms.
+    
+    """
+    # First check that lattice constant * basis vectors are compatible.
+    latt = m.any(cell1.lattice_constant * cell1.basis_vectors \
+            - cell2.lattice_constant * cell2.basis_vectors < 1e-15)
+    # Then check that there are an equal number of atoms.
+    natoms = cell1.natoms == cell2.natoms
+    return (latt, natoms)
+
 def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
         theta = 0., psi = 0.):
     """Rotate a molecule via Euler angles.
