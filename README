@@ -62,6 +62,9 @@ modules.  These are
     compatible, takes into account periodic boundary conditions.  Optionally
     print out moved distances.
 
+``vasputil_direct2cartesian``
+    Convert a POSCAR file from direct to cartesian coordinates.
+
 ``vasputil_dosplot``
     Plot density-of-states. 
 

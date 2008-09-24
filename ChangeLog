@@ -1,3 +1,7 @@
+2008-09-24  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* bin/vasputil_direct2cartesian: New file.
+
 2008-09-23  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* bin/vasputil_poscar2xyz: New file.
