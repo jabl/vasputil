@@ -33,9 +33,23 @@ class PlaneTestCase(nt.NumpyTestCase):
         pl1 = g.Plane((127.0, 37.0, 42.0), (0., 0., 10.))
         ntu.assert_almost_equal(pl1.d_origo, 42.0)
 
+class NormPbcTestCase(unittest.TestCase):
+    """Test the norm_pbc function."""
+
+    def test_norm_pbc(self):
+        a = [1.5, 0, 0]
+        d = g.norm_pbc(a)
+        ntu.assert_almost_equal(d, 0.5)
+
+    def test_norm_pbc_2(self):
+        a = [1.0, 1.0, 1.0]
+        d = g.norm_pbc(a)
+        ntu.assert_almost_equal(d, 0.0)
+
 def suite():
     plane_suite = unittest.TestLoader().loadTestsFromTestCase(PlaneTestCase)
-    return unittest.TestSuite([plane_suite])
+    norm_suite = unittest.TestLoader().loadTestsFromTestCase(NormPbcTestCase)
+    return unittest.TestSuite([plane_suite, norm_suite])
 
 
 if __name__ == "__main__":

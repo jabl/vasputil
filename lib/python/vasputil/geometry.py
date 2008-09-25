@@ -53,3 +53,40 @@ class Plane(object):
         else:
             self.normal = normal / n.linalg.norm(normal)
             self.d_origo = n.dot(self.normal, points)
+
+# End of class Plane
+
+def vec_pbc(vec):
+    """Vector taking into account periodic boundary conditions.
+
+    Input vector must be in direct coordinates.
+
+    """
+    arr = n.array(vec)
+    v1 = arr.reshape(arr.size)
+    for ii in range(len(v1)):
+        if v1[ii] < -0.5:
+            v1[ii] += 1.0
+        elif v1[ii] > 0.5:
+            v1[ii] -= 1.0
+    return arr
+
+def norm_pbc(vec):
+    """Norm of a vector, taking into account periodic boundary conditions.
+
+    Input vector must be in direct coordinates. If the input is a 2D array, it
+    is assumed to be a list of vectors, and hence return an 1D array of the
+    same length as the number of rows in the input array.
+
+    """
+    arr = n.array(vec)
+    if len(arr.shape) == 1:
+        return n.linalg.norm(vec_pbc(arr))
+    elif len(arr.shape) == 2:
+        nl = n.empty(arr.shape[0])
+        for v in range(arr.shape[0]):
+            nl[v] = n.linalg.norm(vec_pbc(arr[v]))
+        return nl
+    else:
+        raise TypeError("Invalid shape of input")
+

@@ -1,0 +1,45 @@
+#!/usr/bin/python
+# vim: set fileencoding=latin-1
+# Copyright (c) 2008 Janne Blomqvist
+
+#  This file is part of Vasputil.
+
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Check nearest neighbors in a POSCAR file."""
+
+import vasputil.supercell as s
+from optparse import OptionParser
+
+usage = """%prog [options] POSCAR"""
+
+parser = OptionParser(usage)
+parser.add_option("-t", "--tolerance", dest="tol", \
+        help="Tolerance, default 1.0 Å")
+parser.add_option("-n", "--numneigh", dest="nn", \
+        help="Number of nearest neighbors to print.")
+(options, args) = parser.parse_args()
+if options.tol:
+    tol = float(options.tol)
+else:
+    tol = 1.0
+c = s.Cell(args[0])
+if options.nn:
+    nnd = c.nearest_neighbors(num_neigh=int(options.nn))
+else:
+    nnd = c.nearest_neighbors(tol=tol)
+print 'Atom  Atom    Dist (Å)'
+print '======================'
+for at in nnd:
+    print "%4i  %4i  %10.2f" % at

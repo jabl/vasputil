@@ -26,6 +26,8 @@ try:
 except ImportError:
     import pylab as m
 
+import vasputil.geometry as vg
+
 
 class Cell(object):
     """Class for representing a supercell."""
@@ -303,13 +305,8 @@ class Cell(object):
         """
         self.cartesian2direct()
         dvec = self.atoms[atom1, :] - self.atoms[atom2, :]
-        for ii in range(3):
-            if dvec[ii] > 0.5:
-                dvec[ii] -= 1.0
-            elif dvec[ii] < -0.5:
-                dvec[ii] += 1.0
         dvec = m.dot(self.lattice_constant*self.basis_vectors, \
-                dvec)
+                vg.vec_pbc(dvec))
         if proj == None:
             return m.linalg.norm(dvec)
         elif type(proj) == str:
@@ -325,6 +322,39 @@ class Cell(object):
             return abs(m.dot(dvec, pvec) / m.linalg.norm(pvec))
         else:
             return abs(m.dot(dvec, proj) / m.linalg.norm(proj))
+
+    def nearest_neighbors(self, tol=1.0, num_neigh=None):
+        """Nearest neighbors and distances.
+
+        Arguments:
+        tol  -- Return only distances smaller than this. Default 1.0 Å.
+        num_neigh -- Number of nearest neighbors per atom returned.
+
+        Returns -- List containing 
+                   (source_atom, target_atom, dist) tuples. 
+
+        """
+        self.cartesian2direct()
+        nn = []
+        for anum in range(len(self.atoms)):
+            dvec = self.atoms - self.atoms[anum]
+            dvec = m.transpose(m.dot(self.lattice_constant * self.basis_vectors, \
+                    m.transpose(vg.vec_pbc(dvec))))
+            dist = m.empty(dvec.shape[0])
+            for ii in range(len(dvec)):
+                dist[ii] = m.linalg.norm(dvec[ii])
+            if num_neigh == None:
+                mask = dist < tol
+                for ii in range(len(mask)):
+                    if mask[ii] and ii != anum:
+                        nn.append((anum, ii, dist[ii]))
+            else:
+                sind = dist.argsort()
+                for ii in range(min(num_neigh + 1, len(dist))):
+                    if anum != sind[ii]:
+                        nn.append((anum, sind[ii], dist[sind[ii]]))
+        return nn
+        
 
 
 # End of class Cell
@@ -353,12 +383,8 @@ def atoms_moved(cell1, cell2, tol=0.1):
     for nn in range(nmax):
         dvec = cell1.atoms[nn, :] - cell2.atoms[nn, :]
         if latt:
-            for ii in range(3):
-                if dvec[ii] < -0.5:
-                    dvec[ii] += 1.0
-                elif dvec[ii] > 0.5:
-                    dvec[ii] -= 1.0
-            dvec = m.dot(cell1.lattice_constant * cell1.basis_vectors, dvec)
+            dvec = m.dot(cell1.lattice_constant * cell1.basis_vectors, \
+                    vg.vec_pbc(dvec))
         dist = m.linalg.norm(dvec)
         if dist > tol:
             am.append((nn, dist))

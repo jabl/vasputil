@@ -15,6 +15,7 @@ setup(name='vasputil',
               'bin/vasputil_direct2cartesian', \
               'bin/vasputil_dosplot', \
               'bin/vasputil_interpolate', \
+              'bin/vasputil_nearestneighbors', \
               'bin/vasputil_poscar2xyz', \
               'bin/vasputil_zlayers']
      )

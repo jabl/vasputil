@@ -69,7 +69,12 @@ modules.  These are
     Plot density-of-states. 
 
 ``vasputil_interpolate``
-    Wrapper around "vasputil interpolate" for creating many evenly spaced images at once.
+    Wrapper around "vasputil interpolate" for creating many evenly spaced
+    images at once.
+
+``vasputil_nearestneighbors``
+    Print out nearest neighbor table, based on minimum distance or number of
+    nearest neighbors.
 
 ``vasputil_poscar2xyz``
     Convert a POSCAR format file to XYZ format.

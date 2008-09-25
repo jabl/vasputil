@@ -62,6 +62,20 @@ class CellTestCase(unittest.TestCase):
         dist = self.cell.atoms_distance(2, 18)
         ntu.assert_almost_equal(dist, 1.867066, decimal=5)
 
+    def test_nndist(self):
+        nnd = self.cell.nearest_neighbors(tol=1.7)
+        self.assertEqual(nnd[0][0], 6)
+        self.assertEqual(nnd[0][1], 24)
+        ntu.assert_almost_equal(nnd[0][2], 1.6996583336037345)
+
+    def test_nndist_nn(self):
+        nnd = self.cell.nearest_neighbors(num_neigh=2)
+        self.assertEqual(nnd[0][0], 0) 
+        self.assertEqual(nnd[0][1], 29) 
+        self.assertEqual(nnd[1][0], 0) 
+        self.assertEqual(nnd[2][0], 1) 
+
+
 class RotateMolTestCase(nt.NumpyTestCase):
     """Test the rotate_molecule function."""
 

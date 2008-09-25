@@ -1,3 +1,15 @@
+2008-09-25  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* bin/vasputil_nearestneighbors: New file.
+	* lib/python/vasputil/geometry.py (vec_pbc): New function.
+	(norm_pbc): Likewise.
+	* lib/python/vasputil/tests/test_geometry.py (NormPbcTestCase): New
+	class.
+	* lib/python/vasputil/supercell.py: Use above functions.
+	(nearest_neighbors): New method.
+	* lib/python/vasputil/tests/test_supercell.py (test_nndist): New test.
+	(test_nndist_nn): New test.
+
 2008-09-24  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* bin/vasputil_direct2cartesian: New file.
