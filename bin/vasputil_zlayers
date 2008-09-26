@@ -20,7 +20,6 @@
 """Find layers in z-coordinates, output distances between them."""
 
 import vasputil.supercell as s
-from pylab import *
 from optparse import OptionParser
 
 usage = "%prog [options] POSCAR"
@@ -45,8 +44,8 @@ c = s.Cell(args[0])
 c.direct2cartesian()
 
 zc = c.atoms[:,2] # Atom Z coordinates
-bins = int(ceil((zc.max() - zc.min())/dbin))
-histdat, levels = npy.histogram(zc, bins)
+bins = int(s.m.ceil((zc.max() - zc.min())/dbin))
+histdat, levels = s.m.histogram(zc, bins)
 mask = histdat > tol * histdat.max()
 plev = levels[mask] + dbin/2
 alayer = histdat[mask]
@@ -69,6 +68,12 @@ print "Atoms: Number of atoms in the layer."
 print "%relax 1->2: Relaxation in percent compared to the distance between " \
         + "the first and second layers."
 # Finally, make a picture:
+try:
+    from pylab import *
+except:
+    print 'ERROR: Could not import matplotlib; No picture for you, bye!'
+    import sys
+    sys.exit(1)
 hist(zc,bins)
 xst = "Bin number (bin size " + str(dbin) + " A)"
 xlabel(xst)
