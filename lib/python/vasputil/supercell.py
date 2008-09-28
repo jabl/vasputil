@@ -39,7 +39,7 @@ class Cell(object):
         # Lattice constant, in Ångströms
         self.lattice_constant = 1.
         # 3x3 matrix containing the basis vectors of the supercell
-        # in row major format
+        # in column major format
         self.basis_vectors = m.eye(3)
         # Are the ions allowed to move?
         self.selective_dynamics = False
@@ -142,7 +142,7 @@ class Cell(object):
         for i in xrange(3):
             fc += " "
             for j in xrange(3):
-                fc += basisfmt % self.basis_vectors[i,j] 
+                fc += basisfmt % self.basis_vectors[j,i] 
             fc += "\n"
         atomnumfmt = "%4i"
         for at in asc:
@@ -199,8 +199,7 @@ class Cell(object):
         """
         fc = "" # Contents of the file
         fc += str(self.natoms) + "\n" + comment + "\n"
-        if not self.cartesian:
-            self.direct2cartesian()
+        self.direct2cartesian()
         for nn in xrange(self.natoms):
             fc += "%3s" % self.atom_symbols[nn]
             for i in xrange(3):
@@ -405,6 +404,40 @@ def check_cells(cell1, cell2):
     # Then check that there are an equal number of atoms.
     natoms = cell1.natoms == cell2.natoms
     return (latt, natoms)
+
+def interpolate_cells(cell1, cell2, frac=0.5, images=1):
+    """Interpolate coordinates between two supercells.
+    
+    Arguments:
+    cell1 -- The starting point cell.
+    cell2 -- The endpoint cell.
+    frac -- Fraction, where on the interval [cell1,cell2] should the new cell
+            reside. If 0.0, the resulting cell is equal to cell1, if 1.0 it's 
+            equal to cell2.
+    images -- Number of intermediate images. If != 1, frac is ignored.
+
+    Return value -- A new cell with the interpolated coordinates, or a list 
+                    of cells if images != 1.
+    
+    """
+    import copy
+    (latt, atoms) = check_cells(cell1, cell2)
+    if not latt or not atoms:
+        raise Error("Cells are not compatible.")
+    cell1.cartesian2direct()
+    cell2.cartesian2direct()
+    if images == 1:
+        icell = copy.copy(cell1)
+        icell.atoms = (1 - frac) * cell1.atoms + frac * cell2.atoms
+        return icell
+    icells = []
+    images += 1
+    for ii in range(1, images):
+        icell = copy.copy(cell1)
+        fr = float(ii) / images 
+        icell.atoms = (1 - fr) * cell1.atoms + fr * cell2.atoms
+        icells.append(icell)
+    return icells
 
 def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
         theta = 0., psi = 0.):

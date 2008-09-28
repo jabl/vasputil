@@ -69,8 +69,9 @@ modules.  These are
     Plot density-of-states. 
 
 ``vasputil_interpolate``
-    Wrapper around "vasputil interpolate" for creating many evenly spaced
-    images at once.
+    Interpolate coordinates between two POSCAR files, either one intermediate
+    image where one can specify where in the interval the new coordinates will
+    be, or create many evenly spaced images.
 
 ``vasputil_nearestneighbors``
     Print out nearest neighbor table, based on minimum distance or number of

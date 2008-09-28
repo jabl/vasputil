@@ -31,6 +31,14 @@ def testdir():
     # find the path where this file is
     return os.path.split(__file__)[0]
 
+def load_cells():
+    """Load the two test supercells."""
+    p1 = os.path.join(testdir(), "POSCAR")
+    c1 = s.Cell(poscar=p1)
+    p2 = os.path.join(testdir(), "POSCAR2")
+    c2 = s.Cell(poscar=p2)
+    return (c1, c2)
+
 class CellTestCase(unittest.TestCase):
     """Testcase for vasputil.supercell.Cell class."""
 
@@ -85,14 +93,26 @@ class RotateMolTestCase(nt.NumpyTestCase):
                 psi=math.pi)
         ntu.assert_array_almost_equal(coords, rcoords)
 
+class InterpolateTestCase(unittest.TestCase):
+    """Test the interpolate function."""
+
+    def setUp(self):
+        (self.c1, self.c2 ) = load_cells()
+
+    def test_interpolate(self):
+        c = s.interpolate_cells(self.c1, self.c2, frac=0.5)
+        ntu.assert_almost_equal(c.atoms[29,2], 0.258209253419)
+
+    def test_interpolate_2(self):
+        cells = s.interpolate_cells(self.c1, self.c2, images=2)
+        ntu.assert_almost_equal(cells[0].atoms[29,2], 0.24154259)
+        ntu.assert_almost_equal(cells[1].atoms[29,2], 0.27487592)
+
 class AtomsMovedTestCase(unittest.TestCase):
     """Test the atoms_moved function."""
 
     def setUp(self):
-        p1 = os.path.join(testdir(), "POSCAR")
-        self.c1 = s.Cell(poscar=p1)
-        p2 = os.path.join(testdir(), "POSCAR2")
-        self.c2 = s.Cell(poscar=p2)
+        (self.c1, self.c2 ) = load_cells()
 
     def test_moved(self):
         atoms = []
@@ -108,10 +128,7 @@ class CheckCellsTestCase(unittest.TestCase):
     """Test the check_cells function."""
 
     def setUp(self):
-        p1 = os.path.join(testdir(), "POSCAR")
-        self.c1 = s.Cell(poscar=p1)
-        p2 = os.path.join(testdir(), "POSCAR2")
-        self.c2 = s.Cell(poscar=p2)
+        (self.c1, self.c2 ) = load_cells()
 
     def test_check_cells(self):
         (latt, natoms) = s.check_cells(self.c1, self.c2)
@@ -125,8 +142,10 @@ def suite():
             AtomsMovedTestCase)
     check_suite = unittest.TestLoader().loadTestsFromTestCase(\
             CheckCellsTestCase)
+    interpolate_suite = unittest.TestLoader().loadTestsFromTestCase(\
+            InterpolateTestCase)
     return unittest.TestSuite([cell_suite, rot_suite, move_suite, \
-            check_suite])
+            check_suite, interpolate_suite])
 
 
 if __name__ == "__main__":

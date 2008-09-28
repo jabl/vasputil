@@ -17,28 +17,51 @@
 #  You should have received a copy of the GNU General Public License
 #  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Wrapper around vasputil interpolate.
+"""Interpolate two POSCAR files.
 
 Create a number of evenly spaced interpolated images between start
 and end images.
 
 """
 
-import os
+import vasputil.supercell as s
 from optparse import OptionParser
 
-usage = """%prog POSCAR.start POSCAR.end N
+usage = """%prog POSCAR.start POSCAR.end 
 
-The result is N files called POSCAR.{1-N} which are linearly interpolated
+The result is N files called which are linearly interpolated
 between POSCAR.start and POSCAR.end."""
 parser = OptionParser(usage)
+parser.add_option("-f", "--fraction", dest="frac", \
+        help="Where on the interval [cell1,cell2] the output cell \
+coordinates will be.  Default is 0.5")
+parser.add_option("-i", "--images", dest="images", \
+        help="Number of intermediate images.  If != 1, --fraction\
+is ignored.  Default is 1.")
+parser.add_option("-o", "--output", dest="ofile", \
+        help="The stem of the names of the output file(s).  The output files \
+will be named STEM.1, STEM.2 and so forth.  Default is the name of the \
+POSCAR.start argument.")
 (options, args) = parser.parse_args()
 
 ps = args[0]
 pe = args[1]
-ni = int(args[2]) + 1
-
-for i in range(1, ni):
-    s = "vasputil interpolate " + ps + " " + pe + " " + str(float(i)/ni) + \
-            " POSCAR." + str(i)
-    os.system(s)
+c1 = s.Cell(ps)
+c2 = s.Cell(pe)
+if options.frac:
+    frac = float(options.frac)
+else:
+    frac = 0.5
+if options.ofile:
+    ofile = options.ofile
+else:
+    ofile = ps 
+if options.images:
+    images = int(options.images)
+    cells = s.interpolate_cells(c1, c2, frac, images)
+    for ii in range(len(cells)):
+        cells[ii].write_poscar(ofile + "." + str(ii + 1))
+else:
+    images = 1
+    cell = s.interpolate_cells(c1, c2, frac)
+    cell.write_poscar(ofile + ".1")

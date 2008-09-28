@@ -1,3 +1,13 @@
+2008-09-28  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/vasputil/supercell.py (write_poscar): Write basis vectors
+	transposed.
+	(interpolate_cells): New function.
+	* lib/python/vasputil/tests/test_supercell.py (load_cells): Refactored
+	utility function.
+	(InterpolateTestCase): New test case.
+	* bin/vasputil_interpolate: Use python/vasputil library.
+
 2008-09-25  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* bin/vasputil_nearestneighbors: New file.
