@@ -27,7 +27,7 @@ and end images.
 import vasputil.supercell as s
 from optparse import OptionParser
 
-usage = """%prog POSCAR.start POSCAR.end 
+usage = """%prog [options] POSCAR.start POSCAR.end 
 
 The result is N files called which are linearly interpolated
 between POSCAR.start and POSCAR.end."""
