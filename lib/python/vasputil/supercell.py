@@ -71,25 +71,28 @@ class Cell(object):
     natoms = property(__get_natoms, __set_natoms, __del_natoms, \
             "Total number of atoms.")
 
-    def read_poscar(self, filename):
+    def read_poscar(self, file):
         """Parses a POSCAR file"""
-        f = open(filename)
-        poscar = f.readlines()
-        f.close()
+        if type(file) == str:
+            f = open(file)
+        elif type(file) == file:
+            f = file
+        else:
+            raise TypeError("file argument must be a string or a file object.")
             
         # First line should contain the atom names , eg. "Ag Ge" in
         # the same order
         # as later in the file (and POTCAR for the full vasp run)
-        atomNames = poscar[0].split()
+        atomNames = f.readline().split()
             
-        self.lattice_constant = float(poscar[1])
+        self.lattice_constant = float(f.readline())
             
         # Now the lattice vectors
         a = []
-        for vector in poscar[2:5]:
-            s = vector.split()
+        for ii in range(3):
+            s = f.readline().split()
             floatvect = float(s[0]), float(s[1]), float(s[2])
-            a.append( floatvect)
+            a.append(floatvect)
         
         # Transpose to make natural ordering for linear algebra
         self.basis_vectors = m.transpose(m.array(a))
@@ -97,41 +100,44 @@ class Cell(object):
         # Number of atoms. Again this must be in the same order as
         # in the first line
         # and in the POTCAR file
-        numofatoms = poscar[5].split()
+        numofatoms = f.readline().split()
         for i in xrange(len(numofatoms)):
             numofatoms[i] = int(numofatoms[i])
             if (len(atomNames) < i + 1):
                 atomNames.append("Unknown")
-            [self.atom_symbols.append(atomNames[i]) for n in xrange(numofatoms[i])]
+            [self.atom_symbols.append(atomNames[i]) \
+                    for n in xrange(numofatoms[i])]
         
         # Check if Selective dynamics is switched on
-        sdyn = poscar[6]
-        add = 0
+        sdyn = f.readline()
         if sdyn[0] == "S" or sdyn[0] == "s":
-            add = 1
             self.selective_dynamics = True
         
         # Check if atom coordinates are cartesian or direct
-        acType = poscar[6+add]
-        if acType[0] == "C" or acType[0] == "c" or acType[0] == "K" or acType[0] == "k":
+        if self.selective_dynamics:
+            ac_type = f.readline()
+        else:
+            ac_type = sdyn
+        if ac_type[0] == "C" or ac_type[0] == "c" or ac_type[0] == "K" \
+                or ac_type[0] == "k":
             self.cartesian = 1
         else:
             self.cartesian = 0
-        
-        offset = add+7
         tot_natoms = sum(numofatoms)
         self.atoms = m.zeros((tot_natoms, 3))
         self.selective_flags = []
         for atom in xrange(tot_natoms):
-            ac = poscar[atom+offset].split()
+            ac = f.readline().split()
             self.atoms[atom] = (float(ac[0]), float(ac[1]), float(ac[2]))
             if self.selective_dynamics:
                 self.selective_flags.append((ac[3], ac[4], ac[5]))
         if self.cartesian:
             self.atoms *= self.lattice_constant
+        if type(file) == str:
+            f.close()
         
 
-    def write_poscar(self, filename="POSCAR.out", fd=None):
+    def write_poscar(self, file):
         """Writes data into a POSCAR format file"""
         fc = "" # Contents of the file
         asc = self.get_atom_symbol_count()
@@ -166,12 +172,14 @@ class Cell(object):
                 for j in xrange(3):
                     fc += logicalfmt % selflags[j]
             fc += "\n"
-        if (fd == None):
-            f = open(filename, "w")
+        if type(file) == str:
+            f = open(file, "w")
             f.write(fc)
             f.close()
+        elif type(file) == file:
+            file.write(fc)
         else:
-            fd.write(fc)
+            raise TypeError("file argument must be string of file object.")
         
     def read_xyz(self, infile):
         "Parses an xyz file"
@@ -259,7 +267,7 @@ class Cell(object):
         # as well.
         import tempfile, os
         f = tempfile.NamedTemporaryFile()
-        self.write_poscar(fd=f)
+        self.write_poscar(f)
         f.flush()
         vmdstr = "vmd -nt -POSCAR " + f.name
         print "now executing " + vmdstr
