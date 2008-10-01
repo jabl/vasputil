@@ -22,9 +22,9 @@ functions.
 """
 
 try:
-    import numpy as m
+    import numpy as n
 except ImportError:
-    import pylab as m
+    import pylab as n
 
 import vasputil.geometry as vg
 
@@ -40,7 +40,7 @@ class Cell(object):
         self.lattice_constant = 1.
         # 3x3 matrix containing the basis vectors of the supercell
         # in column major format
-        self.basis_vectors = m.eye(3)
+        self.basis_vectors = n.eye(3)
         # Are the ions allowed to move?
         self.selective_dynamics = False
         # Flags for each atom describing in which cartesian coordinate
@@ -53,7 +53,7 @@ class Cell(object):
         # times the lattice constant
         self.cartesian = True
         # Coordinates of the atoms
-        self.atoms = m.zeros((0, 3))
+        self.atoms = n.zeros((0, 3))
         if (poscar != None):
             self.read_poscar(poscar)
         elif (xyz != None):
@@ -71,14 +71,14 @@ class Cell(object):
     natoms = property(__get_natoms, __set_natoms, __del_natoms, \
             "Total number of atoms.")
 
-    def read_poscar(self, file):
+    def read_poscar(self, pfile):
         """Parses a POSCAR file"""
-        if type(file) == str:
-            f = open(file)
-        elif type(file) == file:
-            f = file
+        if type(pfile) == str:
+            f = open(pfile)
+        elif type(pfile) == file:
+            f = pfile
         else:
-            raise TypeError("file argument must be a string or a file object.")
+            raise TypeError("pfile argument must be a string or a file object.")
             
         # First line should contain the atom names , eg. "Ag Ge" in
         # the same order
@@ -95,7 +95,7 @@ class Cell(object):
             a.append(floatvect)
         
         # Transpose to make natural ordering for linear algebra
-        self.basis_vectors = m.transpose(m.array(a))
+        self.basis_vectors = n.transpose(n.array(a))
         
         # Number of atoms. Again this must be in the same order as
         # in the first line
@@ -106,7 +106,7 @@ class Cell(object):
             if (len(atomNames) < i + 1):
                 atomNames.append("Unknown")
             [self.atom_symbols.append(atomNames[i]) \
-                    for n in xrange(numofatoms[i])]
+                    for na in xrange(numofatoms[i])]
         
         # Check if Selective dynamics is switched on
         sdyn = f.readline()
@@ -124,7 +124,7 @@ class Cell(object):
         else:
             self.cartesian = 0
         tot_natoms = sum(numofatoms)
-        self.atoms = m.zeros((tot_natoms, 3))
+        self.atoms = n.empty((tot_natoms, 3))
         self.selective_flags = []
         for atom in xrange(tot_natoms):
             ac = f.readline().split()
@@ -133,11 +133,11 @@ class Cell(object):
                 self.selective_flags.append((ac[3], ac[4], ac[5]))
         if self.cartesian:
             self.atoms *= self.lattice_constant
-        if type(file) == str:
+        if type(pfile) == str:
             f.close()
         
 
-    def write_poscar(self, file):
+    def write_poscar(self, pfile):
         """Writes data into a POSCAR format file"""
         fc = "" # Contents of the file
         asc = self.get_atom_symbol_count()
@@ -172,14 +172,14 @@ class Cell(object):
                 for j in xrange(3):
                     fc += logicalfmt % selflags[j]
             fc += "\n"
-        if type(file) == str:
-            f = open(file, "w")
+        if type(pfile) == str:
+            f = open(pfile, "w")
             f.write(fc)
             f.close()
-        elif type(file) == file:
-            file.write(fc)
+        elif type(pfile) == file:
+            pfile.write(fc)
         else:
-            raise TypeError("file argument must be string of file object.")
+            raise TypeError("pfile argument must be string of file object.")
         
     def read_xyz(self, infile):
         "Parses an xyz file"
@@ -187,12 +187,12 @@ class Cell(object):
         xyz = f.readlines()
         f.close()
         # first line contains number of atoms
-        self.atoms = m.zeros((int(xyz[0]), 3))
+        self.atoms = n.empty((int(xyz[0]), 3))
         self.cartesian = True
         self.atom_symbols = []
         for ii in xrange(2, self.natoms):
             s = xyz[ii].split()
-            floatvect = m.array([float(s[1]), float(s[2]), float(s[3])])
+            floatvect = n.array([float(s[1]), float(s[2]), float(s[3])])
             self.atoms[(ii-1),:] = floatvect
             self.atom_symbols.append(s[0])
         return self.atoms
@@ -219,10 +219,10 @@ class Cell(object):
 
     def sort_atoms(self):
         """Sort the atoms in the cell according to atomic symbol."""
-        ind = m.argsort(self.atom_symbols)
-        self.atom_symbols = m.array(self.atom_symbols)[ind]
+        ind = n.argsort(self.atom_symbols)
+        self.atom_symbols = n.array(self.atom_symbols)[ind]
         self.atoms = self.atoms[ind]
-        self.selective_flags = m.array(self.selective_flags)[ind]
+        self.selective_flags = n.array(self.selective_flags)[ind]
 
     def get_atom_symbol_count(self):
         """Return a list of (atomic symbol, count) tuples.
@@ -248,17 +248,17 @@ class Cell(object):
         """Convert atom coordinates from cartesian to direct"""
         if not self.cartesian:
             return
-        self.atoms = m.transpose(m.linalg.solve(self.lattice_constant * \
+        self.atoms = n.transpose(n.linalg.solve(self.lattice_constant * \
                 self.basis_vectors, \
-                m.transpose(self.atoms)))
+                n.transpose(self.atoms)))
         self.cartesian = False
 
     def direct2cartesian(self):
         """Convert atom coordinates from direct to cartesian"""
         if self.cartesian:
             return
-        self.atoms = m.transpose(m.dot(self.lattice_constant*self.basis_vectors, \
-                m.transpose(self.atoms)))
+        self.atoms = n.transpose(n.dot(self.lattice_constant*self.basis_vectors, \
+                n.transpose(self.atoms)))
         self.cartesian = True
         
     def show_vmd(self):
@@ -285,9 +285,9 @@ class Cell(object):
         self.direct2cartesian()
         cell.direct2cartesian()
         oldsz = self.natoms
-        atoms = m.zeros((self.natoms + cell.natoms, 3))
-        self.atom_symbols = m.array(self.atom_symbols + cell.atom_symbols)
-        self.selective_flags = m.array(self.selective_flags + cell.selective_flags)
+        atoms = n.empty((self.natoms + cell.natoms, 3))
+        self.atom_symbols = n.array(self.atom_symbols + cell.atom_symbols)
+        self.selective_flags = n.array(self.selective_flags + cell.selective_flags)
         atoms[:oldsz] = self.atoms
         atoms[oldsz:] = cell.atoms
         self.atoms = atoms
@@ -312,10 +312,10 @@ class Cell(object):
         """
         self.cartesian2direct()
         dvec = self.atoms[atom1, :] - self.atoms[atom2, :]
-        dvec = m.dot(self.lattice_constant*self.basis_vectors, \
+        dvec = n.dot(self.lattice_constant*self.basis_vectors, \
                 vg.vec_pbc(dvec))
         if proj == None:
-            return m.linalg.norm(dvec)
+            return n.linalg.norm(dvec)
         elif type(proj) == str:
             if len(proj) != 2:
                 raise TypeError("Length of string specifying plane must be 2.")
@@ -326,9 +326,9 @@ class Cell(object):
                 pvec[1] = 0.
             if proj.find("z") == -1:
                 pvec[2] = 0.
-            return abs(m.dot(dvec, pvec) / m.linalg.norm(pvec))
+            return abs(n.dot(dvec, pvec) / n.linalg.norm(pvec))
         else:
-            return abs(m.dot(dvec, proj) / m.linalg.norm(proj))
+            return abs(n.dot(dvec, proj) / n.linalg.norm(proj))
 
     def nearest_neighbors(self, tol=1.0, num_neigh=None):
         """Nearest neighbors and distances.
@@ -345,11 +345,11 @@ class Cell(object):
         nn = []
         for anum in range(len(self.atoms)):
             dvec = self.atoms - self.atoms[anum]
-            dvec = m.transpose(m.dot(self.lattice_constant * self.basis_vectors, \
-                    m.transpose(vg.vec_pbc(dvec))))
-            dist = m.empty(dvec.shape[0])
+            dvec = n.transpose(n.dot(self.lattice_constant * self.basis_vectors, \
+                    n.transpose(vg.vec_pbc(dvec))))
+            dist = n.empty(dvec.shape[0])
             for ii in range(len(dvec)):
-                dist[ii] = m.linalg.norm(dvec[ii])
+                dist[ii] = n.linalg.norm(dvec[ii])
             if num_neigh == None:
                 mask = dist < tol
                 for ii in range(len(mask)):
@@ -390,9 +390,9 @@ def atoms_moved(cell1, cell2, tol=0.1):
     for nn in range(nmax):
         dvec = cell1.atoms[nn, :] - cell2.atoms[nn, :]
         if latt:
-            dvec = m.dot(cell1.lattice_constant * cell1.basis_vectors, \
+            dvec = n.dot(cell1.lattice_constant * cell1.basis_vectors, \
                     vg.vec_pbc(dvec))
-        dist = m.linalg.norm(dvec)
+        dist = n.linalg.norm(dvec)
         if dist > tol:
             am.append((nn, dist))
     return am
@@ -407,7 +407,7 @@ def check_cells(cell1, cell2):
     
     """
     # First check that lattice constant * basis vectors are compatible.
-    latt = m.any(cell1.lattice_constant * cell1.basis_vectors \
+    latt = n.any(cell1.lattice_constant * cell1.basis_vectors \
             - cell2.lattice_constant * cell2.basis_vectors < 1e-15)
     # Then check that there are an equal number of atoms.
     natoms = cell1.natoms == cell2.natoms
@@ -447,7 +447,7 @@ def interpolate_cells(cell1, cell2, frac=0.5, images=1):
         icells.append(icell)
     return icells
 
-def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
+def rotate_molecule(coords, rotp = n.array((0.,0.,0.)), phi = 0., \
         theta = 0., psi = 0.):
     """Rotate a molecule via Euler angles.
 
@@ -465,17 +465,17 @@ def rotate_molecule(coords, rotp = m.array((0.,0.,0.)), phi = 0., \
     # row-wise, so there is no need to play with the Kronecker product.
     rcoords = coords - rotp
     # First Euler rotation about z in matrix form
-    D = m.array(((m.cos(phi), m.sin(phi), 0.), (-m.sin(phi), m.cos(phi), 0.), \
+    D = n.array(((n.cos(phi), n.sin(phi), 0.), (-n.sin(phi), n.cos(phi), 0.), \
             (0., 0., 1.)))
     # Second Euler rotation about x:
-    C = m.array(((1., 0., 0.), (0., m.cos(theta), m.sin(theta)), \
-            (0., -m.sin(theta), m.cos(theta))))
+    C = n.array(((1., 0., 0.), (0., n.cos(theta), n.sin(theta)), \
+            (0., -n.sin(theta), n.cos(theta))))
     # Third Euler rotation, 2nd rotation about z:
-    B = m.array(((m.cos(psi), m.sin(psi), 0.), (-m.sin(psi), m.cos(psi), 0.), \
+    B = n.array(((n.cos(psi), n.sin(psi), 0.), (-n.sin(psi), n.cos(psi), 0.), \
             (0., 0., 1.)))
     # Total Euler rotation
-    A = m.dot(B, m.dot(C, D))
+    A = n.dot(B, n.dot(C, D))
     # Do the rotation
-    rcoords = m.dot(A, m.transpose(rcoords))
+    rcoords = n.dot(A, n.transpose(rcoords))
     # Move back to the rotation point
-    return m.transpose(rcoords) + rotp
+    return n.transpose(rcoords) + rotp

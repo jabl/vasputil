@@ -44,8 +44,8 @@ c = s.Cell(args[0])
 c.direct2cartesian()
 
 zc = c.atoms[:,2] # Atom Z coordinates
-bins = int(s.m.ceil((zc.max() - zc.min())/dbin))
-histdat, levels = s.m.histogram(zc, bins)
+bins = int(s.n.ceil((zc.max() - zc.min())/dbin))
+histdat, levels = s.n.histogram(zc, bins)
 mask = histdat > tol * histdat.max()
 plev = levels[mask] + dbin/2
 alayer = histdat[mask]
