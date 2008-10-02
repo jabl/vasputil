@@ -71,6 +71,19 @@ class Cell(object):
     natoms = property(__get_natoms, __set_natoms, __del_natoms, \
             "Total number of atoms.")
 
+    def _get_volume(self):
+        return n.dot(self.basis_vectors[:,0], n.cross( \
+                self.basis_vectors[:,1], self.basis_vectors[:,2]))
+
+    def _set_volume(self, val):
+        raise AttributeError("Can't set attribute.")
+
+    def _del_volume(self):
+        raise AttributeError("Can't delete attribute.")
+
+    volume = property(_get_volume, _set_volume, _del_volume, \
+            "The volume of the supercell.")
+
     def read_poscar(self, pfile):
         """Parses a POSCAR file"""
         if type(pfile) == str:
