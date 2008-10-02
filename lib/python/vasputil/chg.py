@@ -49,10 +49,12 @@ class ChargeDensity(object):
         self.chg = n.empty(ng)
         # VASP writes charge density as
         # WRITE(IU,FORM) (((C(NX,NY,NZ),NX=1,NGXC),NY=1,NGYZ),NZ=1,NGZC)
+        # Fortran nested implied do loops; innermost index fastest
         # First, just read it in
-        for xx in range(self.chg.shape[0]):
+        for zz in range(self.chg.shape[2]):
             for yy in range(self.chg.shape[1]):
-                self.ng[xx, yy, :] = n.fromfile(f, count = \
-                        self.chg.shape[2], sep=' ')
+                self.chg[:, yy, zz] = n.fromfile(f, count = \
+                        self.chg.shape[0], sep=' ')
         f.close()
+        self.chg /= self.cell.volume
 
