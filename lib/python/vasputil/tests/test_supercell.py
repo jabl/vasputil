@@ -83,6 +83,13 @@ class CellTestCase(unittest.TestCase):
         self.assertEqual(nnd[1][0], 0) 
         self.assertEqual(nnd[2][0], 1) 
 
+    def test_coord_trans(self):
+        self.cell.cartesian2direct()
+        atoms = self.cell.atoms
+        self.cell.direct2cartesian()
+        self.cell.cartesian2direct()
+        ntu.assert_array_almost_equal(atoms, self.cell.atoms)
+
 
 class RotateMolTestCase(nt.NumpyTestCase):
     """Test the rotate_molecule function."""

@@ -39,7 +39,7 @@ class Cell(object):
         # Lattice constant, in Ångströms
         self.lattice_constant = 1.
         # 3x3 matrix containing the basis vectors of the supercell
-        # in column major format
+        # as row vectors
         self.basis_vectors = n.eye(3)
         # Are the ions allowed to move?
         self.selective_dynamics = False
@@ -107,8 +107,7 @@ class Cell(object):
             floatvect = float(s[0]), float(s[1]), float(s[2])
             a.append(floatvect)
         
-        # Transpose to make natural ordering for linear algebra
-        self.basis_vectors = n.transpose(n.array(a))
+        self.basis_vectors = n.array(a)
         
         # Number of atoms. Again this must be in the same order as
         # in the first line
@@ -161,7 +160,7 @@ class Cell(object):
         for i in xrange(3):
             fc += " "
             for j in xrange(3):
-                fc += basisfmt % self.basis_vectors[j,i] 
+                fc += basisfmt % self.basis_vectors[i,j] 
             fc += "\n"
         atomnumfmt = "%4i"
         for at in asc:
@@ -258,20 +257,39 @@ class Cell(object):
         return sc
 
     def cartesian2direct(self):
-        """Convert atom coordinates from cartesian to direct"""
+        """Convert atom coordinates from cartesian to direct.
+        
+        For further explanation, see documentation for direct2cartesian.
+        In this case, we want to solve atoms_d * basis = atoms_c for atoms_d.
+        In order to turn it into the canonical Ax = b system we need to
+        transpose everything, then solve, and transpose back.
+        
+        """
         if not self.cartesian:
             return
         self.atoms = n.transpose(n.linalg.solve(self.lattice_constant * \
-                self.basis_vectors, \
+                n.transpose(self.basis_vectors), \
                 n.transpose(self.atoms)))
         self.cartesian = False
 
     def direct2cartesian(self):
-        """Convert atom coordinates from direct to cartesian"""
+        """Convert atom coordinates from direct to cartesian.
+        
+        If the basis vectors are stored as column vectors in an array, the
+        coordinates of an atom as a column vector can be converted from
+        direct to cartesian coordinates by basis * atom_coords. Generalizing
+        to multiple atoms implies that atom_coords must then be a 3xN array.
+
+        Now, we store atoms as a Nx3 array, and basis vectors as row vectors,
+        so both of these need to be transposed. However, from linear algebra
+        we know that (basis.T * atoms.T).T = atoms * basis, where .T is the
+        transpose operator.
+        
+        """
         if self.cartesian:
             return
-        self.atoms = n.transpose(n.dot(self.lattice_constant*self.basis_vectors, \
-                n.transpose(self.atoms)))
+        self.atoms = n.dot(self.atoms, \
+                self.lattice_constant * self.basis_vectors)
         self.cartesian = True
         
     def show_vmd(self):
@@ -325,8 +343,8 @@ class Cell(object):
         """
         self.cartesian2direct()
         dvec = self.atoms[atom1, :] - self.atoms[atom2, :]
-        dvec = n.dot(self.lattice_constant*self.basis_vectors, \
-                vg.vec_pbc(dvec))
+        dvec = n.dot(vg.vec_pbc(dvec), \
+                self.lattice_constant * self.basis_vectors)
         if proj == None:
             return n.linalg.norm(dvec)
         elif type(proj) == str:
@@ -358,8 +376,8 @@ class Cell(object):
         nn = []
         for anum in range(len(self.atoms)):
             dvec = self.atoms - self.atoms[anum]
-            dvec = n.transpose(n.dot(self.lattice_constant * self.basis_vectors, \
-                    n.transpose(vg.vec_pbc(dvec))))
+            dvec = n.dot(vg.vec_pbc(dvec), \
+                    self.lattice_constant * self.basis_vectors)
             dist = n.empty(dvec.shape[0])
             for ii in range(len(dvec)):
                 dist[ii] = n.linalg.norm(dvec[ii])
