@@ -1,4 +1,4 @@
-vasputil 4.3, 2008
+vasputil 4.3, 2008-10-15
 
 * New python utilities, vasputil_atomsdistance, vasputil_atomsmoved, 
   vasputil_direct2cartesian, vasputil_nearestneighbors and vasputil_poscar2xyz.
