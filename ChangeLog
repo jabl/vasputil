@@ -1,3 +1,8 @@
+2008-10-15  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/vasputil/dos.py (read_doscar): Don't clobber numpy
+	import.
+
 2008-09-28  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* lib/python/vasputil/supercell.py (write_poscar): Write basis vectors
