@@ -47,7 +47,7 @@ class LDOS(object):
         """Read a VASP DOSCAR file."""
         f = open(fname)
         natoms = int(f.readline().split()[0])
-        [f.readline() for n in range(4)]  # Skip next 4 lines.
+        [f.readline() for nn in range(4)]  # Skip next 4 lines.
         dos = []
         for na in xrange(natoms + 1):
             try:
