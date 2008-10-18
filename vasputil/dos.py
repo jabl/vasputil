@@ -119,7 +119,7 @@ def showdp(fsz=16, show_legend=True):
     """Utility function to set default parameters for DOS plots."""
     import pylab as pl
     pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
-    pl.figtext(0.03, 0.45, "LDOS", rotation='vertical', size=fsz)
+    pl.figtext(0.03, 0.35, "LDOS (arb. units)", rotation='vertical', size=fsz)
     loc, lab = pl.xticks()
     lab.set_size = fsz
     loc, lab = pl.yticks()
