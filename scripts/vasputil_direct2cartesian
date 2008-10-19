@@ -19,7 +19,7 @@
 
 """Convert a POSCAR file from direct to cartesian coordinates."""
 
-import vasputil.supercell as s
+import ase
 from optparse import OptionParser
 import os.path
 
@@ -34,7 +34,6 @@ if options.outfile:
     fname = options.outfile
 else:
     fname = os.path.basename(args[0]) + ".cart"
-c = s.Cell(args[0])
-c.direct2cartesian()
-c.write_poscar(fname)
+a = ase.read(args[0], format="vasp")
+ase.write(fname, a, format="vasp", direct=False, sort=False)
 

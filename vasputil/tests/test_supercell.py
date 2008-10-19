@@ -20,8 +20,10 @@
 
 import unittest
 import vasputil.supercell as s
+import ase
 import numpy.testing.numpytest as nt
 import numpy.testing.utils as ntu
+import numpy as np
 import math
 import os
 
@@ -34,9 +36,9 @@ def testdir():
 def load_cells():
     """Load the two test supercells."""
     p1 = os.path.join(testdir(), "POSCAR")
-    c1 = s.Cell(poscar=p1)
+    c1 = ase.read(p1, format="vasp")
     p2 = os.path.join(testdir(), "POSCAR2")
-    c2 = s.Cell(poscar=p2)
+    c2 = ase.read(p2, format="vasp")
     return (c1, c2)
 
 class CellTestCase(unittest.TestCase):
@@ -45,50 +47,44 @@ class CellTestCase(unittest.TestCase):
     def setUp(self):
         # The test POSCAR file is in the same directory.
         path = os.path.join(testdir(), "POSCAR")
-        self.cell = s.Cell(poscar=path)
-
-    def test_lc(self):
-        """Check that the lattice constant is imported correctly."""
-        self.assertEqual(self.cell.lattice_constant, 1.)
+        self.cell = ase.read(path, format="vasp")
 
     def test_atoms_distance(self):
         """Test the atoms_distance method."""
-        dist = self.cell.atoms_distance(9, 24)
+        dist = s.atoms_distance(self.cell, 9, 24)
         ntu.assert_almost_equal(dist, 1.90823040889809)
 
     def test_atoms_distance_proj(self):
         """Test the atoms_distance method with a projection."""
-        dist = self.cell.atoms_distance(24, 9, "xy")
+        dist = s.atoms_distance(self.cell, 24, 9, "xy")
         ntu.assert_almost_equal(dist, 1.51230705052) 
 
     def test_atoms_distance_proj2(self):
         """Test the atoms_distance method with a projection defined by vector."""
-        dist = self.cell.atoms_distance(9, 24, (0,0,10))
+        dist = s.atoms_distance(self.cell, 9, 24, (0,0,10))
         ntu.assert_almost_equal(dist, 1.16373136) 
 
     def test_atoms_distance_pbc(self):
-        dist = self.cell.atoms_distance(2, 18)
+        dist = s.atoms_distance(self.cell, 2, 18)
         ntu.assert_almost_equal(dist, 1.867066, decimal=5)
 
     def test_nndist(self):
-        nnd = self.cell.nearest_neighbors(tol=1.7)
+        nnd = s.nearest_neighbors(self.cell, tol=1.7)
         self.assertEqual(nnd[0][0], 6)
         self.assertEqual(nnd[0][1], 24)
         ntu.assert_almost_equal(nnd[0][2], 1.6996583336037345)
 
     def test_nndist_nn(self):
-        nnd = self.cell.nearest_neighbors(num_neigh=2)
+        nnd = s.nearest_neighbors(self.cell, num_neigh=2)
         self.assertEqual(nnd[0][0], 0) 
         self.assertEqual(nnd[0][1], 29) 
         self.assertEqual(nnd[1][0], 0) 
         self.assertEqual(nnd[2][0], 1) 
 
     def test_coord_trans(self):
-        self.cell.cartesian2direct()
-        atoms = self.cell.atoms
-        self.cell.direct2cartesian()
-        self.cell.cartesian2direct()
-        ntu.assert_array_almost_equal(atoms, self.cell.atoms)
+        ntu.assert_array_almost_equal(np.linalg.solve(self.cell.get_cell().T, \
+                self.cell.get_positions().T).T % 1.0, \
+                self.cell.get_scaled_positions())
 
 
 class RotateMolTestCase(nt.NumpyTestCase):
@@ -108,12 +104,12 @@ class InterpolateTestCase(unittest.TestCase):
 
     def test_interpolate(self):
         c = s.interpolate_cells(self.c1, self.c2, frac=0.5)
-        ntu.assert_almost_equal(c.atoms[29,2], 0.258209253419)
+        ntu.assert_almost_equal(c.get_scaled_positions()[29,2], 0.258209253419)
 
     def test_interpolate_2(self):
         cells = s.interpolate_cells(self.c1, self.c2, images=2)
-        ntu.assert_almost_equal(cells[0].atoms[29,2], 0.24154259)
-        ntu.assert_almost_equal(cells[1].atoms[29,2], 0.27487592)
+        ntu.assert_almost_equal(cells[0].get_scaled_positions()[29,2], 0.24154259)
+        ntu.assert_almost_equal(cells[1].get_scaled_positions()[29,2], 0.27487592)
 
 class AtomsMovedTestCase(unittest.TestCase):
     """Test the atoms_moved function."""

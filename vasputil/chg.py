@@ -25,7 +25,7 @@ try:
 except ImportError:
     import pylab as n
 
-import vasputil.supercell as sc
+import ase
 
 
 class ChargeDensity(object):
@@ -41,8 +41,7 @@ class ChargeDensity(object):
     def read_chg(self, filename):
         """Read VASP CHG/CHGCAR file."""
         f = open(filename)
-        self.cell = sc.Cell()
-        self.cell.read_poscar(f)
+        self.atoms = ase.io.vasp.read_vasp(f)
         f.readline()
         ng = f.readline().split()
         ng = (int(ng[0]), int(ng[1]), int(ng[2]))
@@ -56,5 +55,5 @@ class ChargeDensity(object):
                 self.chg[:, yy, zz] = n.fromfile(f, count = \
                         self.chg.shape[0], sep=' ')
         f.close()
-        self.chg /= self.cell.volume
+        self.chg /= self.atoms.get_volume()
 

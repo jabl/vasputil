@@ -25,6 +25,7 @@ and end images.
 """
 
 import vasputil.supercell as s
+import ase
 from optparse import OptionParser
 
 usage = """%prog [options] POSCAR.start POSCAR.end 
@@ -46,8 +47,8 @@ POSCAR.start argument.")
 
 ps = args[0]
 pe = args[1]
-c1 = s.Cell(ps)
-c2 = s.Cell(pe)
+c1 = ase.read(ps, format='vasp')
+c2 = ase.read(pe, format='vasp')
 if options.frac:
     frac = float(options.frac)
 else:
@@ -60,8 +61,8 @@ if options.images:
     images = int(options.images)
     cells = s.interpolate_cells(c1, c2, frac, images)
     for ii in range(len(cells)):
-        cells[ii].write_poscar(ofile + "." + str(ii + 1))
+        ase.write(ofile + '.' + str(ii + 1), cells[ii], format="vasp", sort=False)
 else:
     images = 1
     cell = s.interpolate_cells(c1, c2, frac)
-    cell.write_poscar(ofile + ".1")
+    ase.write(ofile + ".1", cell, format='vasp', sort=False)

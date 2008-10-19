@@ -19,7 +19,7 @@
 
 """Convert a POSCAR file to XYZ format."""
 
-import vasputil.supercell as s
+import ase
 from optparse import OptionParser
 import time
 import os.path
@@ -35,6 +35,7 @@ if options.outfile:
     fname = options.outfile
 else:
     fname = os.path.basename(args[0]) + ".xyz"
-xyzcmt = "Generated from " + args[0] + " on " + time.ctime()
-c = s.Cell(args[0])
-c.write_xyz(fname, xyzcmt)
+# ASE needs to support a label for xyz files..
+#xyzcmt = "Generated from " + args[0] + " on " + time.ctime()
+a = ase.read(args[0], format='vasp')
+ase.write(fname, a, format='xyz')
