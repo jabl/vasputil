@@ -31,7 +31,7 @@ import vasputil.geometry as vg
 
 def natoms(atoms):
     """How many atoms in the cell?"""
-    return atoms.get_positions().shape[0]
+    return atoms.positions.shape[0]
 
 def atoms_distance(atoms, atom1, atom2, proj=None):
     """Measure the distance between two atoms.
@@ -122,8 +122,8 @@ def atoms_moved(cell1, cell2, tol=0.1):
         at1 = cell1.get_scaled_positions()
         at2 = cell2.get_scaled_positions()
     else:
-        at1 = cell1.get_positions()
-        at2 = cell2.get_positions()
+        at1 = cell1.positions
+        at2 = cell2.positions
     nmax = min(natoms(cell1), natoms(cell2))
     am = []
     for nn in range(nmax):

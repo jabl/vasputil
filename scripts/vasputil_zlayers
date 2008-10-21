@@ -43,7 +43,7 @@ else:
 
 c = ase.read(args[0], format='vasp')
 
-zc = c.get_positions()[:,2] # Atom Z coordinates
+zc = c.positions[:,2] # Atom Z coordinates
 bins = int(np.ceil((zc.max() - zc.min())/dbin))
 histdat, levels = np.histogram(zc, bins)
 mask = histdat > tol * histdat.max()
