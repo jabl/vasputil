@@ -25,7 +25,7 @@ try:
 except ImportError:
     import pylab as n
 
-import ase
+import ase.io.vasp as aiv
 
 
 class ChargeDensity(object):
@@ -41,7 +41,7 @@ class ChargeDensity(object):
     def read_chg(self, filename):
         """Read VASP CHG/CHGCAR file."""
         f = open(filename)
-        self.atoms = ase.io.vasp.read_vasp(f)
+        self.atoms = aiv.read_vasp(f)
         f.readline()
         ng = f.readline().split()
         ng = (int(ng[0]), int(ng[1]), int(ng[2]))
