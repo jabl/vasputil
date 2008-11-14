@@ -1,0 +1,110 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+
+# Copyright (c) 2008 Janne Blomqvist
+
+#  This file is part of Vasputil.
+
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Plot charge density in a plane as created by lev00"""
+
+from optparse import OptionParser
+from pylab import *
+
+usage = """%prog [options] datfile
+
+datfile is the charge density in a plane, as created by lev00."""
+
+parser = OptionParser(usage)
+parser.add_option('-o', '--output', dest='output', help='Output to file \
+instead of displaying the image. The format is deduced from the extension \
+of the filename; supported are eps, jpeg, pdf, png, ps, svg')
+parser.add_option('-c', '--contour', dest='contour', action='store_true',
+                  help='Make a contour plot rather than the default \
+                  pseudocolor plot')
+parser.add_option('-f', '--filled-contour', dest='fc', action='store_true',
+                  help='Make a filled contour plot rather than the default \
+                  pseudocolor plot')
+(options, args) = parser.parse_args()
+
+dat = load(args[0])
+
+# Data is stored in text form, with each line containing
+# X Y Z
+# where Z is the charge density
+# However, if the width along the axises are different, the grid points in
+# each direction stay constant, but the grid spacing changes.
+# So we might need to reinterpolate on a regular grid
+
+n = sqrt(dat.shape[0]) # Original num of points in both X and Y directions.
+#x, y = meshgrid(dat[0:n, 0], dat[0:n, 1])
+x = dat[:,0]
+y = dat[:,1]
+xmax = x.max()
+xmin = x.min()
+ymax = y.max()
+ymin = y.min()
+xr = xmax - xmin
+yr = ymax - ymin
+
+xl = linspace(xmin, xmax, n)
+yl = linspace(ymin, ymax, n)
+z = reshape(dat[:, 2], (n, n))
+
+if xr == yr:
+    # No interpolation needed
+    pass
+else:
+    import scipy.interpolate as spi
+    # Create 2D interpolator object with original data
+    # interp2d goes into an infinite loop?
+    #inter2 = spi.interp2d(xl, yl, z)
+    inter2 = spi.RectBivariateSpline(xl, yl, z)
+    # Reinterpolate only along the bigger dimension
+    idim = xr < yr
+    if idim: # Y range is bigger
+        fac = int(round(n * yr / xr))
+        yl = linspace(ymin, ymax, fac)
+    else:
+        fac = int(round(n * xr / yr))
+        xl = linspace(xmin, xmax, fac)
+    z = inter2(xl, yl)
+    #ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+    #fig = figure(1)
+    #fig.set_figheight(yr)
+    #fig.set_figwidth(xr)
+    #    pcolor(xl, yl, z.T)
+    #fig.set_size_inches(xr, yr)
+
+# This ensures that the aspect ratio of the plot is equivalent to the array.
+w, h = figaspect(z.T)
+fig = figure(1, figsize=(w+4, h))
+a = axes()
+a.set_aspect(1)
+
+if options.contour or options.fc:
+    xm, ym = meshgrid(xl, yl)
+    if options.contour:
+        contour(xm, ym, z.T)
+    else:
+        contourf(xm, ym, z.T)
+else:
+    pcolor(xl, yl, z.T)
+axis([xmin, xmax, ymin, ymax])
+colorbar()
+if options.output:
+    savefig(options.output)
+else:
+    show()

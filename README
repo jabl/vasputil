@@ -62,6 +62,11 @@ modules.  These are
     compatible, takes into account periodic boundary conditions.  Optionally
     print out moved distances.
 
+``vasputil_chgplaneplot``
+    Plot charge density in a plane as a pseudocolor, contour, or
+    filled contour plot. Output is either to a window on the screen or
+    to a file.
+
 ``vasputil_direct2cartesian``
     Convert a POSCAR file from direct to cartesian coordinates.
 
