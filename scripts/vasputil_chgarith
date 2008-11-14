@@ -1,0 +1,78 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+
+# Copyright (c) 2008 Janne Blomqvist
+
+#  This file is part of Vasputil.
+
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Simple arithmetic operations (+,-,*,/) on CHG/CHGCAR files"""
+
+from optparse import OptionParser
+from pylab import *
+import ase
+
+usage = """%prog [options] chgfile1 op chgfile2
+
+chgfile1 and chgfile2 are the charge density files in VASP CHG or
+CHGCAR format.  If the charge density files are not compatible, you
+get what you deserve.
+
+op is an elementary arithmetic operator, one of +,-,*,/"""
+
+parser = OptionParser(usage)
+parser.add_option('-o', '--output', dest='outfile', help='Output to file named by this argument. If omitted, defaults to a file chgfile1_op_chgfile2')
+(options, args) = parser.parse_args()
+
+chgf1 = args[0]
+chgf2 = args[2]
+op = args[1]
+
+c = ase.Vasp()
+chg1 = c.read_charge_density(chgf1)
+chg2 = c.read_charge_density(chgf2)
+
+if len(chg1) != len(chg2):
+    print 'Number of images in charge density files not equal. Using just \
+the final images in both files.'
+    chg1 = [chg1[-1]]
+    chg2 = [chg2[-1]]
+
+newchg = []
+for i, atchg in enumerate(chg1):
+    c1 = atchg[1]
+    c2 = chg2[i][1]
+    na = atchg[0].copy()
+    if op == '+':
+        nc = c1 + c2
+        oplong = '_add_'
+    elif op == '-':
+        nc = c1 - c2
+        oplong = '_sub_'
+    elif op == '*':
+        nc = c1 * c2
+        oplong = '_mult_'
+    elif op == '/':
+        nc = c1 / c2
+        oplong = '_div_'
+    newchg.append((na, nc))
+
+if options.outfile:
+    fname = options.outfile
+else:
+    from os.path import basename
+    fname = basename(chgf1) + oplong + basename(chgf2)
+
+c.write_charge_density(newchg, fname)
