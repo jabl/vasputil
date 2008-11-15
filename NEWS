@@ -5,6 +5,8 @@ vasputil 5.0, 200X-XX-XX
 
 * vasputil now uses the Campos ASE framework.
 
+------------------------------------------------------------------------------.
+
 vasputil 4.3, 2008-10-15
 
 * New python utilities, vasputil_atomsdistance, vasputil_atomsmoved, 
