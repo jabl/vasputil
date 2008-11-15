@@ -30,7 +30,8 @@ chgfile1 and chgfile2 are the charge density files in VASP CHG or
 CHGCAR format.  If the charge density files are not compatible, you
 get what you deserve.
 
-op is an elementary arithmetic operator, one of +,-,*,/"""
+op is an elementary arithmetic operator (+,-,*,/), or avg to calculate
+the average."""
 
 parser = OptionParser(usage)
 parser.add_option('-o', '--output', dest='outfile', help='Output to file named by this argument. If omitted, defaults to a file chgfile1_op_chgfile2')
@@ -67,6 +68,9 @@ for i, atchg in enumerate(chg1):
     elif op == '/':
         nc = c1 / c2
         oplong = '_div_'
+    elif op == 'avg':
+        nc = (c1 + c2) / 2
+        oplong = '_avg_'
     newchg.append((na, nc))
 
 if options.outfile:

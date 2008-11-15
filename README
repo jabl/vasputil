@@ -55,7 +55,8 @@ used directly or as examples of what can be done with the provided python
 modules.  These are 
 
 ``vasputil_atomsdistance``
-    Improved version of 'vasputil atomsdistance', can also measure projected distances.
+    Improved version of 'vasputil atomsdistance', can also measure
+    projected distances.
 
 ``vasputil_atomsmoved`` 
     See which atoms have moved between two POSCAR files.  If lattices are
@@ -64,7 +65,8 @@ modules.  These are
 
 ``vasputil_chgarith``
     Simple arithmetic on charge density in CHG/CHGCAR format
-    files. Supports +,-,*,/ .
+    files. Supports +,-,*,/ for the elemental arithmetic operations
+    and 'avg' for calculating the average.
 
 ``vasputil_chgplaneplot``
     Plot charge density in a plane (generated e.g. by lev00) as a

@@ -1,3 +1,10 @@
+vasputil 5.0, 200X-XX-XX
+
+* Fortran stuff removed, vasputil is now 100 % pure python. This will
+  hopefully make it easier to install.
+
+* vasputil now uses the Campos ASE framework.
+
 vasputil 4.3, 2008-10-15
 
 * New python utilities, vasputil_atomsdistance, vasputil_atomsmoved, 

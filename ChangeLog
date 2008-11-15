@@ -1,3 +1,17 @@
+2008-11-15  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* scripts/vasputil_chgarith: New script.
+	* scripts/vasputil_chgplaneplot: New script.
+
+2008-10-19  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
+
+	* lib/python/vasputil/*: Change directories to standard python
+	convention, vasputil/*
+	* bin/vasputil_*: Move to scripts/vasputil_*
+	* scripts/vasputil_*: use ASE Atoms class instead of
+	vasputil.supercell.Cell.
+	* vasputil/supercell.py: Remove Cell class.
+
 2008-10-15  Janne Blomqvist  <Janne.Blomqvist@tkk.fi>
 
 	* lib/python/vasputil/dos.py (read_doscar): Don't clobber numpy
