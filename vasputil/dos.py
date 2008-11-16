@@ -20,9 +20,9 @@
 """Module for doing stuff with density-of-states."""
 
 try:
-    import numpy as n
+    import numpy as np
 except:
-    import pylab as n
+    import pylab as np
 
 import sys
 
@@ -61,25 +61,25 @@ class LDOS(object):
                         + "first produce a block with integrated DOS. Inserting " \
                         + "empty 0:th block."
                 sys.stderr.write(errstr)
-                dos.insert(0, n.zeros((ndos, dos[1].shape[1])))
+                dos.insert(0, np.zeros((ndos, dos[1].shape[1])))
                 continue
             try:
                 ndos = int(line.split()[2])
             except:
                 print "Error, line is: " + line + "ENDLINE"
             line = f.readline().split()
-            cdos = n.zeros((ndos, len(line)))
-            cdos[0] = n.array(line)
+            cdos = np.zeros((ndos, len(line)))
+            cdos[0] = np.array(line)
             for nd in xrange(1, ndos):
                 line = f.readline().split()
-                cdos[nd] = n.array(line)
+                cdos[nd] = np.array(line)
             dos.append(cdos)
         f.close()
         if dos[0].shape != dos[1].shape:
-            dos0 = n.zeros(dos[1].shape)
+            dos0 = np.zeros(dos[1].shape)
             dos0[:,:dos[0].shape[1]] = dos[0]
             dos[0] = dos0
-        self.dos = n.array(dos)
+        self.dos = np.array(dos)
 
     def _set_efermi(self, efermi):
         """Set the Fermi level."""

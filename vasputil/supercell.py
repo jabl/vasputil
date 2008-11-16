@@ -23,9 +23,9 @@ the Atoms class from ase.
 """
 
 try:
-    import numpy as n
+    import numpy as np
 except ImportError:
-    import pylab as n
+    import pylab as np
 
 import vasputil.geometry as vg
 
@@ -54,10 +54,10 @@ def atoms_distance(atoms, atom1, atom2, proj=None):
     """
     at = atoms.get_scaled_positions()
     dvec = at[atom1, :] - at[atom2, :]
-    dvec = n.dot(vg.vec_pbc(dvec), \
+    dvec = np.dot(vg.vec_pbc(dvec), \
             atoms.get_cell())
     if proj == None:
-        return n.linalg.norm(dvec)
+        return np.linalg.norm(dvec)
     elif type(proj) == str:
         if len(proj) != 2:
             raise TypeError("Length of string specifying plane must be 2.")
@@ -68,9 +68,9 @@ def atoms_distance(atoms, atom1, atom2, proj=None):
             pvec[1] = 0.
         if proj.find("z") == -1:
             pvec[2] = 0.
-        return abs(n.dot(dvec, pvec) / n.linalg.norm(pvec))
+        return abs(np.dot(dvec, pvec) / np.linalg.norm(pvec))
     else:
-        return abs(n.dot(dvec, proj) / n.linalg.norm(proj))
+        return abs(np.dot(dvec, proj) / np.linalg.norm(proj))
 
 def nearest_neighbors(atoms, tol=1.0, num_neigh=None):
     """Nearest neighbors and distances.
@@ -88,11 +88,11 @@ def nearest_neighbors(atoms, tol=1.0, num_neigh=None):
     nn = []
     for anum in range(len(at)):
         dvec = at - at[anum]
-        dvec = n.dot(vg.vec_pbc(dvec), \
+        dvec = np.dot(vg.vec_pbc(dvec), \
                 atoms.get_cell())
-        dist = n.empty(dvec.shape[0])
+        dist = np.empty(dvec.shape[0])
         for ii in range(len(dvec)):
-            dist[ii] = n.linalg.norm(dvec[ii])
+            dist[ii] = np.linalg.norm(dvec[ii])
         if num_neigh == None:
             mask = dist < tol
             for ii in range(len(mask)):
@@ -129,9 +129,9 @@ def atoms_moved(cell1, cell2, tol=0.1):
     for nn in range(nmax):
         dvec = at1[nn, :] - at2[nn, :]
         if latt:
-            dvec = n.dot(cell1.get_cell(), \
+            dvec = np.dot(cell1.get_cell(), \
                     vg.vec_pbc(dvec))
-        dist = n.linalg.norm(dvec)
+        dist = np.linalg.norm(dvec)
         if dist > tol:
             am.append((nn, dist))
     return am
@@ -146,7 +146,7 @@ def check_cells(cell1, cell2):
     
     """
     # First check that lattice constant * basis vectors are compatible.
-    latt = n.any(cell1.get_cell() \
+    latt = np.any(cell1.get_cell() \
             - cell2.get_cell() < 1e-15)
     # Then check that there are an equal number of atoms.
     nat = natoms(cell1) == natoms(cell2)
@@ -186,7 +186,7 @@ def interpolate_cells(cell1, cell2, frac=0.5, images=1):
         icells.append(icell)
     return icells
 
-def rotate_molecule(coords, rotp = n.array((0.,0.,0.)), phi = 0., \
+def rotate_molecule(coords, rotp = np.array((0.,0.,0.)), phi = 0., \
         theta = 0., psi = 0.):
     """Rotate a molecule via Euler angles.
 
@@ -204,17 +204,17 @@ def rotate_molecule(coords, rotp = n.array((0.,0.,0.)), phi = 0., \
     # row-wise, so there is no need to play with the Kronecker product.
     rcoords = coords - rotp
     # First Euler rotation about z in matrix form
-    D = n.array(((n.cos(phi), n.sin(phi), 0.), (-n.sin(phi), n.cos(phi), 0.), \
+    D = np.array(((np.cos(phi), np.sin(phi), 0.), (-np.sin(phi), np.cos(phi), 0.), \
             (0., 0., 1.)))
     # Second Euler rotation about x:
-    C = n.array(((1., 0., 0.), (0., n.cos(theta), n.sin(theta)), \
-            (0., -n.sin(theta), n.cos(theta))))
+    C = np.array(((1., 0., 0.), (0., np.cos(theta), np.sin(theta)), \
+            (0., -np.sin(theta), np.cos(theta))))
     # Third Euler rotation, 2nd rotation about z:
-    B = n.array(((n.cos(psi), n.sin(psi), 0.), (-n.sin(psi), n.cos(psi), 0.), \
+    B = np.array(((np.cos(psi), np.sin(psi), 0.), (-np.sin(psi), np.cos(psi), 0.), \
             (0., 0., 1.)))
     # Total Euler rotation
-    A = n.dot(B, n.dot(C, D))
+    A = np.dot(B, np.dot(C, D))
     # Do the rotation
-    rcoords = n.dot(A, n.transpose(rcoords))
+    rcoords = np.dot(A, np.transpose(rcoords))
     # Move back to the rotation point
-    return n.transpose(rcoords) + rotp
+    return np.transpose(rcoords) + rotp
