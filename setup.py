@@ -11,6 +11,6 @@ setup(name='vasputil',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@tkk.fi',
       url='http://www.fyslab.hut.fi/~job/',
-      packages=['vasputil'],
+      packages=['vasputil', 'vasputil.tests'],
       scripts = scripts)
 

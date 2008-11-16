@@ -4,3 +4,4 @@ include NEWS
 include ChangeLog
 include COPYING
 include AUTHORS
+include runtests.py
