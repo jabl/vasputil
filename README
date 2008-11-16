@@ -1,62 +1,15 @@
 ====================
-Vasputil release 4.3
+Vasputil release 5.0
 ====================
 
-Vasputil is a set of command-line utilities and python libraries designed to
-make life with VASP easier. It provides a set of commands to manipulate POSCAR
-files.
-
-Available commands via the ``vasputil`` binary are:
-
-poscar2xyz
-    Convert a POSCAR file to a xyz format file.
-plane2atom 
-    Calculate the average distance from a plane to a set of atoms.
-plane2layer 
-    Calculate the average distance from a plane to a layer.
-atomsdistance 
-    Calculate the distance between two atoms.
-atomsmoved
-    Check which atoms have moved from one POSCAR to another.
-interpolate
-    Interpolate the coordinates between two POSCAR files.
-normalize
-    Normalize the coordinates in a POSCAR file.
-unnormalize
-    Unnormalize coordinates in a POSCAR file.
-centercell
-    Center a cell around a point.
-removeatoms
-    Remove atoms from a POSCAR file.
-kspace2xyz
-    Convert a POSCAR file to a xyz file with reciprocal coordinates.
-check_nndist
-    Check nearest neighbor distances.
-scgenerator
-    Generate a supercell.
-lockatoms
-    Lock atom coordinates in a supercell.
-xyz2poscar
-    Convert a XYZ file to a POSCAR file.
-dumpcoords
-    Dump cartesian coordinates to stdout.
-importcoords
-    Read cartesian coordinates from stdin.
-dumpatomsase
-    Dump atom types and coordinates suitable for importing to Campos ASE.
-test
-    Run self-tests.
-
-Documentation for each utility is available by running it without any
-arguments, e.g. ``vasputil poscar2xyz``.
-
-In addition to the above, vasputil contains some Python scripts, which can be
-used directly or as examples of what can be done with the provided python
-modules.  These are 
+Vasputil is a set of command-line utilities and Python libraries
+designed to make life with VASP easier. The command-line utilities
+(Python scripts), can be used directly or as examples of what can be
+done with the provided python modules.  These are
 
 ``vasputil_atomsdistance``
-    Improved version of 'vasputil atomsdistance', can also measure
-    projected distances.
+    Measure distance between two atoms, can also measure projected
+    distances.
 
 ``vasputil_atomsmoved`` 
     See which atoms have moved between two POSCAR files.  If lattices are
@@ -88,100 +41,84 @@ modules.  These are
     Print out nearest neighbor table, based on minimum distance or number of
     nearest neighbors.
 
+``vasputil_plane2atom``
+    Calculate the distance between an atom and a plane defined by three atoms.
+
 ``vasputil_poscar2xyz``
     Convert a POSCAR format file to XYZ format.
 
 ``vasputil_zlayers``
-    Find layers in z direction and print interlayer distances.
+    Find layers in the z direction and print interlayer distances.
 
-For the Python scripts, documentation is provided via the ``-h`` command line
-option.
+Documentation for these utilities is provided via the ``-h`` command
+line option.
 
-Vasputil is written mostly the Fortran 95 programming language with a few
-optional Fortran 2003 features such as command line argument handling, and
-should be compilable by any compiler that conforms to said standard.  Vasputil
-uses the common GNU autotools based build system, and has been tested with IBM
-xlf95, Lahey lf95, Pathscale pathf90, Intel ifort, GNU Fortran (Gfortran), and
-Portland pgf90. Parts of vasputil are also written in Python, see below for
-requirements.
+Requirements
+------------
 
-Vasputil depends on the LAPACK and BLAS libraries. The provided autotools build
-system tries to use different platform-specific optimized versions of the BLAS
-library; ESSL on IBM, the BLAS that is provided with the Lahey compiler, and
-the Portland and Pathscale Makefiles use the AMD ACML library.
+For full functionality, vasputil requires the following python libraries:
 
-To regenerate the Fortran source code documentation (file doc/fortrandoc.html),
-the `robodoc <http://www.xs4all.nl/~rfsber/Robo/>`_ utility is needed. To
-regenerate the README.html file, the `rst2html
-<http://docutils.sourceforge.net/docs/user/tools.html>`_ utility is needed.
-Finally, to regenerate the dependency list, the `makedepf90
-<http://personal.inet.fi/private/erikedelmann/makedepf90/>`_ utility is needed.
+1) `ASE <https://wiki.fysik.dtu.dk/ase/index.html>`_ (Atomic
+   Simulation Environment) version 3.0.0.657 or later.
+
+2) `NumPy <http://www.scipy.org/NumPy>`_ 
+
+3) `matplotlib <http://matplotlib.sf.net>`_
+
+4) `SciPy <http://www.scipy.org/SciPy>`_
+
+Finally, to regenerate the README.html file, the `rst2html
+<http://docutils.sourceforge.net/docs/user/tools.html>`_ utility is
+needed.
+
+Without all the libraries, a subset of the functionality is
+available. The matplotlib library is needed only by the
+vasputil_chgplaneplot and vasputil_dosplot utilities. The SciPy
+library is needed only by vasputil_chgplaneplot, and only in case the
+figure shape is not square. The other utilities require only ASE and
+NumPy.
+
+Except for ASE, the other three libraries (and their dependencies)
+should already be installed on your system. If not, at least on Linux
+they should be available from the default package repositories, and
+installation should be a breeze.  If you don't have access to a
+package management system (e.g. on Linux) which includes matplotlib
+and its dependencies, you can get all at once by installing one of the
+python distributions targeted at science, such as SAGE, Enthought
+Python Distribution, or Python(x,y). Another solution if you already
+have python installed, is to install matplotlib and other libraries
+via *easy_install* from setuptools (a sort of package management
+system for python packages).
 
 
-Quick Installation Instructions
-===============================
+Installation Instructions
+-------------------------
 
-1)  Unpack the source code.
+1)  Unpack the program distribution and go to the directory.
 
     ``tar xvzf vasputil-$(VERSION).tar.gz``
 
-2)  Run configure, if necessary with extra flags to specify location of
-    libraries not in the default search path, if you want to use some specific
-    compiler etc.
+    ``cd vasputil-$(VERSION)``
 
-    Eg. to use dynamically linked ACML:
+2)  Install the program into your home directory
 
-    ``./configure LDFLAGS=-L/opt/acml/pathscale64/lib/``
+    ``python setup.py install --home=~``
 
-    Statically linked ACML
+    This will install the scripts into ~/bin and the python modules
+    into ~/lib/python/vasputil. You should make sure that the
+    directory of the python modules is found on the python search
+    path. E.g. if you installed it like the above, you should have
 
-    ``./configure --with-blas=/opt/acml/pathscale64/lib/libacml.a``
+    ``export PYTHONPATH=$HOME/lib/python``
 
-    Use Intel Fortran
+    in your shell initialization script (~/.bash_profile or
+    equivalent). For installation into some other directory, see
+    ``python setup.py --help`` and the documentation for `distutils
+    <http://www.python.org/doc/lib/module-distutils.html>`_ .
 
-    ``./configure FC=ifort``
+3)  Optionally, run the testsuite to make sure it works.
 
-    Install somewhere not in the default location ($HOME)
-
-    ``./configure --prefix=/usr/local``
-
-    For help, see
-
-    ``./configure --help``
-
-3)  Compile and install.
-
-    ``make && make install``
-
-4)  Optionally, run the testsuite (requires that the python stuff is installed
-    correctly).
-
-    ``make test``
-
-
-Python Scripts
-==============
-
-To use the python scripts you should add the python library directory to the
-PYTHONPATH environment variable. E.g. if you ran configure with the prefix
-$HOME (default), then you should have something like 
-
-``export PYTHONPATH=$HOME/lib/pythonX.Y/site-packages``
-
-where X.Y is your python version, in your shell initialization file (e.g.
-~/.bash_profile). On the other hand, if you installed into the system default
-location, you probably don't need to do anything. 
-
-Also, some of the python scripts and the library modules use the `matplotlib
-<http://matplotlib.sf.net>`_ library.  Matplotlib requires some other libraries
-(e.g.  `NumPy <http://numpy.scipy.org>`_), and if you don't have access to a
-package management system (e.g. on Linux) which includes matplotlib and its
-dependencies, you can get all at once by installing one of the python
-distributions targeted at science, such as SAGE, Enthought Python Distribution,
-or Python(x,y). Another solution if you already have python installed, is to
-install matplotlib and other libraries via *easy_install* from setuptools (a
-sort of package management system for python packages).
-
+    ``python runtests.py``
 
 Interactive Usage
 -----------------
@@ -196,3 +133,55 @@ For those familiar with MATLAB, see `NumPy for MATLAB Users
 you need from the vasputil module and get going! See the python scripts for
 reference, or ``pydoc vasputil``, ``pydoc vasputil.supercell`` etc. to read
 documentation, or the ``?`` operator in IPython.
+
+With IPython you can also run the scripts in the interactive
+environment with the ``%run`` command, and this will import the
+variables in the script into the ipython environment. This is useful
+if you want to do something similar, but not quite what the
+command-line interface allows.
+
+
+Manual
+------
+
+This section describes how to accomplish specific tasks. It does not
+document every feature of vasputil, as most of the tasks are hopefully
+simple enough that the usage should be self-evident from the help
+instruction given by the ``-h`` option to the command-line utilities.
+
+Plotting charge density in a plane
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the `lev00 <http://www.cmmp.ucl.ac.uk/~lev/codes/lev00/>`_
+utility to create the charge density data in a plane. The data is
+written to a file (default name out.dat_1) that can be read with the
+``vasputil_chgplaneplot`` utility which can then plot this data.
+
+Generating supercells
+~~~~~~~~~~~~~~~~~~~~~
+
+vasputil 5.0 does not contain the supercell generator previously found
+in vasputil 4.x. To create supercells, the ASE supercell generator is
+recommended. This contains functionality to create surface supercells
+as well. In order to generate a supercell for VASP, first create the
+supercell following the `ASE lattice
+<https://wiki.fysik.dtu.dk/ase/ase/lattice.html>`_ instructions. This
+is probably easiest done interactively using IPython. Assuming you
+have imported ase as ``from ase import *`` and your supercell is
+referenced via the variable ``atoms``, you can visualize your results
+with ``view(atoms)``. Finally, write out the supercell to the file
+``POSCAR.out`` with ``write('POSCAR.out', atoms, format='vasp')``.
+
+Another option is the `tetr
+<http://www.cmmp.ucl.ac.uk/~lev/codes/lev00/>`_ utility, which also
+contains a supercell generator.
+
+Plotting projected Density-of-States
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``vasputil_dosplot`` contains a simple command-line utility for
+plotting a single orbital. While this is nice for quickly looking at
+the DOS, for publication plots you probably want to look at that
+utility and create custom versions of it in order to create the
+specific plots you want, with multiple subplots and multiple graphs
+per plot.
