@@ -19,9 +19,9 @@
 """This module defines a class that represents a plane in 3d space."""
 
 try:
-    import numpy as n
+    import numpy as np
 except:
-    import pylab as n
+    import pylab as np
 
 
 class Plane(object):
@@ -41,18 +41,22 @@ class Plane(object):
 
         """
         if normal == None:
-            if type(points) == n.ndarray and points.shape != (3,3):
+            if isinstance(points, np.ndarray) and points.shape != (3,3):
                 raise TypeError("Shape of points array must be (3,3).")
             elif len(points) != 3:
                 raise TypeError("Points sequence must have 3 elemnents.")
             v1 = points[1] - points[0]
             v2 = points[2] - points[1]
-            self.normal = n.cross(v1, v2)
-            self.normal /= n.linalg.norm(self.normal)
-            self.d_origo = n.dot(self.normal, points[1])
+            self.normal = np.cross(v1, v2)
+            self.normal /= np.linalg.norm(self.normal)
+            self.d_origo = np.dot(self.normal, points[1])
         else:
-            self.normal = normal / n.linalg.norm(normal)
-            self.d_origo = n.dot(self.normal, points)
+            self.normal = normal / np.linalg.norm(normal)
+            self.d_origo = np.dot(self.normal, points)
+
+    def distance(self, point):
+        """Measure the distance between the plane and a point."""
+        return abs(np.dot(self.normal, point) - self.d_origo)
 
 # End of class Plane
 
@@ -62,7 +66,7 @@ def vec_pbc(vec):
     Input vector must be in direct coordinates.
 
     """
-    arr = n.array(vec)
+    arr = np.array(vec)
     v1 = arr.reshape(arr.size)
     for ii in range(len(v1)):
         if v1[ii] < -0.5:
@@ -79,13 +83,13 @@ def norm_pbc(vec):
     same length as the number of rows in the input array.
 
     """
-    arr = n.array(vec)
+    arr = np.array(vec)
     if len(arr.shape) == 1:
-        return n.linalg.norm(vec_pbc(arr))
+        return np.linalg.norm(vec_pbc(arr))
     elif len(arr.shape) == 2:
-        nl = n.empty(arr.shape[0])
+        nl = np.empty(arr.shape[0])
         for v in range(arr.shape[0]):
-            nl[v] = n.linalg.norm(vec_pbc(arr[v]))
+            nl[v] = np.linalg.norm(vec_pbc(arr[v]))
         return nl
     else:
         raise TypeError("Invalid shape of input")
