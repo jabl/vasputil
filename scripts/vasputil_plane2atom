@@ -1,0 +1,43 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+# vim: set fileencoding=latin-1
+# Copyright (c) 2008 Janne Blomqvist
+
+#  This file is part of Vasputil.
+
+#  Vasputil is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+
+#  Vasputil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Measure the distance between an atom and a plane."""
+
+import ase
+import vasputil.geometry as vg
+from optparse import OptionParser
+import time
+import os.path
+
+usage = """%prog [options] POSCAR p0 p1 p2 atom
+
+atom is the index of the atom to measure the distance to. The plane is
+defined by the atoms with indices p0-p2. Indices start from 0."""
+
+parser = OptionParser(usage)
+(options, args) = parser.parse_args()
+
+poscar = ase.read(args[0], format='vasp')
+ac = poscar.positions[int(args[4])]
+p = [int(args[1]), int(args[2]), int(args[3])]
+pc = poscar.positions[p]
+plane = vg.Plane(pc)
+
+print plane.distance(ac)
