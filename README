@@ -73,10 +73,10 @@ needed.
 
 Without all the libraries, a subset of the functionality is
 available. The matplotlib library is needed only by the
-vasputil_chgplaneplot and vasputil_dosplot utilities. The SciPy
-library is needed only by vasputil_chgplaneplot, and only in case the
-figure shape is not square. The other utilities require only ASE and
-NumPy.
+vasputil_chgplaneplot, vasputil_dosplot and vasputil_zlayers
+utilities. The SciPy library is needed only by vasputil_chgplaneplot,
+and only in case the figure shape is not square. The remaining
+utilities require only ASE and NumPy.
 
 Except for ASE, the other three libraries (and their dependencies)
 should already be installed on your system. If not, at least on Linux
