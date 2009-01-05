@@ -22,7 +22,7 @@
 
 from optparse import OptionParser
 from pylab import *
-import ase
+from ase.calculators.vasp import VaspChargeDensity
 
 usage = """%prog [options] chgfile1 op chgfile2
 
@@ -34,28 +34,33 @@ op is an elementary arithmetic operator (+,-,*,/), or avg to calculate
 the average."""
 
 parser = OptionParser(usage)
-parser.add_option('-o', '--output', dest='outfile', help='Output to file named by this argument. If omitted, defaults to a file chgfile1_op_chgfile2')
+parser.add_option('-o', '--output', dest='outfile', help='Output to file \
+named by this argument. If omitted, defaults to a file chgfile1_op_chgfile2')
 (options, args) = parser.parse_args()
 
 chgf1 = args[0]
 chgf2 = args[2]
 op = args[1]
 
-c = ase.Vasp()
-chg1 = c.read_charge_density(chgf1)
-chg2 = c.read_charge_density(chgf2)
+chg1 = VaspChargeDensity(chgf1)
+chg2 = VaspChargeDensity(chgf2)
 
-if len(chg1) != len(chg2):
+if len(chg1.chg) != len(chg2.chg):
     print 'Number of images in charge density files not equal. Using just \
 the final images in both files.'
-    chg1 = [chg1[-1]]
-    chg2 = [chg2[-1]]
+    chg1.chg = [chg1.chg[-1]]
+    chg1.atoms = [chg1.atoms[-1]]
+    if chg1.is_spin_polarized():
+        chg1.chgdiff = [chg1.chgdiff[-1]]
+        chg2.chgdiff = [chg2.chgdiff[-1]]
+    chg2.chg = [chg2.chg[-1]]
+    chg2.atoms = [chg2.atoms[-1]]
 
-newchg = []
-for i, atchg in enumerate(chg1):
-    c1 = atchg[1]
-    c2 = chg2[i][1]
-    na = atchg[0].copy()
+newchg = VaspChargeDensity(None)
+for i, atchg in enumerate(chg1.chg):
+    c1 = atchg
+    c2 = chg2.chg[i]
+    newchg.atoms.append(chg1.atoms[i].copy())
     if op == '+':
         nc = c1 + c2
         oplong = '_add_'
@@ -71,7 +76,26 @@ for i, atchg in enumerate(chg1):
     elif op == 'avg':
         nc = (c1 + c2) / 2
         oplong = '_avg_'
-    newchg.append((na, nc))
+    newchg.chg.append(nc)
+
+if chg1.is_spin_polarized():
+    for i, cd in enumerate(chg1.chgdiff):
+        cd2 = chg2.chgdiff[i]
+        if op == '+':
+            nd = cd + cd2
+        elif op == '-':
+            nd = cd - cd2
+        elif op == '*':
+            nd = cd * cd2
+        elif op == '/':
+            nd = cd / cd2
+        elif op == 'avg':
+            nd = (cd + cd2) / 2
+        newchg.chgdiff.append(nd)
+
+# Screw doing anything fancy with the augmentation charges
+newchg.aug = chg1.aug
+newchg.augdiff = chg1.augdiff
 
 if options.outfile:
     fname = options.outfile
@@ -79,4 +103,4 @@ else:
     from os.path import basename
     fname = basename(chgf1) + oplong + basename(chgf2)
 
-c.write_charge_density(newchg, fname)
+newchg.write(fname)

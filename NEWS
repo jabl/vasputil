@@ -1,3 +1,9 @@
+vasputil 5.1, 200?-??-??
+
+* Uses improved charge density handling in ASE 3.1.
+
+------------------------------------------------------------------------------
+
 vasputil 5.0, 2008-11-16
 
 * Fortran stuff removed, vasputil is now 100 % pure python. This will

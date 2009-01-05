@@ -1,5 +1,5 @@
 ====================
-Vasputil release 5.0
+Vasputil release 5.1
 ====================
 
 Vasputil is a set of command-line utilities and Python libraries
@@ -59,7 +59,8 @@ Requirements
 For full functionality, vasputil requires the following python libraries:
 
 1) `ASE <https://wiki.fysik.dtu.dk/ase/index.html>`_ (Atomic
-   Simulation Environment) version 3.0.0.657 or later.
+   Simulation Environment) version 3.1.0.733 or later. If you wish to
+   use the stable ASE release 3.0.x, please use vasputil 5.0.
 
 2) `NumPy <http://www.scipy.org/NumPy>`_ 
 
@@ -152,15 +153,18 @@ instruction given by the ``-h`` option to the command-line utilities.
 Plotting charge density in a plane
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use the `lev00 <http://www.cmmp.ucl.ac.uk/~lev/codes/lev00/>`_
-utility to create the charge density data in a plane. The data is
-written to a file (default name out.dat_1) that can be read with the
-``vasputil_chgplaneplot`` utility which can then plot this data.
+Use the ``vasputil_chgarith`` tool to create a suitable input charge
+density file (e.g. the charge density difference when some species
+adsorbs on a surface), and then use the `lev00
+<http://www.cmmp.ucl.ac.uk/~lev/codes/lev00/>`_ utility to create the
+charge density data in a plane. The data is written to a file (default
+name out.dat_1) that can be read with the ``vasputil_chgplaneplot``
+utility which can then plot this data.
 
 Generating supercells
 ~~~~~~~~~~~~~~~~~~~~~
 
-vasputil 5.0 does not contain the supercell generator previously found
+vasputil 5.x does not contain the supercell generator previously found
 in vasputil 4.x. To create supercells, the ASE supercell generator is
 recommended. This contains functionality to create surface supercells
 as well. In order to generate a supercell for VASP, first create the
