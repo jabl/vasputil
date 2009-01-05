@@ -52,6 +52,12 @@ d.showdp()
 # For a more involved plot, create your own plot script or run interactively
 # via 'ipython -pylab'
 # Below are some example pylab commands for plotting
+
+# For good plots in PS or PDF formats begin your script with
+# from matplotlib import rc
+# rc('ps', usedistiller='xpdf')
+# rc('text', usetex=True)
+
 #subplot(211)
 # Get the s and p DOS of atom 1.
 #plot(en, dc.get_dos(1, 1), "k-", label="Al s")
@@ -64,4 +70,13 @@ d.showdp()
 #plot(en, dc.get_dos(2, 1), "k-", label="Al s")
 #xlim(-15,5)
 #ylim(0,.29)
-#d.showdp()
+
+# And to save the figs in EPS/PDF, use
+# d.set_labels()
+# savefig('tex_demo.eps')
+# Fonts in legend touch upper border, test with your version of matplotlib
+# savefig('tex_demo_xpdf.pdf')
+# os.system('epstopdf tex_demo.eps')
+
+# Finally, show picture
+# show()

@@ -115,7 +115,7 @@ class LDOS(object):
         return self.dos[atom, :, orbital]
 
 
-def showdp(fsz=16, show_legend=True):
+def set_labels(fsz=16, show_legend=True):
     """Utility function to set default parameters for DOS plots."""
     import pylab as pl
     pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
@@ -127,4 +127,9 @@ def showdp(fsz=16, show_legend=True):
     if show_legend:
         pl.legend()
     pl.subplots_adjust(hspace=0.0)
+
+def showdp(fsz=16, show_legend=True):
+    """Set labels etc. and show the plot."""
+    import pylab as pl
+    set_labels(fsz, show_legend)
     pl.show()
