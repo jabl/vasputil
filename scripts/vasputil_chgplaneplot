@@ -117,7 +117,7 @@ if options.norm:
         low = float(n[0])
         high = float(n[1])
     else:
-        high = min(abs(z.max()), abs(z.min()))
+        high = max(abs(z.max()), abs(z.min()))
         low = -high
     norm = normalize(low, high)
 else:
@@ -133,6 +133,9 @@ else:
     pcolor(xl, yl, z.T, cmap=cmap, norm=norm)
 axis([xmin, xmax, ymin, ymax])
 colorbar()
+# \u00c5 is the unicode literal for 'Å'
+xlabel(u'Distance from center (\u00c5)')
+ylabel(u'Distance from center (\u00c5)')
 if options.output:
     savefig(options.output)
 else:
