@@ -33,6 +33,9 @@ instead of displaying the image. The format is deduced from the extension \
 of the filename; supported are eps, jpeg, pdf, png, ps, svg')
 parser.add_option('-m', '--color-map', dest='cm', help='Colormap, see the \
 list at http://www.scipy.org/Cookbook/Matplotlib/Show_colormaps')
+parser.add_option('-n', '--normalize', dest='norm', help='Normalize color map. \
+If the argument length is 2, use the values for the upper and lower maximum \
+values. If length != 0, normalize such that 0 is in the middle')
 parser.add_option('-c', '--contour', dest='contour', action='store_true',
                   help='Make a contour plot rather than the default \
                   pseudocolor plot')
@@ -101,14 +104,26 @@ if options.cm:
 else:
     cmap = cm.jet
 
+if options.norm:
+    n = options.norm.split()
+    if len(n) == 2:
+        low = float(n[0])
+        high = float(n[1])
+    else:
+        high = min(abs(z.max()), abs(z.min()))
+        low = -high
+    norm = normalize(low, high)
+else:
+    norm = None
+
 if options.contour or options.fc:
     xm, ym = meshgrid(xl, yl)
     if options.contour:
-        contour(xm, ym, z.T, cmap=cmap)
+        contour(xm, ym, z.T, cmap=cmap, norm=norm)
     else:
-        contourf(xm, ym, z.T, cmap=cmap)
+        contourf(xm, ym, z.T, cmap=cmap, norm=norm)
 else:
-    pcolor(xl, yl, z.T, cmap=cmap)
+    pcolor(xl, yl, z.T, cmap=cmap, norm=norm)
 axis([xmin, xmax, ymin, ymax])
 colorbar()
 if options.output:
