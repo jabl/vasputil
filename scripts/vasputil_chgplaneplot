@@ -36,6 +36,8 @@ list at http://www.scipy.org/Cookbook/Matplotlib/Show_colormaps')
 parser.add_option('-n', '--normalize', dest='norm', help='Normalize color map. \
 If the argument length is 2, use the values for the upper and lower maximum \
 values. If length != 0, normalize such that 0 is in the middle')
+parser.add_option('-i', '--inverse', dest='inverse', action='store_true',
+                  help='Inverse the colormap')
 parser.add_option('-c', '--contour', dest='contour', action='store_true',
                   help='Make a contour plot rather than the default \
                   pseudocolor plot')
@@ -98,6 +100,11 @@ w, h = figaspect(z.T)
 fig = figure(1, figsize=(w+4, h))
 a = axes()
 a.set_aspect(1)
+
+# No idea how to actually inverse the colormap, so inverse the array
+# of values instead
+if options.inverse:
+    z = z * -1
 
 if options.cm:
     cmap = get_cmap(options.cm)
