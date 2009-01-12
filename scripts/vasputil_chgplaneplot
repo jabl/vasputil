@@ -31,6 +31,8 @@ parser = OptionParser(usage)
 parser.add_option('-o', '--output', dest='output', help='Output to file \
 instead of displaying the image. The format is deduced from the extension \
 of the filename; supported are eps, jpeg, pdf, png, ps, svg')
+parser.add_option('-m', '--color-map', dest='cm', help='Colormap, see the \
+list at http://www.scipy.org/Cookbook/Matplotlib/Show_colormaps')
 parser.add_option('-c', '--contour', dest='contour', action='store_true',
                   help='Make a contour plot rather than the default \
                   pseudocolor plot')
@@ -94,14 +96,19 @@ fig = figure(1, figsize=(w+4, h))
 a = axes()
 a.set_aspect(1)
 
+if options.cm:
+    cmap = get_cmap(options.cm)
+else:
+    cmap = cm.jet
+
 if options.contour or options.fc:
     xm, ym = meshgrid(xl, yl)
     if options.contour:
-        contour(xm, ym, z.T)
+        contour(xm, ym, z.T, cmap=cmap)
     else:
-        contourf(xm, ym, z.T)
+        contourf(xm, ym, z.T, cmap=cmap)
 else:
-    pcolor(xl, yl, z.T)
+    pcolor(xl, yl, z.T, cmap=cmap)
 axis([xmin, xmax, ymin, ymax])
 colorbar()
 if options.output:
