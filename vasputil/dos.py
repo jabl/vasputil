@@ -120,10 +120,8 @@ def set_labels(fsz=16, show_legend=True):
     import pylab as pl
     pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
     pl.figtext(0.03, 0.35, "LDOS (arb. units)", rotation='vertical', size=fsz)
-    loc, lab = pl.xticks()
-    lab.set_size = fsz
-    loc, lab = pl.yticks()
-    lab.set_size = fsz
+    pl.xticks(size=fsz)
+    pl.yticks(size=fsz)
     if show_legend:
         pl.legend()
     pl.subplots_adjust(hspace=0.0)
@@ -132,4 +130,17 @@ def showdp(fsz=16, show_legend=True):
     """Set labels etc. and show the plot."""
     import pylab as pl
     set_labels(fsz, show_legend)
+    pl.show()
+
+def save_and_show(fname, fsz=16, show_legend=True):
+    """Set labels etc., save the file to .eps and .pdf and show plot."""
+    import pylab as pl
+    import os
+    set_labels(fsz, show_legend)
+    if fname.endswith('.eps'):
+        fn = fname
+    else:
+        fn = fname + '.eps'
+    pl.savefig(fn)
+    os.system('epstopdf ' + fn)
     pl.show()
