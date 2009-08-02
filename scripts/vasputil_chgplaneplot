@@ -109,7 +109,7 @@ if options.inverse:
 if options.cm:
     cmap = get_cmap(options.cm)
 else:
-    cmap = cm.hot # hot colormap is good for both color and BW
+    cmap = cm.jet
 
 if options.norm:
     n = options.norm.split()
