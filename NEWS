@@ -1,3 +1,10 @@
+vasputil 5.2, 2009-08-03
+
+* Improved DOSCAR support contributed to ASE, use that in vasputil_dosplot. 
+  Note that atoms and orbitals in vasputil_dosplot now use 0-based indexing.
+
+------------------------------------------------------------------------------
+
 vasputil 5.1, 2009-03-15
 
 * Uses improved charge density handling in ASE 3.1.

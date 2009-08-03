@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+# Copyright (c) 2008, 2009 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -17,36 +17,66 @@
 #  You should have received a copy of the GNU General Public License
 #  along with vasputil.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Example plotting script demonstrating how to use the vasputil.dos module."""
+"""Example plotting script demonstrating how to use the vasputil.dos module
+and the ase.calculators.vasp.VaspDos class."""
 
 import vasputil.dos as d
+import ase.calculators.vasp as v
 from pylab import *
 from optparse import OptionParser
 
 usage = """%prog [options] DOSCAR atom
 
-atom 0 is the total dos, atom 1-N are LDOS."""
+atom is the index of the atom, starting from 0. If omitted, plots the total
+DOS, or the integrated total DOS if additionally the -i option is present.
+"""
 parser = OptionParser(usage)
 parser.add_option("-f", "--fermi", dest="fermi", help="Fermi energy")
-parser.add_option("-o", "--orbital", dest="orb", help="Orbital, s=1, p=2, \
-d=3, if spin polarized s+ = 1, s- = 2 etc.")
+parser.add_option("-o", "--orbital", dest="orb", help="Orbital, either \
+string or integer. For non-spin polarized s=0, p=1, \
+d=2, if spin polarized s+=0, s-=1 etc. If phase factors: s, py, pz, px, \
+dxy, dyz, dz2, dxz, dx2, and equivalent as previous for spin polarized etc.")
+parser.add_option('-i', '--integrated', dest='integ', action='store_true',
+                  help='Show the integrated total DOS')
 (options, args) = parser.parse_args()
 
-# By default LDOS constructor tries to read a file called "DOSCAR".
-dc = d.LDOS(args[0])
-atom = int(args[1])
+# By default VaspDos constructor tries to read a file called "DOSCAR".
+dc = v.VaspDos(args[0])
 if options.fermi:
     fermi = float(options.fermi)
     dc.efermi = fermi
 if options.orb:
-    orb = int(options.orb)
+    try:
+        orb = int(options.orb)
+    except ValueError:
+        orb = options.orb
 else:
-    orb = 1
+    orb = 0
 
-en = dc.get_energygrid() # This is the x-axis in a typical DOS plot.
+en = dc.energy # This is the x-axis in a typical DOS plot.
 
-label = "Atom " + str(atom) + " orbital " + str(orb)
-plot(en, dc.get_dos(atom, orb), label=label)
+if len(args) == 2:
+    atom = int(args[1])
+    label = "Atom " + str(atom) + " orbital " + str(orb)
+    plot(en, dc.site_dos(atom, orb), label=label)
+elif options.integ:
+    label = 'Integrated total DOS'
+    if len(dc.integrated_dos.shape) == 1:
+        plot(en, dc.integrated_dos, label=label)
+    else:
+        ul = label + ' spin up'
+        plot(en, dc.integrated_dos[0, :], label=ul)
+        dl = label + ' spin down'
+        plot(en, dc.integrated_dos[1, :], label=dl)
+else:
+    label = 'Total DOS'
+    if len(dc.dos.shape) == 1:
+        plot(en, dc.dos, label=label)
+    else:
+        ul = label + ' spin up'
+        plot(en, dc.dos[0, :], label=ul)
+        dl = label + ' spin down'
+        plot(en, dc.dos[1, :], label=dl)
 d.showdp()
 
 # For a more involved plot, create your own plot script or run interactively
@@ -60,14 +90,14 @@ d.showdp()
 
 #subplot(211)
 # Get the s and p DOS of atom 1.
-#plot(en, dc.get_dos(1, 1), "k-", label="Al s")
-#plot(en, dc.get_dos(1, 2), "k-.", label="Al p")
+#plot(en, dc.site_dos(1, 0), "k-", label="Al s")
+#plot(en, dc.site_dos(1, 1), "k-.", label="Al p")
 #legend()
 #xlim(-15,5)
 #xticks(arange(0))
 #subplot(212)
 # s-DOS of atom 2. 
-#plot(en, dc.get_dos(2, 1), "k-", label="Al s")
+#plot(en, dc.site_dos(2, 0), "k-", label="Al s")
 #xlim(-15,5)
 #ylim(0,.29)
 

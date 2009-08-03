@@ -1,5 +1,5 @@
 # vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+# Copyright (c) 2008, 2009 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -25,6 +25,7 @@ except:
     import pylab as np
 
 import sys
+import warnings
 
 class LDOS(object):
     """Class for representing a set of local DOS.
@@ -39,6 +40,9 @@ class LDOS(object):
 
     def __init__(self, doscar="DOSCAR", efermi=0.0):
         """Initialize LDOS."""
+        warnings.warn('vasputil.dos.LDOS is deprecated, please use \
+ ase.calculators.vasp.VaspDos instead, which is an improved version if this \
+ class', DeprecationWarning)
         self._efermi = 0.0
         self.read_doscar(doscar)
         self.efermi = efermi
