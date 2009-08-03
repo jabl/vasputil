@@ -11,7 +11,7 @@ setup(name='vasputil',
       description='VASP utilities',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@tkk.fi',
-      url='http://tfy.tkk.fi/~job/',
+      url='http://tfy.tkk.fi/~job/vasputil',
       packages=['vasputil', 'vasputil.tests'],
       scripts = scripts)
 
