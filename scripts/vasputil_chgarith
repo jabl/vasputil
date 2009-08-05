@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: latin-1 -*-
 
-# Copyright (c) 2008 Janne Blomqvist
+# Copyright (c) 2008, 2009 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -23,10 +23,11 @@
 from optparse import OptionParser
 from pylab import *
 from ase.calculators.vasp import VaspChargeDensity
+import sys
 
-usage = """%prog [options] chgfile1 op chgfile2
+usage = """%prog [options] chgfile0 op chgfile1
 
-chgfile1 and chgfile2 are the charge density files in VASP CHG or
+chgfile0 and chgfile1 are the charge density files in VASP CHG or
 CHGCAR format.  If the charge density files are not compatible, you
 get what you deserve.
 
@@ -35,7 +36,10 @@ the average."""
 
 parser = OptionParser(usage)
 parser.add_option('-o', '--output', dest='outfile', help='Output to file \
-named by this argument. If omitted, defaults to a file chgfile1_op_chgfile2')
+named by this argument. If omitted, defaults to a file chgfile0_op_chgfile1')
+parser.add_option('-w', '--which-cell', dest='wcell', help='Take the \
+embedded supercell information from which charge density file. Must be \
+either 0 or 1.')
 (options, args) = parser.parse_args()
 
 chgf1 = args[0]
@@ -44,6 +48,16 @@ op = args[1]
 
 chg1 = VaspChargeDensity(chgf1)
 chg2 = VaspChargeDensity(chgf2)
+
+if options.wcell:
+    wcell = int(options.wcell)
+    if wcell == 0:
+        chga = chg1
+    elif wcell == 1:
+        chga = chg2
+    else:
+        print 'Error, invalid argument to -w option'
+        sys.exit(1)
 
 if len(chg1.chg) != len(chg2.chg):
     print 'Number of images in charge density files not equal. Using just \
@@ -60,7 +74,7 @@ newchg = VaspChargeDensity(None)
 for i, atchg in enumerate(chg1.chg):
     c1 = atchg
     c2 = chg2.chg[i]
-    newchg.atoms.append(chg1.atoms[i].copy())
+    newchg.atoms.append(chga.atoms[i].copy())
     if op == '+':
         nc = c1 + c2
         oplong = '_add_'
@@ -94,8 +108,9 @@ if chg1.is_spin_polarized():
         newchg.chgdiff.append(nd)
 
 # Screw doing anything fancy with the augmentation charges
-newchg.aug = chg1.aug
-newchg.augdiff = chg1.augdiff
+# Just take them from the same file as the embedded atoms object.
+newchg.aug = chga.aug
+newchg.augdiff = chga.augdiff
 
 if options.outfile:
     fname = options.outfile
