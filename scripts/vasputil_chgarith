@@ -58,6 +58,8 @@ if options.wcell:
     else:
         print 'Error, invalid argument to -w option'
         sys.exit(1)
+else:
+    chga = chg1
 
 if len(chg1.chg) != len(chg2.chg):
     print 'Number of images in charge density files not equal. Using just \
