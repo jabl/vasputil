@@ -1,5 +1,5 @@
 ====================
-Vasputil release 5.2
+Vasputil release 5.3
 ====================
 
 Vasputil is a set of command-line utilities and Python libraries
@@ -23,8 +23,8 @@ done with the provided python modules.  These are
 
 ``vasputil_chgplaneplot``
     Plot charge density in a plane (generated e.g. by lev00) as a
-    pseudocolor, contour, or filled contour plot. Output is either to
-    a window on the screen or to a file.
+    pseudocolor, contour (colour or BW), or filled contour
+    plot. Output is either to a window on the screen or to a file.
 
 ``vasputil_direct2cartesian``
     Convert a POSCAR file from direct to cartesian coordinates.
@@ -60,7 +60,7 @@ For full functionality, vasputil requires the following python libraries:
 
 1) `ASE <https://wiki.fysik.dtu.dk/ase/index.html>`_ (Atomic
    Simulation Environment) version 3.2.0.1067 or later. If you wish to
-   use the stable ASE release 3.1.x, please use vasputil 5.1, and for ASE 
+   use the older ASE release 3.1.x, please use vasputil 5.1, and for ASE 
    release 3.0.x please use vasputil 5.0.
 
 2) `NumPy <http://www.scipy.org/NumPy>`_ 

@@ -1,3 +1,9 @@
+vasputil 5.3, xxx
+
+* vasputil_chgplaneplot can now plot black and white contour plots.
+
+------------------------------------------------------------------------------
+
 vasputil 5.2, 2009-08-03
 
 * Improved DOSCAR support contributed to ASE, use that in vasputil_dosplot. 
