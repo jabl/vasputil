@@ -35,7 +35,7 @@ parser.add_option('-m', '--color-map', dest='cm', help='Colormap, see the \
 list at http://www.scipy.org/Cookbook/Matplotlib/Show_colormaps')
 parser.add_option('-n', '--normalize', dest='norm', help='Normalize color map. \
 If the argument length is 2, use the values for the upper and lower maximum \
-values. If length != 0, normalize such that 0 is in the middle')
+values. If length != 0, normalize such that 0 is in the middle; if the argument is a number, that will be the maximum and minimum values, if not, the maximum values in the file will be used.')
 parser.add_option('-i', '--inverse', dest='inverse', action='store_true',
                   help='Inverse the colormap')
 parser.add_option('-c', '--contour', dest='contour', action='store_true',
@@ -46,6 +46,7 @@ parser.add_option('-f', '--filled-contour', dest='fc', action='store_true',
                   pseudocolor plot')
 parser.add_option('-b', '--bw-contour', dest='bw', action='store_true',
                   help='Make a black-and-white contour plot')
+parser.add_option('-l', '--levels', dest='levels', help='Number of levels for contour plots. Alternatively, if the argument is a decimal number, the inter-level difference')
 (options, args) = parser.parse_args()
 
 dat = load(args[0])
@@ -119,7 +120,10 @@ if options.norm:
         low = float(n[0])
         high = float(n[1])
     else:
-        high = max(abs(z.max()), abs(z.min()))
+        try:
+            high = abs(float(n[0]))
+        except ValueError:
+            high = max(abs(z.max()), abs(z.min()))
         low = -high
     norm = normalize(low, high)
 else:
@@ -127,16 +131,28 @@ else:
 
 if options.contour or options.fc or options.bw:
     xm, ym = meshgrid(xl, yl)
-    if options.contour:
-        contour(xm, ym, z.T, cmap=cmap, norm=norm)
-    elif options.fc:
-        contourf(xm, ym, z.T, cmap=cmap, norm=norm)
+    if options.levels:
+        try:
+            lev = int(options.levels)
+        except ValueError:
+            ld = float(options.levels)
+            if not options.norm:
+                low = z.min()
+                high = z.max()
+            lev = arange(low, high, ld)
     else:
-        contour(xm, ym, z.T, colors='k')
+        lev = 10
+    if options.contour:
+        contour(xm, ym, z.T, lev, cmap=cmap, norm=norm)
+    elif options.fc:
+        contourf(xm, ym, z.T, lev, cmap=cmap, norm=norm)
+    else:
+        contour(xm, ym, z.T, lev, colors='k')
 else:
     pcolor(xl, yl, z.T, cmap=cmap, norm=norm)
 axis([xmin, xmax, ymin, ymax])
-colorbar()
+if not options.bw:
+    colorbar()
 # \u00c5 is the unicode literal for 'Å'
 xlabel(u'Distance from center (\u00c5)')
 ylabel(u'Distance from center (\u00c5)')
