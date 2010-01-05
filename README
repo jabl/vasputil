@@ -30,7 +30,9 @@ done with the provided python modules.  These are
     Convert a POSCAR file from direct to cartesian coordinates.
 
 ``vasputil_dosplot``
-    Plot density-of-states. 
+    Plot density-of-states. Can plot total, total integrated, and
+    site-projected DOS. For site-projected DOS, different orbitals can
+    be plotted.
 
 ``vasputil_interpolate``
     Interpolate coordinates between two POSCAR files, either one intermediate
