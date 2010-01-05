@@ -136,15 +136,19 @@ def showdp(fsz=16, show_legend=True):
     set_labels(fsz, show_legend)
     pl.show()
 
-def save_and_show(fname, fsz=16, show_legend=True):
+def save_and_show(fname, fsz=16, show_legend=True, figure=None):
     """Set labels etc., save the file to .eps and .pdf and show plot."""
     import pylab as pl
     import os
+    if not figure:
+        f = pl.figure()
+    else:
+        f = figure
     set_labels(fsz, show_legend)
     if fname.endswith('.eps'):
         fn = fname
     else:
         fn = fname + '.eps'
-    pl.savefig(fn)
+    f.savefig(fn)
     os.system('epstopdf ' + fn)
     pl.show()
