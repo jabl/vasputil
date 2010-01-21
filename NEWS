@@ -1,6 +1,11 @@
-vasputil 5.3, xxx
+vasputil 5.3, 2010-01-21
 
-* vasputil_chgplaneplot can now plot black and white contour plots.
+* vasputil_chgplaneplot can now plot black and white contour
+  plots, with a configurable number of levels. Also some small
+  enhancements to the DOS plotting module.
+
+* Usage of NumpyTestCase in the testsuite has been removed, allowing
+  the testsuite to run successfully with NumPy 1.3.
 
 ------------------------------------------------------------------------------
 

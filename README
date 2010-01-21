@@ -61,9 +61,9 @@ Requirements
 For full functionality, vasputil requires the following python libraries:
 
 1) `ASE <https://wiki.fysik.dtu.dk/ase/index.html>`_ (Atomic
-   Simulation Environment) version 3.2.0.1067 or later. If you wish to
-   use the older ASE release 3.1.x, please use vasputil 5.1, and for ASE 
-   release 3.0.x please use vasputil 5.0.
+   Simulation Environment) version 3.3.1 or later. For older ASE
+   releases, vasputil 5.2 is compatible with ASE 3.2, vasputil 5.1 with
+   ASE 3.1, and vasputil 5.0 with ASE 3.0.
 
 2) `NumPy <http://www.scipy.org/NumPy>`_ 
 
