@@ -1,5 +1,7 @@
+# -*- coding: latin-1 -*-
 # vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+
+# Copyright (c) 2008, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -20,10 +22,8 @@
 
 import unittest
 import vasputil.dos as d
-import numpy.testing.numpytest as nt
-import numpy.testing.utils as ntu
 
-class LdosTestCase(nt.NumpyTestCase):
+class LdosTestCase(unittest.TestCase):
     """Testcase for vasputil.dos.LDOS class."""
 
 

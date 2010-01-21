@@ -1,5 +1,7 @@
+# -*- coding: latin-1 -*-
 # vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+
+# Copyright (c) 2008, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -21,8 +23,6 @@
 import unittest
 import vasputil.supercell as s
 import ase
-import numpy.testing.numpytest as nt
-import numpy.testing.utils as ntu
 import numpy as np
 import math
 import os
@@ -41,6 +41,10 @@ def load_cells():
     c2 = ase.read(p2, format="vasp")
     return (c1, c2)
 
+def array_almost_equal(a1, a2):
+    """Replacement for old numpy.testing.utils.array_almost_equal."""
+    return (np.abs(a1 - a2) < np.finfo(type(1.0)).eps).any()
+
 class CellTestCase(unittest.TestCase):
     """Testcase for vasputil.supercell.Cell class."""
 
@@ -52,27 +56,27 @@ class CellTestCase(unittest.TestCase):
     def test_atoms_distance(self):
         """Test the atoms_distance method."""
         dist = s.atoms_distance(self.cell, 9, 24)
-        ntu.assert_almost_equal(dist, 1.90823040889809)
+        self.assertAlmostEqual(dist, 1.90823040889809)
 
     def test_atoms_distance_proj(self):
         """Test the atoms_distance method with a projection."""
         dist = s.atoms_distance(self.cell, 24, 9, "xy")
-        ntu.assert_almost_equal(dist, 1.51230705052) 
+        self.assertAlmostEqual(dist, 1.51230705052) 
 
     def test_atoms_distance_proj2(self):
         """Test the atoms_distance method with a projection defined by vector."""
         dist = s.atoms_distance(self.cell, 9, 24, (0,0,10))
-        ntu.assert_almost_equal(dist, 1.16373136) 
+        self.assertAlmostEqual(dist, 1.16373136) 
 
     def test_atoms_distance_pbc(self):
         dist = s.atoms_distance(self.cell, 2, 18)
-        ntu.assert_almost_equal(dist, 1.867066, decimal=5)
+        self.assertAlmostEqual(dist, 1.867066, 5)
 
     def test_nndist(self):
         nnd = s.nearest_neighbors(self.cell, tol=1.7)
         self.assertEqual(nnd[0][0], 6)
         self.assertEqual(nnd[0][1], 24)
-        ntu.assert_almost_equal(nnd[0][2], 1.6996583336037345)
+        self.assertAlmostEqual(nnd[0][2], 1.6996583336037345)
 
     def test_nndist_nn(self):
         nnd = s.nearest_neighbors(self.cell, num_neigh=2)
@@ -82,19 +86,20 @@ class CellTestCase(unittest.TestCase):
         self.assertEqual(nnd[2][0], 1) 
 
     def test_coord_trans(self):
-        ntu.assert_array_almost_equal(np.linalg.solve(self.cell.get_cell().T, \
-                self.cell.get_positions().T).T % 1.0, \
-                self.cell.get_scaled_positions())
+        self.assertEqual(array_almost_equal(
+            np.linalg.solve(self.cell.get_cell().T, \
+                            self.cell.get_positions().T).T % 1.0, \
+            self.cell.get_scaled_positions()), True)
+        
 
-
-class RotateMolTestCase(nt.NumpyTestCase):
+class RotateMolTestCase(unittest.TestCase):
     """Test the rotate_molecule function."""
 
     def test_rotate(self):
-        coords = ntu.rand(10, 3)
+        coords = np.random.randn(10, 3)
         rcoords = s.rotate_molecule(coords, phi=math.pi, theta=2*math.pi, \
                 psi=math.pi)
-        ntu.assert_array_almost_equal(coords, rcoords)
+        self.assertEqual(array_almost_equal(coords, rcoords), True)
 
 class InterpolateTestCase(unittest.TestCase):
     """Test the interpolate function."""
@@ -104,12 +109,12 @@ class InterpolateTestCase(unittest.TestCase):
 
     def test_interpolate(self):
         c = s.interpolate_cells(self.c1, self.c2, frac=0.5)
-        ntu.assert_almost_equal(c.get_scaled_positions()[29,2], 0.258209253419)
+        self.assertAlmostEqual(c.get_scaled_positions()[29,2], 0.258209253419)
 
     def test_interpolate_2(self):
         cells = s.interpolate_cells(self.c1, self.c2, images=2)
-        ntu.assert_almost_equal(cells[0].get_scaled_positions()[29,2], 0.24154259)
-        ntu.assert_almost_equal(cells[1].get_scaled_positions()[29,2], 0.27487592)
+        self.assertAlmostEqual(cells[0].get_scaled_positions()[29,2], 0.24154259)
+        self.assertAlmostEqual(cells[1].get_scaled_positions()[29,2], 0.27487592)
 
 class AtomsMovedTestCase(unittest.TestCase):
     """Test the atoms_moved function."""

@@ -1,5 +1,7 @@
+# -*- coding: latin-1 -*-
 # vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+
+# Copyright (c) 2008, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -20,10 +22,8 @@
 
 import unittest
 import vasputil.geometry as g
-import numpy.testing.numpytest as nt
-import numpy.testing.utils as ntu
 
-class PlaneTestCase(nt.NumpyTestCase):
+class PlaneTestCase(unittest.TestCase):
     """Testcase for vasputil.geometry.Plane class."""
 
     def test_construct(self):
@@ -31,7 +31,7 @@ class PlaneTestCase(nt.NumpyTestCase):
 
     def test_construct_normal(self):
         pl1 = g.Plane((127.0, 37.0, 42.0), (0., 0., 10.))
-        ntu.assert_almost_equal(pl1.d_origo, 42.0)
+        self.assertAlmostEqual(pl1.d_origo, 42.0)
 
 class NormPbcTestCase(unittest.TestCase):
     """Test the norm_pbc function."""
@@ -39,12 +39,12 @@ class NormPbcTestCase(unittest.TestCase):
     def test_norm_pbc(self):
         a = [1.5, 0, 0]
         d = g.norm_pbc(a)
-        ntu.assert_almost_equal(d, 0.5)
+        self.assertAlmostEqual(d, 0.5)
 
     def test_norm_pbc_2(self):
         a = [1.0, 1.0, 1.0]
         d = g.norm_pbc(a)
-        ntu.assert_almost_equal(d, 0.0)
+        self.assertAlmostEqual(d, 0.0)
 
 def suite():
     plane_suite = unittest.TestLoader().loadTestsFromTestCase(PlaneTestCase)
