@@ -1,5 +1,5 @@
 # vim: set fileencoding=latin-1
-# Copyright (c) 2008, 2009 Janne Blomqvist
+# Copyright (c) 2008, 2009, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -19,11 +19,8 @@
 
 """Module for doing stuff with density-of-states."""
 
-try:
-    import numpy as np
-except:
-    import pylab as np
-
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
 import warnings
 
@@ -119,36 +116,31 @@ class LDOS(object):
         return self.dos[atom, :, orbital]
 
 
-def set_labels(fsz=16, show_legend=True):
+def set_labels(fig, fsz=16, show_legend=True):
     """Utility function to set default parameters for DOS plots."""
-    import pylab as pl
-    pl.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
-    pl.figtext(0.03, 0.35, "LDOS (arb. units)", rotation='vertical', size=fsz)
-    pl.xticks(size=fsz)
-    pl.yticks(size=fsz)
-    if show_legend:
-        pl.legend()
-    pl.subplots_adjust(hspace=0.0)
 
-def showdp(fsz=16, show_legend=True):
+    plt.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
+    plt.figtext(0.03, 0.35, "LDOS (arb. units)", rotation='vertical', size=fsz)
+    for ax in fig.get_axes():
+        #ax.set_xticks(size=fsz)
+        #ax.set_yticks(size=fsz)
+        if show_legend:
+            ax.legend()
+    fig.subplots_adjust(hspace=0.0)
+
+def showdp(fig, fsz=16, show_legend=True):
     """Set labels etc. and show the plot."""
-    import pylab as pl
-    set_labels(fsz, show_legend)
-    pl.show()
+    set_labels(fig, fsz, show_legend)
+    plt.show()
 
-def save_and_show(fname, fsz=16, show_legend=True, figure=None):
+def save_and_show(fig, fname, fsz=16, show_legend=True):
     """Set labels etc., save the file to .eps and .pdf and show plot."""
-    import pylab as pl
     import os
-    if not figure:
-        f = pl.figure()
-    else:
-        f = figure
-    set_labels(fsz, show_legend)
+    set_labels(fig, fsz, show_legend)
     if fname.endswith('.eps'):
         fn = fname
     else:
         fn = fname + '.eps'
-    f.savefig(fn)
+    fig.savefig(fn)
     os.system('epstopdf ' + fn)
-    pl.show()
+    plt.show()
