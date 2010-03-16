@@ -41,9 +41,9 @@ def load_cells():
     c2 = ase.read(p2, format="vasp")
     return (c1, c2)
 
-def array_almost_equal(a1, a2):
+def array_almost_equal(a1, a2, tol=np.finfo(type(1.0)).eps):
     """Replacement for old numpy.testing.utils.array_almost_equal."""
-    return (np.abs(a1 - a2) < np.finfo(type(1.0)).eps).any()
+    return (np.abs(a1 - a2) < tol).all()
 
 class CellTestCase(unittest.TestCase):
     """Testcase for vasputil.supercell.Cell class."""
@@ -99,7 +99,7 @@ class RotateMolTestCase(unittest.TestCase):
         coords = np.random.randn(10, 3)
         rcoords = s.rotate_molecule(coords, phi=math.pi, theta=2*math.pi, \
                 psi=math.pi)
-        self.assertEqual(array_almost_equal(coords, rcoords), True)
+        self.assertEqual(array_almost_equal(coords, rcoords, 1e-15), True)
 
 class InterpolateTestCase(unittest.TestCase):
     """Test the interpolate function."""
