@@ -120,6 +120,15 @@ Installation Instructions
     ``python setup.py --help`` and the documentation for `distutils
     <http://www.python.org/doc/lib/module-distutils.html>`_ .
 
+    For SUSE Linux users: There is apparently something weird with the
+    python installation in SUSE, and the ``--home`` option does not
+    work properly. Instead install vasputil with
+
+    ``python setup.py install --prefix=~``
+
+    In this case the library modules will instead be installed in
+    ~/lib{64}/python{X.Y}/site-packages/vasputil.
+
 3)  Optionally, run the testsuite to make sure it works.
 
     ``python runtests.py``
