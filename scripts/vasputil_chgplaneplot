@@ -1,7 +1,7 @@
 #!/usr/bin/python
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 
-# Copyright (c) 2008, 2009 Janne Blomqvist
+# Copyright (c) 2008, 2009, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -21,7 +21,9 @@
 """Plot charge density in a plane as created by lev00"""
 
 from optparse import OptionParser
-from pylab import *
+#from pylab import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 usage = """%prog [options] datfile
 
@@ -49,7 +51,7 @@ parser.add_option('-b', '--bw-contour', dest='bw', action='store_true',
 parser.add_option('-l', '--levels', dest='levels', help='Number of levels for contour plots. Alternatively, if the argument is a decimal number, the inter-level difference')
 (options, args) = parser.parse_args()
 
-dat = load(args[0])
+dat = np.loadtxt(args[0])
 
 # Data is stored in text form, with each line containing
 # X Y Z
@@ -58,7 +60,7 @@ dat = load(args[0])
 # each direction stay constant, but the grid spacing changes.
 # So we might need to reinterpolate on a regular grid
 
-n = sqrt(dat.shape[0]) # Original num of points in both X and Y directions.
+n = np.sqrt(dat.shape[0]) # Original num of points in both X and Y directions.
 #x, y = meshgrid(dat[0:n, 0], dat[0:n, 1])
 x = dat[:,0]
 y = dat[:,1]
@@ -69,9 +71,9 @@ ymin = y.min()
 xr = xmax - xmin
 yr = ymax - ymin
 
-xl = linspace(xmin, xmax, n)
-yl = linspace(ymin, ymax, n)
-z = reshape(dat[:, 2], (n, n))
+xl = np.linspace(xmin, xmax, n)
+yl = np.linspace(ymin, ymax, n)
+z = np.reshape(dat[:, 2], (n, n))
 
 if xr == yr:
     # No interpolation needed
@@ -86,10 +88,10 @@ else:
     idim = xr < yr
     if idim: # Y range is bigger
         fac = int(round(n * yr / xr))
-        yl = linspace(ymin, ymax, fac)
+        yl = np.linspace(ymin, ymax, fac)
     else:
         fac = int(round(n * xr / yr))
-        xl = linspace(xmin, xmax, fac)
+        xl = np.linspace(xmin, xmax, fac)
     z = inter2(xl, yl)
     #ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
     #fig = figure(1)
@@ -99,9 +101,9 @@ else:
     #fig.set_size_inches(xr, yr)
 
 # This ensures that the aspect ratio of the plot is equivalent to the array.
-w, h = figaspect(z.T)
-fig = figure(1, figsize=(w+4, h))
-a = axes()
+w, h = plt.figaspect(z.T)
+fig = plt.figure(1, figsize=(w+4, h))
+a = fig.add_subplot(111)
 a.set_aspect(1)
 
 # No idea how to actually inverse the colormap, so inverse the array
@@ -110,9 +112,9 @@ if options.inverse:
     z = z * -1
 
 if options.cm:
-    cmap = get_cmap(options.cm)
+    cmap = plt.get_cmap(options.cm)
 else:
-    cmap = cm.hot # hot colormap is good for both color and BW
+    cmap = plt.cm.hot # hot colormap is good for both color and BW
 
 if options.norm:
     n = options.norm.split()
@@ -125,12 +127,12 @@ if options.norm:
         except ValueError:
             high = max(abs(z.max()), abs(z.min()))
         low = -high
-    norm = normalize(low, high)
+    norm = plt.normalize(low, high)
 else:
     norm = None
 
 if options.contour or options.fc or options.bw:
-    xm, ym = meshgrid(xl, yl)
+    xm, ym = np.meshgrid(xl, yl)
     if options.levels:
         try:
             lev = int(options.levels)
@@ -139,24 +141,25 @@ if options.contour or options.fc or options.bw:
             if not options.norm:
                 low = z.min()
                 high = z.max()
-            lev = arange(low, high, ld)
+            lev = np.arange(low, high, ld)
     else:
         lev = 10
     if options.contour:
-        contour(xm, ym, z.T, lev, cmap=cmap, norm=norm)
+        plt.contour(xm, ym, z.T, lev, cmap=cmap, norm=norm)
     elif options.fc:
-        contourf(xm, ym, z.T, lev, cmap=cmap, norm=norm)
+        plt.contourf(xm, ym, z.T, lev, cmap=cmap, norm=norm)
     else:
-        contour(xm, ym, z.T, lev, colors='k')
+        plt.contour(xm, ym, z.T, lev, colors='k')
 else:
-    pcolor(xl, yl, z.T, cmap=cmap, norm=norm)
-axis([xmin, xmax, ymin, ymax])
+    plt.pcolor(xl, yl, z.T, cmap=cmap, norm=norm)
+a.set_xlim(xmin, xmax)
+a.set_ylim(ymin, ymax)
 if not options.bw:
-    colorbar()
-# \u00c5 is the unicode literal for 'Å'
-xlabel(u'Distance from center (\u00c5)')
-ylabel(u'Distance from center (\u00c5)')
+    plt.colorbar()
+# \u00c5 is the unicode literal for 'Ã…'
+a.set_xlabel(u'Distance from center (\u00c5)')
+a.set_ylabel(u'Distance from center (\u00c5)')
 if options.output:
-    savefig(options.output)
+    plt.savefig(options.output)
 else:
-    show()
+    plt.show()
