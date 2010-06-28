@@ -1,6 +1,7 @@
 #!/usr/bin/python
-# vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8
+# Copyright (c) 2008, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -27,7 +28,7 @@ usage = """%prog [options] POSCAR"""
 
 parser = OptionParser(usage)
 parser.add_option("-t", "--tolerance", dest="tol", \
-        help="Tolerance, default 1.0 Å")
+        help=u"Tolerance, default 1.0 Ã…")
 parser.add_option("-n", "--numneigh", dest="nn", \
         help="Number of nearest neighbors to print.")
 (options, args) = parser.parse_args()
@@ -40,7 +41,7 @@ if options.nn:
     nnd = s.nearest_neighbors(c, num_neigh=int(options.nn))
 else:
     nnd = s.nearest_neighbors(c, tol=tol)
-print 'Atom  Atom    Dist (Å)'
+print 'Atom  Atom    Dist (Ã…)'
 print '======================'
 for at in nnd:
     print "%4i  %4i  %10.2f" % at

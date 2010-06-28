@@ -1,6 +1,7 @@
 #!/usr/bin/python
-# vim: set fileencoding=latin-1
-# Copyright (c) 2008 Janne Blomqvist
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8
+# Copyright (c) 2008, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -27,7 +28,7 @@ usage = """%prog [options] POSCAR1 POSCAR2"""
 
 parser = OptionParser(usage)
 parser.add_option("-t", "--tolerance", dest="tol", \
-        help="Tolerance, default 0.1 Å")
+        help=u"Tolerance, default 0.1 Ã…")
 parser.add_option("-v", "--verbose", dest="verb", action="store_true", \
         help="Print out the distance moved as well.")
 (options, args) = parser.parse_args()
@@ -38,7 +39,7 @@ else:
 c1 = ase.read(args[0], format="vasp")
 c2 = ase.read(args[1], format="vasp")
 if options.verb:
-    print 'Atom    Moved (Å)'
+    print 'Atom    Moved (Ã…)'
     print '================='
 for at in s.atoms_moved(c1, c2, tol):
     if options.verb:

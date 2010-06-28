@@ -1,4 +1,5 @@
-# vim: set fileencoding=latin-1
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8
 # Copyright (c) 2008, 2009, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.

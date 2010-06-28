@@ -1,5 +1,5 @@
-# -*- coding: latin-1 -*-
-# vim: set fileencoding=latin-1
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8
 
 # Copyright (c) 2008, 2010 Janne Blomqvist
 

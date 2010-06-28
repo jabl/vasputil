@@ -1,5 +1,6 @@
-# vim: set fileencoding=latin-1
-# Copyright (c) 2003, 2008 Janne Blomqvist
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8
+# Copyright (c) 2003, 2008, 2010 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -77,7 +78,7 @@ def nearest_neighbors(atoms, tol=1.0, num_neigh=None):
 
     Arguments:
     atoms -- The ASE Atoms object with all the atoms.
-    tol  -- Return only distances smaller than this. Default 1.0 Å.
+    tol  -- Return only distances smaller than this. Default 1.0 Ã….
     num_neigh -- Number of nearest neighbors per atom returned.
 
     Returns -- List containing 
@@ -112,7 +113,7 @@ def atoms_moved(cell1, cell2, tol=0.1):
     
     Arguments:
     cell1,2 -- The supercells to compare
-    tol -- The tolerance in Å
+    tol -- The tolerance in Ã…
 
     Return value -- A list of (atom index, distance moved) tuples.
 
