@@ -21,7 +21,6 @@
 """Simple arithmetic operations (+,-,*,/) on CHG/CHGCAR files"""
 
 from optparse import OptionParser
-from pylab import *
 from ase.calculators.vasp import VaspChargeDensity
 import sys
 

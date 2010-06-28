@@ -21,9 +21,9 @@
 """Plot charge density in a plane as created by lev00"""
 
 from optparse import OptionParser
-#from pylab import *
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 usage = """%prog [options] datfile
 

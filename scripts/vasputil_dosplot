@@ -23,7 +23,7 @@ and the ase.calculators.vasp.VaspDos class."""
 
 import vasputil.dos as d
 import ase.calculators.vasp as v
-from pylab import *
+import matplotlib.pyplot as plt
 from optparse import OptionParser
 
 usage = """%prog [options] DOSCAR atom
@@ -56,29 +56,32 @@ else:
 
 en = dc.energy # This is the x-axis in a typical DOS plot.
 
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
 if len(args) == 2:
     atom = int(args[1])
     label = "Atom " + str(atom) + " orbital " + str(orb)
-    plot(en, dc.site_dos(atom, orb), label=label)
+    ax.plot(en, dc.site_dos(atom, orb), label=label)
 elif options.integ:
     label = 'Integrated total DOS'
     if len(dc.integrated_dos.shape) == 1:
-        plot(en, dc.integrated_dos, label=label)
+        ax.plot(en, dc.integrated_dos, label=label)
     else:
         ul = label + ' spin up'
-        plot(en, dc.integrated_dos[0, :], label=ul)
+        ax.plot(en, dc.integrated_dos[0, :], label=ul)
         dl = label + ' spin down'
-        plot(en, dc.integrated_dos[1, :], label=dl)
+        ax.plot(en, dc.integrated_dos[1, :], label=dl)
 else:
     label = 'Total DOS'
     if len(dc.dos.shape) == 1:
-        plot(en, dc.dos, label=label)
+        ax.plot(en, dc.dos, label=label)
     else:
         ul = label + ' spin up'
-        plot(en, dc.dos[0, :], label=ul)
+        ax.plot(en, dc.dos[0, :], label=ul)
         dl = label + ' spin down'
-        plot(en, dc.dos[1, :], label=dl)
-d.showdp()
+        ax.plot(en, dc.dos[1, :], label=dl)
+d.showdp(fig)
 
 # For a more involved plot, create your own plot script or run interactively
 # via 'ipython -pylab'

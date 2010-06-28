@@ -70,14 +70,14 @@ print "%relax 1->2: Relaxation in percent compared to the distance between " \
         + "the first and second layers."
 # Finally, make a picture:
 try:
-    from pylab import *
+    import matplotlib.pyplot as plt
 except:
     print 'ERROR: Could not import matplotlib; No picture for you, bye!'
     import sys
     sys.exit(1)
-hist(zc,bins)
+plt.hist(zc,bins)
 xst = "Bin number (bin size " + str(dbin) + " A)"
-xlabel(xst)
-ylabel("Atoms in bin")
-show()
+plt.xlabel(xst)
+plt.ylabel("Atoms in bin")
+plt.show()
 
