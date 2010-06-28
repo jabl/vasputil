@@ -23,11 +23,7 @@ the Atoms class from ase.
 
 """
 
-try:
-    import numpy as np
-except ImportError:
-    import pylab as np
-
+import numpy as np
 import vasputil.geometry as vg
 
 def natoms(atoms):

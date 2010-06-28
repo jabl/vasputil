@@ -19,10 +19,7 @@
 
 """This module defines a class that represents a plane in 3d space."""
 
-try:
-    import numpy as np
-except:
-    import pylab as np
+import numpy as np
 
 
 class Plane(object):
