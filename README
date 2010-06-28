@@ -1,5 +1,5 @@
 ====================
-Vasputil release 5.3
+Vasputil release 5.4
 ====================
 
 Vasputil is a set of command-line utilities and Python libraries
@@ -61,9 +61,10 @@ Requirements
 For full functionality, vasputil requires the following python libraries:
 
 1) `ASE <https://wiki.fysik.dtu.dk/ase/index.html>`_ (Atomic
-   Simulation Environment) version 3.3.1 or later. For older ASE
-   releases, vasputil 5.2 is compatible with ASE 3.2, vasputil 5.1 with
-   ASE 3.1, and vasputil 5.0 with ASE 3.0.
+   Simulation Environment) version 3.4. For older ASE releases,
+   vasputil 5.3 is compatible with ASE 3.3.1, vasputil 5.2 is
+   compatible with ASE 3.2, vasputil 5.1 with ASE 3.1, and vasputil
+   5.0 with ASE 3.0.
 
 2) `NumPy <http://www.scipy.org/NumPy>`_ 
 

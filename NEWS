@@ -1,3 +1,10 @@
+vasputil 5.4, XXX
+
+* Minor changes to fix problems with newer versions of required
+  libraries.
+
+------------------------------------------------------------------------------
+
 vasputil 5.3, 2010-01-21
 
 * vasputil_chgplaneplot can now plot black and white contour
