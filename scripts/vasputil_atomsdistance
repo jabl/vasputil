@@ -21,7 +21,7 @@
 """Find distance between two atoms."""
 
 import vasputil.supercell as s
-import ase
+import ase.io
 from optparse import OptionParser
 
 usage = """%prog [options] POSCAR atom1 atom2
@@ -35,7 +35,7 @@ enclosed in quotation marks")
 parser.add_option("-s", "--plane", dest="plane", \
         help="Projection plane, e.g. 'xy'")
 (options, args) = parser.parse_args()
-c = ase.read(args[0], format="vasp")
+c = ase.io.read(args[0], format="vasp")
 atom1 = int(args[1])
 atom2 = int(args[2])
 if options.pvec:

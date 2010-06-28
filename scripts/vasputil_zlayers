@@ -20,7 +20,7 @@
 
 """Find layers in z-coordinates, output distances between them."""
 
-import ase
+import ase.io
 import numpy as np
 from optparse import OptionParser
 
@@ -42,7 +42,7 @@ if options.tol:
 else:
     tol = 0.1
 
-c = ase.read(args[0], format='vasp')
+c = ase.io.read(args[0], format='vasp')
 
 zc = c.positions[:,2] # Atom Z coordinates
 bins = int(np.ceil((zc.max() - zc.min())/dbin))

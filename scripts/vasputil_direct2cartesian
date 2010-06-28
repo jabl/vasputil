@@ -20,7 +20,7 @@
 
 """Convert a POSCAR file from direct to cartesian coordinates."""
 
-import ase
+import ase.io
 from optparse import OptionParser
 import os.path
 
@@ -35,6 +35,6 @@ if options.outfile:
     fname = options.outfile
 else:
     fname = os.path.basename(args[0]) + ".cart"
-a = ase.read(args[0], format="vasp")
-ase.write(fname, a, format="vasp", direct=False, sort=False)
+a = ase.io.read(args[0], format="vasp")
+ase.io.write(fname, a, format="vasp", direct=False, sort=False)
 

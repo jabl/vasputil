@@ -21,7 +21,7 @@
 """Compare to POSCAR files and print out atoms that have moved."""
 
 import vasputil.supercell as s
-import ase
+import ase.io
 from optparse import OptionParser
 
 usage = """%prog [options] POSCAR1 POSCAR2"""
@@ -36,8 +36,8 @@ if options.tol:
     tol = float(options.tol)
 else:
     tol = 0.1
-c1 = ase.read(args[0], format="vasp")
-c2 = ase.read(args[1], format="vasp")
+c1 = ase.io.read(args[0], format="vasp")
+c2 = ase.io.read(args[1], format="vasp")
 if options.verb:
     print 'Atom    Moved (Å)'
     print '================='

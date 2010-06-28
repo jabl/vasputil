@@ -36,7 +36,7 @@ if options.tol:
     tol = float(options.tol)
 else:
     tol = 1.0
-c = ase.read(args[0], format='vasp')
+c = ase.io.read(args[0], format='vasp')
 if options.nn:
     nnd = s.nearest_neighbors(c, num_neigh=int(options.nn))
 else:

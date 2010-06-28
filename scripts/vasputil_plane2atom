@@ -20,7 +20,7 @@
 
 """Measure the distance between an atom and a plane."""
 
-import ase
+import ase.io
 import vasputil.geometry as vg
 from optparse import OptionParser
 import time
@@ -34,7 +34,7 @@ defined by the atoms with indices p0-p2. Indices start from 0."""
 parser = OptionParser(usage)
 (options, args) = parser.parse_args()
 
-poscar = ase.read(args[0], format='vasp')
+poscar = ase.io.read(args[0], format='vasp')
 ac = poscar.positions[int(args[4])]
 p = [int(args[1]), int(args[2]), int(args[3])]
 pc = poscar.positions[p]

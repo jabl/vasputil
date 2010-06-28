@@ -20,7 +20,7 @@
 
 """Convert a POSCAR file to XYZ format."""
 
-import ase
+import ase.io
 from optparse import OptionParser
 import time
 import os.path
@@ -38,5 +38,5 @@ else:
     fname = os.path.basename(args[0]) + ".xyz"
 # ASE needs to support a label for xyz files..
 #xyzcmt = "Generated from " + args[0] + " on " + time.ctime()
-a = ase.read(args[0], format='vasp')
-ase.write(fname, a, format='xyz')
+a = ase.io.read(args[0], format='vasp')
+ase.io.write(fname, a, format='xyz')
