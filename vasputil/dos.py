@@ -117,31 +117,34 @@ class LDOS(object):
         return self.dos[atom, :, orbital]
 
 
-def set_labels(fig, fsz=16, show_legend=True):
+def set_labels(fig, show_legend=True):
     """Utility function to set default parameters for DOS plots."""
 
-    plt.xlabel("E-E$_\mathrm{f}$ (eV)", size=fsz)
-    plt.figtext(0.03, 0.35, "LDOS (arb. units)", rotation='vertical', size=fsz)
+    plt.xlabel("E-E$_\mathrm{f}$ (eV)")
+    #plt.ylabel('LDOS (arb. units)')
+    plt.figtext(0., 0.35, "LDOS (arb. units)", rotation='vertical')
     for ax in fig.get_axes():
         #ax.set_xticks(size=fsz)
         #ax.set_yticks(size=fsz)
         if show_legend:
             ax.legend()
-    fig.subplots_adjust(hspace=0.0)
+    fig.subplots_adjust(hspace=0.0, left=0.12, bottom=0.12)
 
-def showdp(fig, fsz=16, show_legend=True):
+def showdp(fig, fsz=None, show_legend=True):
     """Set labels etc. and show the plot."""
-    set_labels(fig, fsz, show_legend)
+    set_labels(fig, show_legend)
     plt.show()
 
-def save_and_show(fig, fname, fsz=16, show_legend=True):
+def save_and_show(fig, fname, show_legend=True):
     """Set labels etc., save the file to .eps and .pdf and show plot."""
-    import os
-    set_labels(fig, fsz, show_legend)
-    if fname.endswith('.eps'):
-        fn = fname
-    else:
+    import subprocess
+    set_labels(fig, show_legend)
+    exti = fname.find('.')
+    if exti == -1:
         fn = fname + '.eps'
+    else:
+        fn = fname
     fig.savefig(fn)
-    os.system('epstopdf ' + fn)
+    if exti == -1:
+        subprocess.call('/usr/bin/epstopdf ' + fn, shell=True)
     plt.show()
