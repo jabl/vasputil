@@ -1,5 +1,7 @@
 vasputil 5.4, XXX
 
+* New module chg for stuff dealing with charge densities.
+
 * Minor changes to fix problems with newer versions of required
   libraries.
 
