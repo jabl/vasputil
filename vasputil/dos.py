@@ -122,5 +122,5 @@ def set_labels(fig):
 
     plt.xlabel("E-E$_\mathrm{f}$ (eV)")
     plt.figtext(0., 0.35, "LDOS (arb. units)", rotation='vertical')
-    fig.subplots_adjust(hspace=0.0, left=0.12, bottom=0.12)
+    fig.subplots_adjust(hspace=0.0, left=0.15, bottom=0.12)
 
