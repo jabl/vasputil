@@ -81,7 +81,8 @@ else:
         ax.plot(en, dc.dos[0, :], label=ul)
         dl = label + ' spin down'
         ax.plot(en, dc.dos[1, :], label=dl)
-d.showdp(fig)
+d.set_labels()
+plt.show()
 
 # For a more involved plot, create your own plot script or run interactively
 # via 'ipython -pylab'

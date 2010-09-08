@@ -117,10 +117,15 @@ class LDOS(object):
         return self.dos[atom, :, orbital]
 
 
-def set_labels(fig):
+def set_labels(fig=None):
     """Utility function to set default parameters for DOS plots."""
 
     plt.xlabel("E-E$_\mathrm{f}$ (eV)")
     plt.figtext(0., 0.35, "LDOS (arb. units)", rotation='vertical')
-    fig.subplots_adjust(hspace=0.0, left=0.15, bottom=0.12)
+    if fig is not None:
+        # Looks good in publication plots
+        fig.subplots_adjust(hspace=0.0, left=0.15, bottom=0.12)
+    else:
+        # This might be better for on-screen viewing
+        plt.subplots_adjust(hspace=0.0)
 
