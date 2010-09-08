@@ -22,7 +22,7 @@
 
 import unittest
 import vasputil.supercell as s
-import ase
+from ase.io import read as aread
 import numpy as np
 import math
 import os
@@ -36,9 +36,9 @@ def testdir():
 def load_cells():
     """Load the two test supercells."""
     p1 = os.path.join(testdir(), "POSCAR")
-    c1 = ase.read(p1, format="vasp")
+    c1 = aread(p1, format="vasp")
     p2 = os.path.join(testdir(), "POSCAR2")
-    c2 = ase.read(p2, format="vasp")
+    c2 = aread(p2, format="vasp")
     return (c1, c2)
 
 def array_almost_equal(a1, a2, tol=np.finfo(type(1.0)).eps):
@@ -51,7 +51,7 @@ class CellTestCase(unittest.TestCase):
     def setUp(self):
         # The test POSCAR file is in the same directory.
         path = os.path.join(testdir(), "POSCAR")
-        self.cell = ase.read(path, format="vasp")
+        self.cell = aread(path, format="vasp")
 
     def test_atoms_distance(self):
         """Test the atoms_distance method."""
