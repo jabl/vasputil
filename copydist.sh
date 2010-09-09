@@ -1,6 +1,6 @@
 #!/bin/bash
 # Make the dist directory
-rst2html README README.html
+rst2html README.rst README.html
 git2cl > ChangeLog
 ./setup.py sdist
 cp dist/vasputil-*.tar.gz ~/public_html/vasputil
