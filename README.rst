@@ -59,10 +59,10 @@ Web Page
 --------
 
 http://github.com/jabl/vasputil
-    This page, download, source tree, issue tracker, etc.
+    README page, download, source tree, issue tracker, etc.
 
 http://tfy.tkk.fi/~job/vasputil/
-    Older release tarballs, and a copy of this page.
+    Older release tarballs, and a copy of the README page.
 
 Requirements
 ------------
