@@ -55,6 +55,15 @@ done with the provided python modules.  These are
 Documentation for these utilities is provided via the ``-h`` command
 line option.
 
+Web Page
+--------
+
+http://github.com/jabl/vasputil
+    This page, download, source tree, issue tracker, etc.
+
+http://tfy.tkk.fi/~job/vasputil/
+    Older release tarballs, and a copy of this page.
+
 Requirements
 ------------
 
