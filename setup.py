@@ -7,11 +7,11 @@ from glob import glob
 scripts = glob('scripts/*[a-z,1-9]')
 
 setup(name='vasputil',
-      version='5.4',
+      version='5.5',
       description='VASP utilities',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@tkk.fi',
-      url='http://tfy.tkk.fi/~job/vasputil',
+      url='http://github.com/jabl/vasputil',
       packages=['vasputil', 'vasputil.tests'],
       scripts = scripts)
 

@@ -1,6 +1,6 @@
-====================
-Vasputil release 5.4
-====================
+========
+Vasputil
+========
 
 Vasputil is a set of command-line utilities and Python libraries
 designed to make life with VASP easier. The command-line utilities
@@ -59,10 +59,10 @@ Web Page
 --------
 
 http://github.com/jabl/vasputil
-    README page, download, source tree, issue tracker, etc.
+    Main home page; download, source tree, issue tracker, etc.
 
 http://tfy.tkk.fi/~job/vasputil/
-    Older release tarballs, and a copy of the README page.
+    Older releases, and a copy of the README page.
 
 Requirements
 ------------
