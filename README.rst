@@ -128,7 +128,7 @@ Installation Instructions
     in your shell initialization script (~/.bash_profile or
     equivalent). For installation into some other directory, see
     ``python setup.py --help`` and the documentation for `distutils
-    <http://www.python.org/doc/lib/module-distutils.html>`_ .
+    <http://docs.python.org/library/distutils.html>`_ .
 
     For SUSE Linux users: There is apparently something weird with the
     python installation in SUSE, and the ``--home`` option does not
@@ -146,16 +146,18 @@ Installation Instructions
 Interactive Usage
 -----------------
 
-The python modules are designed to be used from the interactive python prompt
-as well, to provide a sort of MATLAB-like interactive environment where you can
-manipulate coordinates stored in arrays, or plot data etc. For this, the
-`IPython <http://ipython.scipy.org/moin/>`_ enhanced interactive environment is
-recommended. Start with the matplotlib stuff preloaded with ``ipython -pylab``.
-For those familiar with MATLAB, see `NumPy for MATLAB Users
-<http://www.scipy.org/NumPy_for_Matlab_Users>`_ . After that, just import what
-you need from the vasputil module and get going! See the python scripts for
-reference, or ``pydoc vasputil``, ``pydoc vasputil.supercell`` etc. to read
-documentation, or the ``?`` operator in IPython.
+The python modules are designed to be used from the interactive python
+prompt as well, to provide a sort of MATLAB-like interactive
+environment where you can manipulate coordinates stored in arrays, or
+plot data etc. For this, the `IPython <http://ipython.scipy.org>`_
+enhanced interactive environment is recommended. Start with the
+matplotlib stuff preloaded with ``ipython -pylab``.  For those
+familiar with MATLAB, see `NumPy for MATLAB Users
+<http://www.scipy.org/NumPy_for_Matlab_Users>`_ . After that, just
+import what you need from the vasputil module and get going! See the
+python scripts for reference, or ``pydoc vasputil``, ``pydoc
+vasputil.supercell`` etc. to read documentation, or the ``?`` operator
+in IPython.
 
 With IPython you can also run the scripts in the interactive
 environment with the ``%run`` command, and this will import the
