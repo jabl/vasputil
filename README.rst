@@ -61,7 +61,7 @@ Web Page
 http://github.com/jabl/vasputil
     Main home page; download, source tree, issue tracker, etc.
 
-http://tfy.tkk.fi/~job/vasputil/
+http://tfy.tkk.fi/~job/vasputil
     Older releases, and a copy of the README page.
 
 Requirements
@@ -69,17 +69,17 @@ Requirements
 
 For full functionality, vasputil requires the following python libraries:
 
-1) `ASE <https://wiki.fysik.dtu.dk/ase/index.html>`_ (Atomic
+1) `ASE <https://wiki.fysik.dtu.dk/ase>`_ (Atomic
    Simulation Environment) version 3.4. For older ASE releases,
    vasputil 5.3 is compatible with ASE 3.3.1, vasputil 5.2 is
    compatible with ASE 3.2, vasputil 5.1 with ASE 3.1, and vasputil
    5.0 with ASE 3.0.
 
-2) `NumPy <http://www.scipy.org/NumPy>`_ 
+2) `NumPy <http://numpy.scipy.org>`_ 
 
 3) `matplotlib <http://matplotlib.sf.net>`_
 
-4) `SciPy <http://www.scipy.org/SciPy>`_
+4) `SciPy <http://www.scipy.org>`_
 
 Finally, to regenerate the README.html file, the `rst2html
 <http://docutils.sourceforge.net/docs/user/tools.html>`_ utility is
