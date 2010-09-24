@@ -66,11 +66,7 @@ def vec_pbc(vec):
     """
     arr = np.array(vec)
     v1 = arr.reshape(arr.size)
-    for ii in range(len(v1)):
-        if v1[ii] < -0.5:
-            v1[ii] += 1.0
-        elif v1[ii] > 0.5:
-            v1[ii] -= 1.0
+    v1 -= v1.round()
     return arr
 
 def norm_pbc(vec):
@@ -83,11 +79,11 @@ def norm_pbc(vec):
     """
     arr = np.array(vec)
     if len(arr.shape) == 1:
-        return np.linalg.norm(vec_pbc(arr))
+        return np.linalg.norm(arr - arr.round())
     elif len(arr.shape) == 2:
         nl = np.empty(arr.shape[0])
         for v in range(arr.shape[0]):
-            nl[v] = np.linalg.norm(vec_pbc(arr[v]))
+            nl[v] = np.linalg.norm(arr[v] - arr[v].round())
         return nl
     else:
         raise TypeError("Invalid shape of input")
