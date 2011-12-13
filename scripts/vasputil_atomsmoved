@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2008, 2010 Janne Blomqvist
+# Copyright (c) 2008, 2010, 2011 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -28,7 +28,7 @@ usage = """%prog [options] POSCAR1 POSCAR2"""
 
 parser = OptionParser(usage)
 parser.add_option("-t", "--tolerance", dest="tol", \
-        help=u"Tolerance, default 0.1 Å")
+        help="Tolerance, default 0.1 Angstrom")
 parser.add_option("-v", "--verbose", dest="verb", action="store_true", \
         help="Print out the distance moved as well.")
 (options, args) = parser.parse_args()

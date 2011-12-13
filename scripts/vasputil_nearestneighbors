@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2008, 2010 Janne Blomqvist
+# Copyright (c) 2008, 2010, 2011 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -28,7 +28,7 @@ usage = """%prog [options] POSCAR"""
 
 parser = OptionParser(usage)
 parser.add_option("-t", "--tolerance", dest="tol", \
-        help=u"Tolerance, default 1.0 Å")
+        help="Tolerance, default 1.0 Angstrom")
 parser.add_option("-n", "--numneigh", dest="nn", \
         help="Number of nearest neighbors to print.")
 (options, args) = parser.parse_args()

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2008, 2010 Janne Blomqvist
+# Copyright (c) 2008, 2010, 2011 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -27,7 +27,7 @@ from optparse import OptionParser
 usage = "%prog [options] POSCAR"
 parser= OptionParser(usage)
 parser.add_option("-b", "--binsize", dest="dbin", help=\
-                      u"Size of histogram bin, default 0.1 Å")
+                      "Size of histogram bin, default 0.1 Angstrom")
 parser.add_option("-t", "--tol", dest="tol", help=\
         "Tolerance, bin should contain > tol*maxbin in order to be counted \
 as a layer, where maxbin is the population in the largest bin. Default is 0.1.")
