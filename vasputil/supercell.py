@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2003, 2008, 2010 Janne Blomqvist
+# Copyright (c) 2003, 2008, 2010, 2011 Janne Blomqvist
 
 #  This file is part of Vasputil.
 
@@ -126,8 +126,7 @@ def atoms_moved(cell1, cell2, tol=0.1):
     for nn in range(nmax):
         dvec = at1[nn, :] - at2[nn, :]
         if latt:
-            dvec = np.dot(cell1.get_cell(), \
-                    vg.vec_pbc(dvec))
+            dvec = np.dot(vg.vec_pbc(dvec), cell1.get_cell())
         dist = np.linalg.norm(dvec)
         if dist > tol:
             am.append((nn, dist))
