@@ -1,5 +1,5 @@
 include README
-include doc/README.html
+include README.html
 include NEWS
 include ChangeLog
 include COPYING
