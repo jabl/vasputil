@@ -1,7 +1,10 @@
-vasputil X.Y, 20NN-NN-NN
+vasputil 5.5, 2011-12-13
 
 * Website moved to github, with access to the latest source tree,
   issue tracker etc.
+
+* Removed non-ASCII characters from help strings, as some python
+  installations cannot handle this.
 
 ------------------------------------------------------------------------------
 
