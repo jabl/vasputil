@@ -14,7 +14,7 @@ done with the provided python modules.  These are
 ``vasputil_atomsmoved`` 
     See which atoms have moved between two POSCAR files.  If lattices are
     compatible, takes into account periodic boundary conditions.  Optionally
-    print out moved distances.
+    print out moved distances and the distance vector.
 
 ``vasputil_chgarith``
     Simple arithmetic on charge density in CHG/CHGCAR format

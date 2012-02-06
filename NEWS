@@ -1,3 +1,15 @@
+vasputil 5.6, 2012-02-06
+
+* Bugfix in supercell.py (atoms_moved), distances incorrect due to
+  wrong ordering of matrix multiplication operands. Reported by Noam
+  Bernstein, NRL.
+
+* vasputil_atomsmoved with the verbose option (-v) now prints the
+  distance vector components in addition to the length. Initial patch
+  by Noam Bernstein, NRL.
+
+------------------------------------------------------------------------------
+
 vasputil 5.5, 2011-12-13
 
 * Website moved to github, with access to the latest source tree,
