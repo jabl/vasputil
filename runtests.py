@@ -1,5 +1,6 @@
 #!/usr/bin/python
-# vim: set fileencoding=latin-1
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8
 # Copyright (c) 2008 Janne Blomqvist
 
 #  This file is part of Vasputil; you can redistribute it and/or
