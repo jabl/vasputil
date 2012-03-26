@@ -1,3 +1,9 @@
+vasputil 5.7, 201X-XX-XX
+
+* License is now LGPL 2.1 in order to match ASE.
+
+------------------------------------------------------------------------------
+
 vasputil 5.6, 2012-02-06
 
 * Bugfix in supercell.py (atoms_moved), distances incorrect due to
