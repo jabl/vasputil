@@ -2,11 +2,8 @@
 # vim: set fileencoding=utf-8
 # Copyright (c) 2003, 2008, 2010, 2011, 2012 Janne Blomqvist
 
-#  This file is part of Vasputil; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License, or (at your option) any later version.
-#  See the file COPYING for details.
+# This source code file is subject to the terms of the MIT (Expat)
+# License. See the file LICENSE for details.
 
 """This module defines a utility functions for dealing with vasp 
 supercells. Instead of the old Cell class, the module now uses
