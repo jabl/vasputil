@@ -2,7 +2,7 @@ include README.rst
 include README.html
 include NEWS
 include ChangeLog
-include COPYING
+include LICENSE
 include AUTHORS
 include runtests.py
 include vasputil/tests/POSCAR*

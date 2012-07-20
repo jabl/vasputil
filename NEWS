@@ -1,6 +1,6 @@
 vasputil 5.7, 201X-XX-XX
 
-* License is now LGPL 2.1 in order to match ASE.
+* License is now MIT, allowing code to be incorporated e.g. into ASE.
 
 ------------------------------------------------------------------------------
 
