@@ -111,18 +111,30 @@ Installation Instructions
 
     ``tar xvzf vasputil-$(VERSION).tar.gz``
 
+    or ``unzip vasputil-$(VERSION).zip``
+
     ``cd vasputil-$(VERSION)``
 
-2)  Install the program into your home directory
+2)  Install the program into the standard python user site directory
 
-    ``python setup.py install --home=~``
+    ``python setup.py install --user``
 
-    This will install the scripts into ~/bin and the python modules
-    into ~/lib/python/vasputil. You should make sure that the
-    directory of the python modules is found on the python search
-    path. E.g. if you installed it like the above, you should have
+    Make sure that the user site binary directory is in your PATH. On
+    Linux, the default directory is ~/.local/bin, for more information
+    see `PEP 370 <http://www.python.org/dev/peps/pep-0370/>`_ .
 
-    ``export PYTHONPATH=$HOME/lib/python``
+    In case your python version is older than 2.6, you can instead
+    install with the --home or --prefix options, e.g.
+
+    ``python setup.py install --home=~/.local``
+
+    This will install the scripts into ~/.local/bin and the python
+    modules into ~/.local/lib/python/vasputil. You should make sure
+    that the directory of the python modules is found on the python
+    search path. E.g. if you installed it like the above, you should
+    have
+
+    ``export PYTHONPATH=$HOME/.local/lib/python``
 
     in your shell initialization script (~/.bash_profile or
     equivalent). For installation into some other directory, see
@@ -133,10 +145,10 @@ Installation Instructions
     python installation in SUSE, and the ``--home`` option does not
     work properly. Instead install vasputil with
 
-    ``python setup.py install --prefix=~``
+    ``python setup.py install --prefix=~/.local``
 
     In this case the library modules will instead be installed in
-    ~/lib{64}/python{X.Y}/site-packages/vasputil.
+    ~/.local/lib{64}/python{X.Y}/site-packages/vasputil.
 
 3)  Optionally, run the testsuite to make sure it works.
 
