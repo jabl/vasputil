@@ -43,7 +43,7 @@ class LDOS(object):
                 line = f.readline()
                 if line == "":
                     raise Exception
-            except Exception, e:
+            except Exception:
                 errstr = "Failed reading " + str(na) + ":th DOS block, probably " \
                         + "this DOSCAR is from some old version of VASP that " \
                         + "doesn't " \
@@ -54,7 +54,7 @@ class LDOS(object):
                 continue
             try:
                 ndos = int(line.split()[2])
-            except:
+            except Exception:
                 print "Error, line is: " + line + "ENDLINE"
             line = f.readline().split()
             cdos = np.zeros((ndos, len(line)))
