@@ -58,10 +58,10 @@ line option.
 Web Page
 --------
 
-http://github.com/jabl/vasputil
+https://github.com/jabl/vasputil
     Main home page; download, source tree, issue tracker, etc.
 
-http://tfy.tkk.fi/~job/vasputil
+http://tfy.tkk.fi/~jblomqvi/vasputil
     Older releases, and a copy of the README page.
 
 Requirements
