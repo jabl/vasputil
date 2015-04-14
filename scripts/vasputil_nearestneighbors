@@ -9,7 +9,7 @@
 """Check nearest neighbors in a POSCAR file."""
 
 import vasputil.supercell as s
-import ase
+import ase.io
 from optparse import OptionParser
 
 usage = """%prog [options] POSCAR"""
