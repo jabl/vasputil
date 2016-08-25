@@ -7,6 +7,7 @@
 # License. See the file LICENSE for details.
 
 """Find distance between two atoms."""
+from __future__ import print_function
 
 import vasputil.supercell as s
 import ase.io
@@ -29,8 +30,8 @@ atom2 = int(args[2])
 if options.pvec:
     pvec = []
     [pvec.append(float(x)) for x in options.pvec.split()]
-    print s.atoms_distance(c, atom1, atom2, pvec)
+    print(s.atoms_distance(c, atom1, atom2, pvec))
 elif options.plane:
-    print s.atoms_distance(c, atom1, atom2, options.plane)
+    print(s.atoms_distance(c, atom1, atom2, options.plane))
 else:
-    print s.atoms_distance(c, atom1, atom2)
+    print(s.atoms_distance(c, atom1, atom2))

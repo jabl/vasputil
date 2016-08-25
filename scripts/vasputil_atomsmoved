@@ -8,6 +8,7 @@
 # License. See the file LICENSE for details.
 
 """Compare to POSCAR files and print out atoms that have moved."""
+from __future__ import print_function
 
 import vasputil.supercell as s
 import ase.io
@@ -29,12 +30,12 @@ c1 = ase.io.read(args[0], format="vasp")
 c2 = ase.io.read(args[1], format="vasp")
 
 if options.verb:
-    print 'Atom   Moved (Å)      dx (Å)      dy (Å)      dz (Å)'
-    print '===================================================='
+    print('Atom   Moved (Å)      dx (Å)      dy (Å)      dz (Å)')
+    print('====================================================')
 for at in s.atoms_moved(c1, c2, tol):
     if options.verb:
 	if options.verb:
             print ("%4i %11.4f %11.4f %11.4f %11.4f" % (at[0], at[1], at[2][0], 
                                                         at[2][1], at[2][2]))
     else:
-        print at[0],
+        print(at[0], end=' ')

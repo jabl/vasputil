@@ -7,6 +7,7 @@
 # License. See the file LICENSE for details.
 
 """Find layers in z-coordinates, output distances between them."""
+from __future__ import print_function
 
 import ase.io
 import numpy as np
@@ -39,28 +40,28 @@ mask = histdat > tol * histdat.max()
 plev = levels[mask] + dbin/2
 alayer = histdat[mask]
 layerdist = plev[1:] - plev[:-1]
-print "Z layer    Dprev  Atoms   %relax 1->2"
-print "-------------------------------------"
+print("Z layer    Dprev  Atoms   %relax 1->2")
+print("-------------------------------------")
 ffmt = "%7.3f"
 ifmt = "%3i"
-print ffmt % plev[0] + "             " + ifmt % alayer[0]
+print(ffmt % plev[0] + "             " + ifmt % alayer[0])
 for ii in range(1, len(plev)):
-    print ffmt % plev[ii] + "  " + ffmt % layerdist[ii-1] + "    " \
+    print(ffmt % plev[ii] + "  " + ffmt % layerdist[ii-1] + "    " \
             + ifmt % alayer[ii] + "     " \
-            + ffmt % ((layerdist[ii-1] - layerdist[0]) / layerdist[0] * 100) + " %"
-print "-------------------------------------"
-print "Explanation of columns:"
-print "Z layer: The z coordinate of the layer mid-point, zero is the atom " \
-        + "with the lowest z coordinate."
-print "Dprev: Distance between this layer and the previous layer."
-print "Atoms: Number of atoms in the layer."
-print "%relax 1->2: Relaxation in percent compared to the distance between " \
-        + "the first and second layers."
+            + ffmt % ((layerdist[ii-1] - layerdist[0]) / layerdist[0] * 100) + " %")
+print("-------------------------------------")
+print("Explanation of columns:")
+print("Z layer: The z coordinate of the layer mid-point, zero is the atom " \
+        + "with the lowest z coordinate.")
+print("Dprev: Distance between this layer and the previous layer.")
+print("Atoms: Number of atoms in the layer.")
+print("%relax 1->2: Relaxation in percent compared to the distance between " \
+        + "the first and second layers.")
 # Finally, make a picture:
 try:
     import matplotlib.pyplot as plt
 except:
-    print 'ERROR: Could not import matplotlib; No picture for you, bye!'
+    print('ERROR: Could not import matplotlib; No picture for you, bye!')
     import sys
     sys.exit(1)
 plt.hist(zc,bins)

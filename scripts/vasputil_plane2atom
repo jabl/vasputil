@@ -7,6 +7,7 @@
 # License. See the file LICENSE for details.
 
 """Measure the distance between an atom and a plane."""
+from __future__ import print_function
 
 import ase.io
 import vasputil.geometry as vg
@@ -28,4 +29,4 @@ p = [int(args[1]), int(args[2]), int(args[3])]
 pc = poscar.positions[p]
 plane = vg.Plane(pc)
 
-print plane.distance(ac)
+print(plane.distance(ac))

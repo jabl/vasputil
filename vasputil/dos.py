@@ -6,6 +6,7 @@
 # License. See the file LICENSE for details.
 
 """Module for doing stuff with density-of-states."""
+from __future__ import print_function
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -55,7 +56,7 @@ class LDOS(object):
             try:
                 ndos = int(line.split()[2])
             except Exception:
-                print "Error, line is: " + line + "ENDLINE"
+                print("Error, line is: " + line + "ENDLINE")
             line = f.readline().split()
             cdos = np.zeros((ndos, len(line)))
             cdos[0] = np.array(line)
@@ -81,7 +82,7 @@ class LDOS(object):
         return self._efermi
 
     def _del_efermi(self):
-        raise AttributeError, "Can't delete attribute."
+        raise AttributeError("Can't delete attribute.")
 
     efermi = property(_get_efermi, _set_efermi, _del_efermi, "Fermi energy.")
 

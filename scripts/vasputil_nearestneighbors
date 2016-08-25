@@ -7,6 +7,7 @@
 # License. See the file LICENSE for details.
 
 """Check nearest neighbors in a POSCAR file."""
+from __future__ import print_function
 
 import vasputil.supercell as s
 import ase.io
@@ -29,7 +30,7 @@ if options.nn:
     nnd = s.nearest_neighbors(c, num_neigh=int(options.nn))
 else:
     nnd = s.nearest_neighbors(c, tol=tol)
-print 'Atom  Atom    Dist (Å)'
-print '======================'
+print('Atom  Atom    Dist (Å)')
+print('======================')
 for at in nnd:
-    print "%4i  %4i  %10.2f" % at
+    print("%4i  %4i  %10.2f" % at)
