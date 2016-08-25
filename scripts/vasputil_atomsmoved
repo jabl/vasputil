@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2008, 2010, 2012 Janne Blomqvist
+# Copyright (c) 2008, 2010, 2012, 2016 Janne Blomqvist
 # Copyright (c) 2011 Noam Bernstein, NRL
 
-# This source code file is subject to the terms of the MIT (Expat)
+# This source code file is subject to the terms of the LGPL 2.1
 # License. See the file LICENSE for details.
 
 """Compare to POSCAR files and print out atoms that have moved."""

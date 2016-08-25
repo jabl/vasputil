@@ -1,3 +1,9 @@
+vasputil X.Y (development version)
+
+* License is now LGPL 2.1, matching ASE.
+
+------------------------------------------------------------------------------
+
 vasputil 5.7, 2012-07-20
 
 * License is now MIT, allowing code to be incorporated e.g. into ASE.

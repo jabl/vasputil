@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2003, 2008, 2010, 2011, 2012 Janne Blomqvist
+# Copyright (c) 2003, 2008, 2010, 2011, 2012, 2016 Janne Blomqvist
 
-# This source code file is subject to the terms of the MIT (Expat)
+# This source code file is subject to the terms of the LGPL 2.1
 # License. See the file LICENSE for details.
 
 """This module defines a utility functions for dealing with vasp 

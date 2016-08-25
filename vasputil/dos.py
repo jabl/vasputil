@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8
-# Copyright (c) 2008-2013 Janne Blomqvist
+# Copyright (c) 2008-2016 Janne Blomqvist
 
-# This source code file is subject to the terms of the MIT (Expat)
+# This source code file is subject to the terms of the LGPL 2.1
 # License. See the file LICENSE for details.
 
 """Module for doing stuff with density-of-states."""
