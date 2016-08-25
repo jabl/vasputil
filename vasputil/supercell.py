@@ -5,9 +5,9 @@
 # This source code file is subject to the terms of the LGPL 2.1
 # License. See the file LICENSE for details.
 
-"""This module defines a utility functions for dealing with vasp 
+"""This module defines a utility functions for dealing with vasp
 supercells. Instead of the old Cell class, the module now uses
-the Atoms class from ase. 
+the Atoms class from ase.
 
 """
 
@@ -20,7 +20,7 @@ def natoms(atoms):
 
 def atoms_distance(atoms, atom1, atom2, proj=None):
     """Measure the distance between two atoms.
-    
+
     Atoms are indexed starting from 0, following the usual Python
     convention.  Note that this is different from VASP itself, which starts
     indexing from 1.  This method takes into account periodic boundary
@@ -35,7 +35,7 @@ def atoms_distance(atoms, atom1, atom2, proj=None):
              in the plane defined by the string. If it's a sequence
              of three numbers, the method measures the distance
              projected along the vector.
-    
+
     """
     at = atoms.get_scaled_positions()
     dvec = at[atom1, :] - at[atom2, :]
@@ -65,36 +65,29 @@ def nearest_neighbors(atoms, tol=1.0, num_neigh=None):
     tol  -- Return only distances smaller than this. Default 1.0 Å.
     num_neigh -- Number of nearest neighbors per atom returned.
 
-    Returns -- List containing 
-               (source_atom, target_atom, dist) tuples. 
+    Returns -- List containing
+               (source_atom, target_atom, dist) tuples.
 
     """
-    at = atoms.get_scaled_positions()
+    d = atoms.get_all_distances(mic=True)
     nn = []
-    for anum in range(len(at)):
-        dvec = at - at[anum]
-        dvec = np.dot(vg.vec_pbc(dvec), \
-                atoms.get_cell())
-        dist = np.empty(dvec.shape[0])
-        for ii in range(len(dvec)):
-            dist[ii] = np.linalg.norm(dvec[ii])
+    for anum in range(len(d)):
         if num_neigh == None:
-            mask = dist < tol
-            for ii in range(len(mask)):
-                if mask[ii] and ii != anum:
-                    nn.append((anum, ii, dist[ii]))
+            for ii, dist in enumerate(d[anum, :]):
+                if dist < tol and ii != anum:
+                    nn.append((anum, ii, dist))
         else:
-            sind = dist.argsort()
-            for ii in range(min(num_neigh + 1, len(dist))):
+            sind = d[anum, :].argsort()
+            for ii in range(min(num_neigh + 1, len(d[anum, :]))):
                 if anum != sind[ii]:
-                    nn.append((anum, sind[ii], dist[sind[ii]]))
+                    nn.append((anum, sind[ii], d[anum, sind[ii]]))
     return nn
 
 def atoms_moved(cell1, cell2, tol=0.1):
     """Return a list of atoms that have moved between the two cells.
 
     If lattices are compatible, take periodic boundary conditions into account.
-    
+
     Arguments:
     cell1,2 -- The supercells to compare
     tol -- The tolerance in Å
@@ -122,12 +115,12 @@ def atoms_moved(cell1, cell2, tol=0.1):
 
 def check_cells(cell1, cell2):
     """Check to which extent two cells are compatible.
-    
+
     Return value -- a tuple where the first element is a boolean specifying
     whether the lattices are compatible, that is, comparing the basis vectors *
     lattice constants. The second element is a boolean specifying whether the
     cells contain an equal amount of atoms.
-    
+
     """
     # First check that lattice constant * basis vectors are compatible.
     latt = np.any(cell1.get_cell() \
@@ -138,18 +131,18 @@ def check_cells(cell1, cell2):
 
 def interpolate_cells(cell1, cell2, frac=0.5, images=1):
     """Interpolate coordinates between two supercells.
-    
+
     Arguments:
     cell1 -- The starting point cell.
     cell2 -- The endpoint cell.
     frac -- Fraction, where on the interval [cell1,cell2] should the new cell
-            reside. If 0.0, the resulting cell is equal to cell1, if 1.0 it's 
+            reside. If 0.0, the resulting cell is equal to cell1, if 1.0 it's
             equal to cell2.
     images -- Number of intermediate images. If != 1, frac is ignored.
 
-    Return value -- A new cell with the interpolated coordinates, or a list 
+    Return value -- A new cell with the interpolated coordinates, or a list
                     of cells if images != 1.
-    
+
     """
     import copy
     (latt, atoms) = check_cells(cell1, cell2)
@@ -164,7 +157,7 @@ def interpolate_cells(cell1, cell2, frac=0.5, images=1):
     images += 1
     for ii in range(1, images):
         icell = copy.deepcopy(cell1)
-        fr = float(ii) / images 
+        fr = float(ii) / images
         icell.set_scaled_positions((1 - fr) * cell1.get_scaled_positions() \
                 + fr * cell2.get_scaled_positions())
         icells.append(icell)
