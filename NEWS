@@ -4,6 +4,9 @@ vasputil X.Y (development version)
 
 * Python 3 compatibility.
 
+* Scripts now launced with /usr/bin/env python shebang, for
+  compatibility with Anaconda, virtualenv etc.
+
 ------------------------------------------------------------------------------
 
 vasputil 5.7, 2012-07-20
