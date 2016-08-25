@@ -2,6 +2,8 @@ vasputil X.Y (development version)
 
 * License is now LGPL 2.1, matching ASE.
 
+* Python 3 compatibility.
+
 ------------------------------------------------------------------------------
 
 vasputil 5.7, 2012-07-20
