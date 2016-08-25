@@ -15,13 +15,13 @@ import warnings
 
 class LDOS(object):
     """Class for representing a set of local DOS.
-    
-    DOS data is stored in the instance variable self.dos, which is a 3D 
+
+    DOS data is stored in the instance variable self.dos, which is a 3D
     ndarray, as follows:
     1st dim: Which atom.
     2nd dim: Selects the DOS grid point.
     3rd dim: 0 is the energy, 1-3 s, p, d DOS.
-        
+
     """
 
     def __init__(self, doscar="DOSCAR", efermi=0.0):
@@ -92,7 +92,7 @@ class LDOS(object):
 
     def get_dos(self, atom, orbital):
         """Return an NDOSx1 array with dos for the chosen atom and orbital.
-        
+
         If spin-unpolarized calculation, no phase factors:
         s = 1, p = 2, d = 3
         Spin-polarized, no phase factors:
@@ -100,7 +100,7 @@ class LDOS(object):
         If phase factors have been calculated, orbitals are
         s, py, pz, px, dxy, dyz, dz2, dxz, dx2
         double in the above fashion if spin polarized.
-        
+
         """
         return self.dos[atom, :, orbital]
 

@@ -22,7 +22,7 @@ def load_chg_plane(fname):
     # So we might need to reinterpolate on a regular grid
 
     # Original num of points in both X and Y directions.
-    n = np.sqrt(dat.shape[0]) 
+    n = np.sqrt(dat.shape[0])
     # x, y = meshgrid(dat[0:n, 0], dat[0:n, 1])
     x = dat[:,0]
     y = dat[:,1]

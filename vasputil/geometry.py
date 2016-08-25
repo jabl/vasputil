@@ -12,7 +12,7 @@ import numpy as np
 
 class Plane(object):
     """Class for representing a plane in 3D space."""
-    
+
     def __init__(self, points, normal=None):
         """Initialize plane.
 

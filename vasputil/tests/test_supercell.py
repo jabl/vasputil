@@ -49,12 +49,12 @@ class CellTestCase(unittest.TestCase):
     def test_atoms_distance_proj(self):
         """Test the atoms_distance method with a projection."""
         dist = s.atoms_distance(self.cell, 24, 9, "xy")
-        self.assertAlmostEqual(dist, 1.51230705052) 
+        self.assertAlmostEqual(dist, 1.51230705052)
 
     def test_atoms_distance_proj2(self):
         """Test the atoms_distance method with a projection defined by vector."""
         dist = s.atoms_distance(self.cell, 9, 24, (0,0,10))
-        self.assertAlmostEqual(dist, 1.16373136) 
+        self.assertAlmostEqual(dist, 1.16373136)
 
     def test_atoms_distance_pbc(self):
         dist = s.atoms_distance(self.cell, 2, 18)
@@ -68,17 +68,17 @@ class CellTestCase(unittest.TestCase):
 
     def test_nndist_nn(self):
         nnd = s.nearest_neighbors(self.cell, num_neigh=2)
-        self.assertEqual(nnd[0][0], 0) 
-        self.assertEqual(nnd[0][1], 29) 
-        self.assertEqual(nnd[1][0], 0) 
-        self.assertEqual(nnd[2][0], 1) 
+        self.assertEqual(nnd[0][0], 0)
+        self.assertEqual(nnd[0][1], 29)
+        self.assertEqual(nnd[1][0], 0)
+        self.assertEqual(nnd[2][0], 1)
 
     def test_coord_trans(self):
         self.assertEqual(array_almost_equal(
             np.linalg.solve(self.cell.get_cell().T, \
                             self.cell.get_positions().T).T % 1.0, \
             self.cell.get_scaled_positions()), True)
-        
+
 
 class RotateMolTestCase(unittest.TestCase):
     """Test the rotate_molecule function."""
