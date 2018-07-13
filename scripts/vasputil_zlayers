@@ -37,7 +37,8 @@ zc = c.positions[:,2] # Atom Z coordinates
 bins = int(np.ceil((zc.max() - zc.min())/dbin))
 histdat, levels = np.histogram(zc, bins)
 mask = histdat > tol * histdat.max()
-plev = levels[mask] + dbin/2
+plev = levels[:-1][mask]
+plev = np.array([np.mean(zc[np.logical_and(zc>=plev[i],zc<(plev[i]+dbin))]) for i in range(len(plev))])
 alayer = histdat[mask]
 layerdist = plev[1:] - plev[:-1]
 print("Z layer    Dprev  Atoms   %relax 1->2")
