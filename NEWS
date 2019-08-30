@@ -1,3 +1,12 @@
+vasputil 6.1, 2019-08-30
+
+* Scripts now launced with /usr/bin/env python3 shebang, as ASE 3.18
+  has dropped python 2 compatibility.
+
+* Bugfix in vasputil_zlayers from Erpan Arkin.
+
+------------------------------------------------------------------------------
+
 vasputil 6.0, 2016-08-25
 
 * License is now LGPL 2.1, matching ASE.
